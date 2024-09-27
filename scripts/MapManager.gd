@@ -231,12 +231,3 @@ func _input(event):
 	if event.is_action_pressed("ui_accept"):  # Default is Spacebar
 		get_tree().reload_current_scene()  # Restart the current scene
 	
-	# Handle hover tile positioning
-	var mouse_pos = get_global_mouse_position()
-	mouse_pos.y += 8
-	var tile_pos = $TileMap.local_to_map(mouse_pos)
-	if tile_pos.x >= 0 and tile_pos.x < grid_width and tile_pos.y >= 0 and tile_pos.y < grid_height:
-		hover_tile.position = $TileMap.map_to_local(tile_pos)  # Update hover tile position
-		hover_tile.visible = true  # Show hover tile
-	else:
-		hover_tile.visible = false  # Hide hover tile when out of bounds

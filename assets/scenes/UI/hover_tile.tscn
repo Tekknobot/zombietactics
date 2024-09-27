@@ -1,14 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://chnsxjmxvgdx"]
+[gd_scene load_steps=3 format=3 uid="uid://bd7mxhwplqa1j"]
 
 [ext_resource type="Script" path="res://scripts/HoverTile.gd" id="1_btw2b"]
 [ext_resource type="Texture2D" uid="uid://b3fmige5evt8r" path="res://assets/iso_tiles/ui/tile_hover.png" id="1_l22dc"]
-[ext_resource type="PackedScene" uid="uid://ib8voghedgm4" path="res://assets/scenes/UI/move_tile.tscn" id="2_1csrk"]
-[ext_resource type="PackedScene" uid="uid://cohpddt8alp72" path="res://assets/scenes/UI/attack_tile.tscn" id="3_h5nkq"]
 
-[node name="HoverTile" type="Node2D"]
-script = ExtResource("1_btw2b")
-walkable_tile_prefab = ExtResource("2_1csrk")
-attack_tile_prefab = ExtResource("3_h5nkq")
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="HoverTile" type="Sprite2D"]
 texture = ExtResource("1_l22dc")
+script = ExtResource("1_btw2b")

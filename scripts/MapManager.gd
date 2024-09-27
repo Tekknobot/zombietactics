@@ -37,6 +37,12 @@ var tower_spawned = false
 
 var map_ready = false
 
+# Array to store structure coordinates
+var structure_coordinates = []
+
+# Array to store water coordinates
+var water_coordinates = []
+
 # Called when the node enters the scene tree for the first time
 func _ready():
 	add_child(hover_tile)  # Add hover tile to the scene
@@ -45,7 +51,9 @@ func _ready():
 
 func generate_map():
 	clear_existing_structures()  # Clear previous structures
-	
+	structure_coordinates.clear()  # Clear the structure coordinates array
+	water_coordinates.clear()  # Clear the water coordinates array
+
 	# Reset structure spawn flags
 	district_spawned = false
 	stadium_spawned = false
@@ -62,6 +70,10 @@ func generate_map():
 			var noise_value = noise.get_noise_2d(x, y)
 			var tile_id = get_tile_id(noise_value)
 			set_tile(x, y, tile_id)
+
+			# If the tile is water, store its position in the water_coordinates array
+			if tile_id == WATER:
+				water_coordinates.append(Vector2i(x, y))
 
 	# Track the odd numbers already picked for roads
 	var picked_horizontal_odd_y = []
@@ -165,8 +177,8 @@ func spawn_structures():
 			# Get the tile ID based on the noise value for this position
 			var tile_id = $TileMap.get_cell_source_id(0, Vector2i(x, y))
 
-			# Only spawn on DIRT or GRASS and make sure the tile is not a road
-			if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id):
+			# Only spawn on DIRT or GRASS and make sure the tile is not a road or already occupied
+			if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id) and not is_occupied(Vector2i(x, y)):
 				if rng.randi_range(0, 100) < 50:  # 50% chance to spawn a structure
 					var structure_type = rng.randi_range(0, 4)
 					match structure_type:
@@ -191,6 +203,10 @@ func spawn_structures():
 func is_road(tile_id: int) -> bool:
 	return tile_id == DOWN_LEFT_ROAD or tile_id == DOWN_RIGHT_ROAD or tile_id == INTERSECTION
 
+# Check if a tile at (x, y) is already occupied by a structure
+func is_occupied(tile_pos: Vector2i) -> bool:
+	return tile_pos in structure_coordinates  # Check if the tile position is in the coordinates array
+
 func spawn_structure(scene: PackedScene, x: int, y: int):
 	var structure_instance = scene.instantiate()
 	
@@ -201,6 +217,9 @@ func spawn_structure(scene: PackedScene, x: int, y: int):
 	# Add the structure to the scene tree and assign it to a group for easy management
 	add_child(structure_instance)
 	structure_instance.add_to_group("structures")  # Add structure to "structures" group
+	
+	# Store the structure's coordinates
+	structure_coordinates.append(Vector2i(x, y))
 
 func clear_existing_structures():
 	# Remove all children that are in the "structures" group

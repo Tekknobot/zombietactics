@@ -15,14 +15,14 @@ var map_ready: bool = false  # Flag to check if map is ready
 # Maximum spawn counts for each unit type
 var max_soldiers: int = 1
 var max_mercenaries: int = 1
-var max_dogs: int = 6  # Maximum number of dogs to spawn
-var max_zombies: int = 16  # Updated for clarity
+var max_dogs: int = 1  # Maximum number of dogs to spawn
+var max_zombies: int = 9  # Updated for clarity
 
 # Number of zombie clusters to spawn
 var number_of_zombie_clusters: int = 3  # Adjust this to the desired number of zombie clusters
 
 # Define cluster parameters
-const CLUSTER_SIZE: int = 2  # Radius of the cluster (1 will create a 3x3 area)
+const CLUSTER_SIZE: int = 1  # Radius of the cluster (1 will create a 3x3 area)
 const ZOMBIE_PROXIMITY_LIMIT: int = 2  # Distance from zombies to avoid for soldiers and mercenaries
 
 var zombie_positions: Array = []  # Store positions of spawned zombies
@@ -44,6 +44,7 @@ func _on_map_generated():
 	spawn_zombie_clusters(number_of_zombie_clusters, max_zombies, ZOMBIE_SCENE)  # Spawn multiple clusters
 	spawn_soldier_cluster(max_soldiers, SOLDIER_SCENE)
 	spawn_mercenary_cluster(max_mercenaries, MERCENARY_SCENE)
+	spawn_dog_on_soldier_side(DOG_SCENE)  # Spawn one dog on the soldier's side
 
 # Spawn multiple clusters of zombies on one side of the map
 func spawn_zombie_clusters(num_clusters: int, max_count: int, zombie_scene: PackedScene):
@@ -80,69 +81,54 @@ func spawn_zombie_cluster(count: int, zombie_scene: PackedScene):
 					zombie_positions.append(spawn_tile_pos)  # Store zombie position
 					count -= 1  # Decrement the count of zombies left to spawn
 
-# Spawn a cluster of soldiers on the opposite side of the map
+# Function to spawn a cluster of soldiers on the opposite side of the map
 func spawn_soldier_cluster(count: int, soldier_scene: PackedScene):
-	# Randomly select a central tile for the cluster on the right side (x = 8 to 15)
-	var central_x = rng.randi_range(8, 16 - 1)  # Adjusted to limit x to right side
-	var central_y = rng.randi_range(0, 16 - 1)
-	var central_tile_pos = Vector2i(central_x, central_y)
+	var attempts: int = 0  # Track the number of attempts
+	while attempts < 10:  # Try up to 10 times to find a valid spawn point
+		var spawn_x = rng.randi_range(8, 15)
+		var spawn_y = rng.randi_range(0, 15)
+		var spawn_tile_pos = Vector2i(spawn_x, spawn_y)
 
-	# Debug print the central tile position
-	print("Central tile for soldier cluster: ", central_tile_pos)
+		# Ensure the tile is valid for spawning
+		var tile_id = tile_map.get_cell_source_id(0, spawn_tile_pos)
+		if is_valid_spawn_tile(spawn_tile_pos, tile_id):
+			spawn_unit(spawn_x, spawn_y, soldier_scene)
+			return  # Exit the function once spawned
+		attempts += 1  # Increment attempts
+	print("Failed to spawn soldier after 10 attempts.")
 
-	# Define cluster boundaries
-	for dx in range(-CLUSTER_SIZE, CLUSTER_SIZE + 1):
-		for dy in range(-CLUSTER_SIZE, CLUSTER_SIZE + 1):
-			if count <= 0:
-				return  # Stop if we've spawned enough soldiers
-
-			var spawn_x = central_x + dx
-			var spawn_y = central_y + dy
-			var spawn_tile_pos = Vector2i(spawn_x, spawn_y)
-
-			# Ensure we are within bounds of the map
-			if spawn_x >= 8 and spawn_x < 16 and spawn_y >= 0 and spawn_y < 16:  # Limit x to 8-15
-				var tile_id = tile_map.get_cell_source_id(0, spawn_tile_pos)
-
-				# Check if the tile is valid for spawning and not near zombies
-				if is_valid_spawn_tile(spawn_tile_pos, tile_id) and not is_near_zombie(spawn_tile_pos):
-					spawn_unit(spawn_x, spawn_y, soldier_scene)
-					count -= 1  # Decrement the count of soldiers left to spawn
-					
-					# After spawning a soldier, attempt to spawn dogs around it
-					spawn_dogs_around_unit(spawn_x, spawn_y, DOG_SCENE)
-
-# Spawn a cluster of mercenaries on the opposite side of the map
+# Function to spawn a cluster of mercenaries on the opposite side of the map
 func spawn_mercenary_cluster(count: int, mercenary_scene: PackedScene):
-	# Randomly select a central tile for the cluster on the right side (x = 8 to 15)
-	var central_x = rng.randi_range(8, 16 - 1)  # Adjusted to limit x to right side
-	var central_y = rng.randi_range(0, 16 - 1)
-	var central_tile_pos = Vector2i(central_x, central_y)
+	var attempts: int = 0  # Track the number of attempts
+	while attempts < 10:  # Try up to 10 times to find a valid spawn point
+		var spawn_x = rng.randi_range(8, 15)
+		var spawn_y = rng.randi_range(0, 15)
+		var spawn_tile_pos = Vector2i(spawn_x, spawn_y)
 
-	# Debug print the central tile position
-	print("Central tile for mercenary cluster: ", central_tile_pos)
+		# Ensure the tile is valid for spawning
+		var tile_id = tile_map.get_cell_source_id(0, spawn_tile_pos)
+		if is_valid_spawn_tile(spawn_tile_pos, tile_id):
+			spawn_unit(spawn_x, spawn_y, mercenary_scene)
+			return  # Exit the function once spawned
+		attempts += 1  # Increment attempts
+	print("Failed to spawn mercenary after 10 attempts.")
 
-	# Define cluster boundaries
-	for dx in range(-CLUSTER_SIZE, CLUSTER_SIZE + 1):
-		for dy in range(-CLUSTER_SIZE, CLUSTER_SIZE + 1):
-			if count <= 0:
-				return  # Stop if we've spawned enough mercenaries
+# Function to spawn a dog on the soldier's side of the map
+func spawn_dog_on_soldier_side(dog_scene: PackedScene):
+	var attempts: int = 0  # Track the number of attempts
+	while attempts < 10:  # Try up to 10 times to find a valid spawn point
+		# Randomly select a position around the soldier
+		var dog_x = rng.randi_range(8, 15)  # Same x range as soldiers and mercenaries
+		var dog_y = rng.randi_range(0, 15)
+		var dog_tile_pos = Vector2i(dog_x, dog_y)
 
-			var spawn_x = central_x + dx
-			var spawn_y = central_y + dy
-			var spawn_tile_pos = Vector2i(spawn_x, spawn_y)
-
-			# Ensure we are within bounds of the map
-			if spawn_x >= 8 and spawn_x < 16 and spawn_y >= 0 and spawn_y < 16:  # Limit x to 8-15
-				var tile_id = tile_map.get_cell_source_id(0, spawn_tile_pos)
-
-				# Check if the tile is valid for spawning and not near zombies
-				if is_valid_spawn_tile(spawn_tile_pos, tile_id) and not is_near_zombie(spawn_tile_pos):
-					spawn_unit(spawn_x, spawn_y, mercenary_scene)
-					count -= 1  # Decrement the count of mercenaries left to spawn
-					
-					# After spawning a mercenary, attempt to spawn dogs around it
-					spawn_dogs_around_unit(spawn_x, spawn_y, DOG_SCENE)
+		# Ensure we are within bounds of the map and valid for spawning
+		var tile_id = tile_map.get_cell_source_id(0, dog_tile_pos)
+		if is_valid_spawn_tile(dog_tile_pos, tile_id):
+			spawn_unit(dog_x, dog_y, dog_scene)
+			return  # Exit the function once spawned successfully
+		attempts += 1  # Increment attempts
+	print("Failed to spawn dog after 10 attempts.")  # Log if spawning fails after 10 attempts
 
 # Function to check if a position is too close to any zombies
 func is_near_zombie(tile_pos: Vector2i) -> bool:
@@ -152,30 +138,7 @@ func is_near_zombie(tile_pos: Vector2i) -> bool:
 			return true  # The position is too close to a zombie
 	return false  # The position is not too close to any zombies
 
-# Function to spawn dogs around a unit
-func spawn_dogs_around_unit(unit_x: int, unit_y: int, dog_scene: PackedScene):
-	# Define the relative positions for spawning dogs (N, S, E, W)
-	var relative_positions = [
-		Vector2i(0, 1),  # North
-		Vector2i(0, -1),  # South
-		Vector2i(1, 0),  # East
-		Vector2i(-1, 0)  # West
-	]
-
-	for position_offset in relative_positions:
-		var dog_x = unit_x + position_offset.x
-		var dog_y = unit_y + position_offset.y
-
-		# Ensure we are within bounds of the map
-		if dog_x >= 0 and dog_x < 16 and dog_y >= 0 and dog_y < 16:
-			var dog_tile_pos = Vector2i(dog_x, dog_y)
-			var tile_id = tile_map.get_cell_source_id(0, dog_tile_pos)
-
-			# Check if the tile is valid for spawning
-			if is_valid_spawn_tile(dog_tile_pos, tile_id):
-				spawn_unit(dog_x, dog_y, dog_scene)
-
-# Check if a tile is valid for spawning (not water or structure)
+# Check if a tile is valid for spawning (not water, not a structure, and not occupied)
 func is_valid_spawn_tile(tile_pos: Vector2i, tile_id: int) -> bool:
 	# Check if the tile is water
 	if is_water(tile_pos):
@@ -187,7 +150,12 @@ func is_valid_spawn_tile(tile_pos: Vector2i, tile_id: int) -> bool:
 		print("Tile is a structure. Skipping spawn at: ", tile_pos)
 		return false
 
-	# If tile is not water and not a structure, it's valid for spawning
+	# Check if the tile is already occupied by another unit
+	if is_occupied(tile_pos.x, tile_pos.y):
+		print("Tile is occupied. Skipping spawn at: ", tile_pos)
+		return false
+
+	# If tile is not water, not a structure, and not occupied, it's valid for spawning
 	return true
 
 # Check if a tile is water based on MapManager's water coordinates

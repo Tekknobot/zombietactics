@@ -19,6 +19,9 @@ const DOWN_RIGHT_ROAD = 8
 @onready var STADIUM_SCENE = preload("res://assets/scenes/prefab/stadium.scn")
 @onready var TOWER_SCENE = preload("res://assets/scenes/prefab/tower.scn")
 
+# Preload the hover tile scene
+@onready var hover_tile = preload("res://assets/scenes/UI/hover_tile.tscn").instantiate()
+
 # Grid dimensions
 var grid_width = 16
 var grid_height = 16
@@ -32,8 +35,12 @@ var district_spawned = false
 var stadium_spawned = false
 var tower_spawned = false
 
+@onready var ui_manager = $UIManager  # Ensure the path is correct
+
 # Called when the node enters the scene tree for the first time
 func _ready():
+	add_child(hover_tile)  # Add hover tile to the scene
+	hover_tile.visible = false  # Initially hide the hover tile
 	generate_map()
 
 func generate_map():
@@ -86,13 +93,24 @@ func get_unique_random_odd(max_value: int, picked_list: Array) -> int:
 
 # Helper function to generate a random odd number within a range
 func get_random_odd(max_value: int) -> int:
-	var rand_value = rng.randi_range(0, max_value - 1)
-	# Ensure the value is odd, if not make it odd
-	if rand_value % 2 == 0:
-		rand_value += 1
-	# Clamp to make sure it stays within the grid limits
-	return min(rand_value, max_value - 1)
+	var rand_value: int
+	var attempts: int = 0
+	const MAX_ATTEMPTS: int = 100  # Limit attempts to prevent infinite loop
 
+	# Loop until a valid odd number is found or attempts are exhausted
+	while attempts < MAX_ATTEMPTS:
+		rand_value = rng.randi_range(1, max_value - 1)
+		if rand_value % 2 == 0:
+			rand_value += 1  # Convert to odd if even
+
+		# Ensure the number is not 0 or 16
+		if rand_value != 0 and rand_value != 15:
+			return rand_value  # Valid odd number found
+
+		attempts += 1
+	
+	# If no valid odd number found, return a default value or handle the failure case appropriately
+	return -1  # Indicates failure if no valid number found
 
 func get_tile_id(noise_value: float) -> int:
 	# Determine the tile ID based on the noise value
@@ -141,7 +159,6 @@ func handle_road_tile(x: int, y: int, road_tile: int):
 		# Otherwise, place the road tile as normal
 		set_tile(x, y, road_tile)
 
-
 func spawn_structures():
 	for x in range(grid_width):
 		for y in range(grid_height):
@@ -188,7 +205,17 @@ func clear_existing_structures():
 	for structure in get_tree().get_nodes_in_group("structures"):
 		structure.queue_free()  # Remove the structure from the scene
 
-# Handle input for regenerating the map
+# Handle input for regenerating the map and hover functionality
 func _input(event):
 	if event.is_action_pressed("ui_accept"):  # Default is Spacebar
 		generate_map()
+	
+	# Handle hover tile positioning
+	var mouse_pos = get_global_mouse_position()
+	mouse_pos.y += 8
+	var tile_pos = $TileMap.local_to_map(mouse_pos)
+	if tile_pos.x >= 0 and tile_pos.x < grid_width and tile_pos.y >= 0 and tile_pos.y < grid_height:
+		hover_tile.position = $TileMap.map_to_local(tile_pos)  # Update hover tile position
+		hover_tile.visible = true  # Show hover tile
+	else:
+		hover_tile.visible = false  # Hide hover tile when out of bounds

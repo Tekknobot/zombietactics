@@ -15,6 +15,11 @@ var tilemap: TileMap = null
 var walkable_tile_prefab: PackedScene = preload("res://assets/scenes/UI/move_tile.tscn")
 var walkable_tiles: Array = []  # Stores references to walkable tile indicators
 
+# Reference to the unit's sprite
+var sprite: AnimatedSprite2D = null
+
+var last_position: Vector2  # Variable to store the last position of the unit
+
 # Called when the node enters the scene
 func _ready() -> void:
 	# Find the TileMap node in the scene
@@ -23,13 +28,18 @@ func _ready() -> void:
 	# Initialize the unit's position in the tile grid based on its current world position
 	tile_pos = tilemap.local_to_map(position)
 
+	# Reference the sprite (assuming it's a direct child of the unit)
+	sprite = $AnimatedSprite2D  # Adjust based on your node structure
+
 	# Set the initial z_index based on the tile position
 	update_z_index()
 
 	# Debugging: Print initial position
 	print("Unit initialized at tile: ", tile_pos)
+	
+	# Initialize the last position when the unit is ready
+	last_position = position	
 
-# Move the unit to a new tile position
 func move_to_tile(target_tile_pos: Vector2i) -> void:
 	if is_moving:
 		return  # Ignore input if the unit is currently moving
@@ -41,12 +51,21 @@ func move_to_tile(target_tile_pos: Vector2i) -> void:
 	if distance <= movement_range:
 		is_moving = true  # Lock the unit while it's moving
 
+		# Store the last position before moving
+		last_position = position
+
 		# Get the world position of the target tile
 		var target_world_pos = tilemap.map_to_local(target_tile_pos)
 
 		# Move the unit to the target tile's world position
 		position = target_world_pos
 
+		# Determine the direction of movement based on current and last position
+		if position.x > last_position.x:
+			scale.x = -1  # Facing right (East)
+		elif position.x < last_position.x:
+			scale.x = 1  # Facing left (West)
+		
 		# Update the unit's tile position
 		tile_pos = target_tile_pos
 
@@ -61,7 +80,7 @@ func move_to_tile(target_tile_pos: Vector2i) -> void:
 		print("Unit moved to tile: ", tile_pos)  # Debugging
 	else:
 		print("Target tile is out of range.")
-
+		
 # Update the z_index based on the unit's tile position
 func update_z_index() -> void:
 	# Typically, z-index is based on the y-coordinate so units further down are drawn on top

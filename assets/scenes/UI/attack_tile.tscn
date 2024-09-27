@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://cohpddt8alp72"]
+
+[ext_resource type="Script" path="res://scripts/HoverTile.gd" id="1_e8ycl"]
+[ext_resource type="Texture2D" uid="uid://6xil7xbbe3vx" path="res://assets/iso_tiles/ui/tile_hover_red.png" id="2_1cqos"]
+
+[node name="HoverTile" type="Node2D"]
+script = ExtResource("1_e8ycl")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_1cqos")

@@ -100,11 +100,11 @@ func get_tile_id(noise_value: float) -> int:
 		return WATER
 	elif noise_value < 0:
 		return SANDSTONE
-	elif noise_value < 0.3:
+	elif noise_value < 0.15:
 		return DIRT
-	elif noise_value < 0.6:
+	elif noise_value < 0.3:
 		return GRASS
-	elif noise_value < 0.9:
+	elif noise_value < 0.45:
 		return SNOW
 	else:
 		return ICE

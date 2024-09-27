@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bobi0fk5stbhe"
+path="res://.godot/imported/Dead Head.mp3-0d8f9bf44c43f5cd5df38f407734ebbb.mp3str"
+
+[deps]
+
+source_file="res://audio/Tracks/Dead Head.mp3"
+dest_files=["res://.godot/imported/Dead Head.mp3-0d8f9bf44c43f5cd5df38f407734ebbb.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0.0
+bpm=0.0
+beat_count=0
+bar_beats=4

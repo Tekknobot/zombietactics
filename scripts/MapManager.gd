@@ -35,7 +35,7 @@ var district_spawned = false
 var stadium_spawned = false
 var tower_spawned = false
 
-@onready var ui_manager = $UIManager  # Ensure the path is correct
+var map_ready = false
 
 # Called when the node enters the scene tree for the first time
 func _ready():
@@ -184,6 +184,8 @@ func spawn_structures():
 							if not tower_spawned:  # Only spawn one tower
 								spawn_structure(TOWER_SCENE, x, y)
 								tower_spawned = true
+								
+	map_ready = true
 
 # Helper function to check if a tile is a road tile
 func is_road(tile_id: int) -> bool:
@@ -205,10 +207,10 @@ func clear_existing_structures():
 	for structure in get_tree().get_nodes_in_group("structures"):
 		structure.queue_free()  # Remove the structure from the scene
 
-# Handle input for regenerating the map and hover functionality
+# Handle input for restarting the scene and hover functionality
 func _input(event):
 	if event.is_action_pressed("ui_accept"):  # Default is Spacebar
-		generate_map()
+		get_tree().reload_current_scene()  # Restart the current scene
 	
 	# Handle hover tile positioning
 	var mouse_pos = get_global_mouse_position()

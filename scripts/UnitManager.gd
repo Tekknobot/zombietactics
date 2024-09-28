@@ -79,21 +79,6 @@ func update_astar_grid() -> void:
 			var pos = Vector2i(x, y)
 			astar_grid.set_point_solid(pos, false)  # Set all points as walkable
 
-func _process(delta: float) -> void:
-	#_draw()
-	pass
-
-func _draw():
-	for x in range(astar_grid.size.x):
-		for y in range(astar_grid.size.y):
-			var grid_pos = Vector2(x, y)
-			var iso_pos = tilemap.map_to_local(grid_pos)  # Convert to isometric position
-			if astar_grid.is_point_solid(Vector2i(x, y)):
-				draw_rect(Rect2(iso_pos, Vector2(astar_grid.cell_size.x, astar_grid.cell_size.y)), Color(1, 0, 0, 0.5))  # Red for solid
-			else:
-				draw_rect(Rect2(iso_pos, Vector2(astar_grid.cell_size.y, astar_grid.cell_size.y)), Color(0, 1, 0, 0.5))  # Green for walkable
-
-
 # Function to move to a specific world position over time
 func move_to_position(target_world_pos: Vector2) -> void:
 	position = target_world_pos
@@ -242,15 +227,34 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		# Store the last position before moving
 		last_position = position
 
+		# Start the movement animation
+		sprite.play("move")  # Assuming the walking animation is named "walk"
+
 		# Move the unit along the calculated path
 		for point in path:
 			var target_world_pos = tilemap.map_to_local(point)
 			await move_to_position(target_world_pos)
+			
+		# Get the world position of the target tile
+		var target_world_pos = tilemap.map_to_local(target_tile_pos)			
+		# Move the unit to the target tile's world position
+		position = target_world_pos
+
+		# Determine the direction of movement based on current and last position
+		if position.x > last_position.x:
+			scale.x = -1  # Facing right (East)
+		elif position.x < last_position.x:
+			scale.x = 1  # Facing left (West)
 
 		# Update the unit's tile position after reaching the final point in the path
 		tile_pos = target_tile_pos
 		# Update the z_index based on the new tile position
 		update_z_index()
+
+		# Stop the movement animation and switch to idle animation
+		sprite.play("default")  # Assuming the idle animation is named "idle"
+		
+		is_moving = false  # Unlock the unit after movement
 
 		print("Unit moved to tile: ", tile_pos)  # Debugging
 	else:

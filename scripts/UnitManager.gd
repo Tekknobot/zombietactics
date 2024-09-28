@@ -4,7 +4,8 @@ extends Node2D
 enum State {
 	IDLE,
 	SELECTED,
-	MOVING
+	MOVING, 
+	ATTACKING
 }
 
 # Unit properties
@@ -13,7 +14,11 @@ var is_moving: bool = false  # Flag to check if the unit is currently moving
 var state: State = State.IDLE  # Current state of the unit
 
 # Public variables (can be adjusted per unit)
+# General properties for all units
+@export var attack_range: int = 1  # General attack range for all units
+@export var attack_damage: int = 5  # General attack damage for all units
 @export var movement_range: int = 3  # Default movement range
+@export var unit_type: String
 
 # Define public variables for target positions
 @export var first_target_position: Vector2i = Vector2i(-1, -1)  # Position of the first click
@@ -38,10 +43,28 @@ var last_position: Vector2  # Variable to store the last position of the unit
 
 var selected_unit: Node2D = null  # Track the currently selected unit
 
+# This flag is used to differentiate zombies from non-zombie units
+@export var is_zombie: bool
+var turn_manager: Node2D = null  # Reference to the TurnManager
+
 # Called when the node enters the scene
 func _ready() -> void:
-	# Find the TileMap and AStarGrid nodes in the scene
+	# Try to find the TileMap
 	tilemap = get_tree().get_root().get_node("MapManager/TileMap")  # Adjust path based on your scene structure
+	if tilemap == null:
+		print("Error: TileMap not found!")
+	else:
+		print("TileMap found: ", tilemap.name)
+
+	# Try to find the TurnManager
+	turn_manager = get_tree().get_root().get_node("MapManager/TurnManager")  # Adjust the path accordingly
+	if turn_manager == null:
+		print("Error: TurnManager not found!")
+	else:
+		print("TurnManager found: ", turn_manager.name)
+
+
+	# Create a new AStarGrid instance
 	astar_grid = AStarGrid2D.new()
 
 	# Initialize the unit's position in the tile grid based on its current world position
@@ -58,7 +81,9 @@ func _ready() -> void:
 
 	# Initialize the last position when the unit is ready
 	last_position = position  
-
+	
+	# Notify that this unit is ready
+	emit_signal("ready")
 	add_to_group("units")
 	
 	# Set up AStar grid
@@ -67,7 +92,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	tile_pos = tilemap.local_to_map(position)
 	update_z_index() 
-
+		
 # Function to update the AStar grid
 func update_astar_grid() -> void:
 	var grid_width = 16
@@ -276,11 +301,14 @@ func is_within_range(target_tile_pos: Vector2i) -> bool:
 	var distance = abs(tile_pos.x - target_tile_pos.x) + abs(tile_pos.y - target_tile_pos.y)
 	return distance <= movement_range
 
-# Move to tile function
+# Move to tile function, updated to check if it's the unit's turn
 func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
+	# Only allow movement during the unit's turn
+	if turn_manager != null and turn_manager.current_unit != self:
+		return  # Not this unit's turn, ignore the movement
+
 	if is_moving:
 		return  # Ignore input if the unit is currently moving
-
 
 	# Check if a valid path exists using the A* algorithm
 	var path = astar_grid.get_point_path(first_tile_pos, target_tile_pos)
@@ -319,6 +347,9 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		
 		is_moving = false  # Unlock the unit after movement
 
+		# Signal that the unit's turn is done
+		end_turn()
+
 		print("Unit moved to tile: ", tile_pos)  # Debugging
 	else:
 		print("No valid path to target tile.")  # Debugging message
@@ -328,3 +359,88 @@ func reset_targets() -> void:
 	first_target_position = Vector2i(-1, -1)  # Reset first target position
 	second_target_position = Vector2i(-1, -1)  # Reset second target position
 	active_target_position = Vector2i(-1, -1)  # Reset active target
+
+# Called when the unit's turn begins
+func start_turn() -> void:
+	state = State.IDLE  # The unit starts in the idle state
+	is_moving = false  # Ensure that the unit is not in the middle of a move
+	selected_unit = self  # Mark this unit as the selected one
+	# show_walkable_tiles()  # Show movement options
+	
+	# Zombie AI Logic (inside _process or any relevant method)
+	if is_zombie and state == State.IDLE:
+		# Check for players within attack range
+		if is_non_zombie_within_range():
+			state = State.ATTACKING
+			attack_nearest_player()  # Call the attack function when in range	
+		else:
+			move_to_nearest_non_zombie()
+
+# Called when the unit's turn ends
+func end_turn() -> void:
+	clear_walkable_tiles()  # Clear any walkable tile markers
+	selected_unit = null  # Deselect the unit
+	state = State.IDLE  # Reset state to idle
+
+	turn_manager = get_tree().get_root().get_node("MapManager/TurnManager")  # Adjust the path accordingly
+	
+	if turn_manager != null:
+		print("Ending turn for unit: ", self.name)  # Debugging: which unit is ending its turn
+		turn_manager.end_current_unit_turn()  # Signal the TurnManager
+	else:
+		print("Error: turn_manager is null.")  # Debugging: check if turn_manager is assigned
+
+# Check if any non-zombie units are within range (for zombie behavior)
+func is_non_zombie_within_range() -> bool:
+	for non_zombie_unit in get_tree().get_nodes_in_group("units"):  # Assuming non-zombie units are in the "units" group
+		if non_zombie_unit.has_method("is_zombie") and not non_zombie_unit.is_zombie():
+			if tile_pos.distance_to(non_zombie_unit.tile_pos) <= attack_range:
+				return true
+	return false
+
+# Move towards the nearest non-zombie unit
+func move_to_nearest_non_zombie() -> void:
+	var nearest_unit: Node2D = null
+	var nearest_distance = INF  # Start with a large distance
+
+	# Iterate through all units in the group
+	for unit in get_tree().get_nodes_in_group("units"):
+		if unit.is_zombie:
+			continue  # Skip zombie units
+
+		var distance = tile_pos.distance_to(unit.tile_pos)  # Calculate distance to unit
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest_unit = unit  # Update nearest non-zombie unit
+
+	if nearest_unit:
+		# Only move if the nearest unit is within a certain range
+		if nearest_distance <= movement_range:
+			# Move towards the nearest unit's tile position
+			var target_tile_pos = nearest_unit.tile_pos
+			move_to_tile(tile_pos, target_tile_pos)  # Move to the non-zombie unit's tile
+			print("Zombie moving to nearest non-zombie unit at position: ", target_tile_pos)
+		else:
+			print("No non-zombie units within movement range.")
+			end_turn()
+	else:
+		print("No non-zombie units found.")
+		end_turn()
+		
+# Zombie AI
+# Attack the nearest player (for zombie behavior)
+func attack_nearest_player() -> void:
+	var nearest_player: Node2D = null
+	var nearest_distance = INF  # Use a very high number as initial distance
+
+	for player in get_tree().get_nodes_in_group("players"):
+		var distance = tile_pos.distance_to(player.tile_pos)
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest_player = player
+
+	if nearest_player:
+		# Play attack animation
+		sprite.play("attack")  # Adjust to your animation name
+		nearest_player.take_damage(attack_damage)  # Assuming the player has a take_damage method
+		print("Zombie attacked player at position: ", nearest_player.tile_pos)

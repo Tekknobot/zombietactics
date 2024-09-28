@@ -7,6 +7,8 @@ extends Node2D
 @onready var tile_map = get_node("/root/MapManager/TileMap")  # Adjust path based on your scene structure
 @onready var map_manager = get_node("/root/MapManager")  # Reference to MapManager to access structure coordinates
 
+var TurnManagerScene = preload("res://assets/scenes/prefab/turn_manager.tscn")
+
 const WATER = 0  # Ensure this matches the correct ID for water tiles
 
 var rng = RandomNumberGenerator.new()
@@ -41,10 +43,14 @@ func _process(delta: float):
 
 # Function called when the map generation is complete
 func _on_map_generated():
-	spawn_zombie_clusters(number_of_zombie_clusters, max_zombies, ZOMBIE_SCENE)  # Spawn multiple clusters
-	spawn_soldier_cluster(max_soldiers, SOLDIER_SCENE)
-	spawn_mercenary_cluster(max_mercenaries, MERCENARY_SCENE)
-	spawn_dog_on_soldier_side(DOG_SCENE)  # Spawn one dog on the soldier's side
+	await spawn_zombie_clusters(number_of_zombie_clusters, max_zombies, ZOMBIE_SCENE)  # Spawn multiple clusters
+	await spawn_soldier_cluster(max_soldiers, SOLDIER_SCENE)
+	await spawn_mercenary_cluster(max_mercenaries, MERCENARY_SCENE)
+	await spawn_dog_on_soldier_side(DOG_SCENE)  # Spawn one dog on the soldier's side
+	
+	# After spawning units, instantiate and add the TurnManager
+	var turn_manager_instance = TurnManagerScene.instantiate()
+	get_parent().add_child(turn_manager_instance)
 
 # Spawn multiple clusters of zombies on one side of the map
 func spawn_zombie_clusters(num_clusters: int, max_count: int, zombie_scene: PackedScene):

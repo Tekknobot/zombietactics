@@ -51,10 +51,10 @@ func spawn_zombie_clusters(num_clusters: int, max_count: int, zombie_scene: Pack
 	for cluster_index in range(num_clusters):
 		spawn_zombie_cluster(max_count, zombie_scene)  # Call existing function to spawn each cluster
 
-# Spawn a single cluster of zombies
+# Spawn a single cluster of zombies with slight scattering and random facing direction
 func spawn_zombie_cluster(count: int, zombie_scene: PackedScene):
 	# Randomly select a central tile for the cluster on the left side (x = 0 to 7)
-	var central_x = rng.randi_range(0, 7)  # Adjusted to limit x to left side
+	var central_x = rng.randi_range(0, 7)  # Limit x to left side
 	var central_y = rng.randi_range(0, 16 - 1)
 	var central_tile_pos = Vector2i(central_x, central_y)
 
@@ -67,18 +67,24 @@ func spawn_zombie_cluster(count: int, zombie_scene: PackedScene):
 			if count <= 0:
 				return  # Stop if we've spawned enough zombies
 
-			var spawn_x = central_x + dx
-			var spawn_y = central_y + dy
-			var spawn_tile_pos = Vector2i(spawn_x, spawn_y)
+			# Apply a small random offset for scattering
+			var scatter_offset_x = rng.randi_range(-1, 1) * 0.25  # Small offset
+			var scatter_offset_y = rng.randi_range(-1, 1) * 0.25
 
-			# Ensure we are within bounds of the map
-			if spawn_x >= 0 and spawn_x < 8 and spawn_y >= 0 and spawn_y < 16:  # Limit x to 0-7
+			var spawn_x = central_x + dx + scatter_offset_x
+			var spawn_y = central_y + dy + scatter_offset_y
+			var spawn_tile_pos = Vector2i(floor(spawn_x), floor(spawn_y))  # Convert to integer tile positions
+
+			# Ensure we are within bounds of the map (with scatter, still constrained to the left side)
+			if spawn_x >= 0 and spawn_x < 8 and spawn_y >= 0 and spawn_y < 16:
 				var tile_id = tile_map.get_cell_source_id(0, spawn_tile_pos)
 
 				# Check if the tile is valid for spawning
 				if is_valid_spawn_tile(spawn_tile_pos, tile_id):
-					spawn_unit(spawn_x, spawn_y, zombie_scene)
+					# Spawn the zombie at the scattered position
+					var zombie = spawn_unit(spawn_x, spawn_y, zombie_scene)
 					zombie_positions.append(spawn_tile_pos)  # Store zombie position
+
 					count -= 1  # Decrement the count of zombies left to spawn
 
 # Function to spawn a cluster of soldiers on the opposite side of the map
@@ -187,6 +193,13 @@ func spawn_unit(x: int, y: int, unit_scene: PackedScene):
 	var unit_instance = unit_scene.instantiate()
 	var local_position = tile_map.map_to_local(Vector2i(x, y))
 	unit_instance.position = local_position
+	
+	# Randomize zombie facing direction (flipping sprite)
+	if rng.randf() > 0.5:
+		unit_instance.scale.x = -1  # Face left
+	else:
+		unit_instance.scale.x = 1   # Face right
+	
 	add_child(unit_instance)
 
 # Check if a tile at (x, y) is already occupied by another unit

@@ -66,8 +66,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	tile_pos = tilemap.local_to_map(position)
-	self.z_index = (tile_pos.x + tile_pos.y) + 1
-	update_astar_grid()
+	update_z_index() 
 
 # Function to update the AStar grid
 func update_astar_grid() -> void:
@@ -127,6 +126,8 @@ func move_to_position(target_world_pos: Vector2) -> void:
 
 	is_moving = false  # Unlock the unit after movement
 	state = State.IDLE  # Return to idle state
+	
+	update_astar_grid()
 
 # Update the z_index based on the unit's tile position
 func update_z_index() -> void:
@@ -142,17 +143,30 @@ func show_walkable_tiles() -> void:
 			if abs(x_offset) + abs(y_offset) <= movement_range:
 				var walkable_tile_pos = tile_pos + Vector2i(x_offset, y_offset)
 
-				# Only instantiate if the position is valid on the map and not occupied
-				if tilemap.get_used_rect().has_point(walkable_tile_pos) and is_walkable(walkable_tile_pos):
-					var walkable_tile = walkable_tile_prefab.instantiate()
-					var walkable_world_pos = tilemap.map_to_local(walkable_tile_pos)
-					walkable_tile.position = walkable_world_pos
+				# Only instantiate if the position is valid on the map
+				if tilemap.get_used_rect().has_point(walkable_tile_pos):
+					# Check if the tile is walkable
+					if is_walkable(walkable_tile_pos):
+						var walkable_tile = walkable_tile_prefab.instantiate()
+						var walkable_world_pos = tilemap.map_to_local(walkable_tile_pos)
+						walkable_tile.position = walkable_world_pos
 
-					# Add the walkable tile to the TileMap
-					tilemap.add_child(walkable_tile)
-					walkable_tiles.append(walkable_tile)
+						# Add the walkable tile to the TileMap
+						tilemap.add_child(walkable_tile)
+						walkable_tiles.append(walkable_tile)
 
-					print("Placing walkable tile at: ", walkable_tile_pos)  # Debugging line
+						print("Placing walkable tile at: ", walkable_tile_pos)  # Debugging line
+					else:
+						# Set the tile as solid (assuming you have a method or property to do this)
+						set_tile_solid(walkable_tile_pos)
+
+# Function to set the tile at a given position to solid
+func set_tile_solid(tile_pos: Vector2i) -> void:
+	# You may need to adjust this based on your tilemap settings
+	# For example, setting a specific tile index that is solid
+	astar_grid.set_point_solid(tile_pos, true)  # Assuming `solid_tile_index` is the index of your solid tile
+
+	print("Setting tile at: ", tile_pos, " to solid.")  # Debugging line
 
 # Clear all walkable tile markers
 func clear_walkable_tiles() -> void:
@@ -162,6 +176,20 @@ func clear_walkable_tiles() -> void:
 
 # Check if the tile is walkable
 func is_walkable(tile_pos: Vector2i) -> bool:
+	# Calculate the Manhattan distance between the current tile and the target tile
+	var distance = abs(tile_pos.x - self.tile_pos.x) + abs(tile_pos.y - self.tile_pos.y)
+	
+	# Ensure the tile is within movement range
+	if distance > movement_range:
+		return false  # If the tile is beyond movement range, it is not walkable
+
+	# Check if the tile position is in the list of walkable tiles
+	for walkable_tile in walkable_tiles:
+		# Check if the current walkable tile matches the position being checked
+		if walkable_tile.position == tilemap.map_to_local(tile_pos):
+			return true  # If the tile is a walkable tile, return true
+
+	# If no walkable tiles match, check other conditions: not water, not a structure, and not a unit present
 	return not is_water(tile_pos) and not is_structure(tile_pos) and not is_unit_present(tile_pos)
 
 # Check if the tile is water
@@ -253,6 +281,7 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 	if is_moving:
 		return  # Ignore input if the unit is currently moving
 
+
 	# Check if a valid path exists using the A* algorithm
 	var path = astar_grid.get_point_path(first_tile_pos, target_tile_pos)
 	if path.size() > 0:
@@ -262,13 +291,13 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		last_position = position
 
 		# Start the movement animation
-		sprite.play("move")  # Assuming the walking animation is named "walk"
+		sprite.play("move")  # Assuming the walking animation is named "move"
 
 		# Move the unit along the calculated path
 		for point in path:
 			var target_world_pos = tilemap.map_to_local(point)
 			await move_to_position(target_world_pos)
-			
+
 		# Get the world position of the target tile
 		var target_world_pos = tilemap.map_to_local(target_tile_pos)			
 		# Move the unit to the target tile's world position

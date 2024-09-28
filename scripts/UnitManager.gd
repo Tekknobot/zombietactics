@@ -64,6 +64,11 @@ func _ready() -> void:
 	# Set up AStar grid
 	update_astar_grid()
 
+func _process(delta: float) -> void:
+	tile_pos = tilemap.local_to_map(position)
+	self.z_index = (tile_pos.x + tile_pos.y) + 1
+	update_astar_grid()
+
 # Function to update the AStar grid
 func update_astar_grid() -> void:
 	var grid_width = 16
@@ -74,22 +79,51 @@ func update_astar_grid() -> void:
 	astar_grid.diagonal_mode = 1
 	astar_grid.update()
 	
+	# Update walkable and unwalkable cells
 	for x in 16:
 		for y in 16:
-			var pos = Vector2i(x, y)
-			astar_grid.set_point_solid(pos, false)  # Set all points as walkable
+			var tile_id = tilemap.get_cell_source_id(0, Vector2i(x, y))
+			if tile_id == -1 or tile_id == 0 or is_structure(Vector2i(x, y)) or is_unit_present(Vector2i(x, y)):
+				astar_grid.set_point_solid(Vector2i(x, y), true)
+			else:
+				astar_grid.set_point_solid(Vector2i(x, y), false)# Set all points as walkable
 
-# Function to move to a specific world position over time
+# Smooth movement function
 func move_to_position(target_world_pos: Vector2) -> void:
-	position = target_world_pos
-	# Determine the direction of movement based on current and last position
-	if position.x > last_position.x:
+	is_moving = true  # Lock the unit during movement
+	state = State.MOVING  # Change to moving state
+
+	# Calculate direction to move in (normalized vector)
+	var direction = (target_world_pos - position).normalized()
+
+	# Determine the direction of movement based on target and current position
+	if direction.x > 0:
 		scale.x = -1  # Facing right (East)
-	elif position.x < last_position.x:
+	elif direction.x < 0:
 		scale.x = 1  # Facing left (West)
 
-	# Simulate movement time (0.5 seconds in this case)
-	await get_tree().create_timer(0.5).timeout
+	# Define movement speed (units per second)
+	var speed = 50  # Adjust speed as needed
+
+	# Move in a loop until the position is close enough to the target
+	while position.distance_to(target_world_pos) > 2:  # Threshold to avoid overshooting
+		var delta = get_process_delta_time()
+
+		# Calculate movement step based on speed and delta
+		var move_step = direction * speed * delta
+
+		# Move the object toward the target position
+		position += move_step
+
+		# Ensure we're not overshooting the target
+		if position.distance_to(target_world_pos) < move_step.length():
+			position = target_world_pos
+
+		# Await the next frame before continuing the loop
+		await get_tree().process_frame
+
+	# Ensure the object reaches the exact target position at the end
+	position = target_world_pos
 
 	is_moving = false  # Unlock the unit after movement
 	state = State.IDLE  # Return to idle state

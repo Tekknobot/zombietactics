@@ -72,15 +72,27 @@ func update_astar_grid() -> void:
 	astar_grid.cell_size = Vector2(1, 1)
 	astar_grid.default_compute_heuristic = 1
 	astar_grid.diagonal_mode = 1
+	astar_grid.update()
 	
-	# Update walkable and unwalkable cells
-	for x in range(grid_width):
-		for y in range(grid_height):
-			var tile_id = tilemap.get_cell_source_id(0, Vector2i(x, y))
-			if tile_id == -1 or tile_id == 0:
-				astar_grid.set_point_solid(Vector2i(x, y), true)
+	for x in 16:
+		for y in 16:
+			var pos = Vector2i(x, y)
+			astar_grid.set_point_solid(pos, false)  # Set all points as walkable
+
+func _process(delta: float) -> void:
+	#_draw()
+	pass
+
+func _draw():
+	for x in range(astar_grid.size.x):
+		for y in range(astar_grid.size.y):
+			var grid_pos = Vector2(x, y)
+			var iso_pos = tilemap.map_to_local(grid_pos)  # Convert to isometric position
+			if astar_grid.is_point_solid(Vector2i(x, y)):
+				draw_rect(Rect2(iso_pos, Vector2(astar_grid.cell_size.x, astar_grid.cell_size.y)), Color(1, 0, 0, 0.5))  # Red for solid
 			else:
-				astar_grid.set_point_solid(Vector2i(x, y), false)
+				draw_rect(Rect2(iso_pos, Vector2(astar_grid.cell_size.y, astar_grid.cell_size.y)), Color(0, 1, 0, 0.5))  # Green for walkable
+
 
 # Function to move to a specific world position over time
 func move_to_position(target_world_pos: Vector2) -> void:

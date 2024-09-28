@@ -349,7 +349,10 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		sprite.play("default")  # Assuming the idle animation is named "idle"
 		
 		is_moving = false  # Unlock the unit after movement
-
+		
+		if is_zombie:
+			self.has_moved = true
+		
 		# Signal that the unit's turn is done
 		end_turn()
 

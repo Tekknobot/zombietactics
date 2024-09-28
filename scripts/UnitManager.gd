@@ -43,6 +43,8 @@ var last_position: Vector2  # Variable to store the last position of the unit
 
 var selected_unit: Node2D = null  # Track the currently selected unit
 
+var has_moved
+
 # This flag is used to differentiate zombies from non-zombie units
 @export var is_zombie: bool
 var turn_manager: Node2D = null  # Reference to the TurnManager
@@ -180,7 +182,7 @@ func show_walkable_tiles() -> void:
 						tilemap.add_child(walkable_tile)
 						walkable_tiles.append(walkable_tile)
 
-						print("Placing walkable tile at: ", walkable_tile_pos)  # Debugging line
+						# print("Placing walkable tile at: ", walkable_tile_pos)  # Debugging line
 					else:
 						# Set the tile as solid (assuming you have a method or property to do this)
 						set_tile_solid(walkable_tile_pos)

@@ -94,6 +94,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	tile_pos = tilemap.local_to_map(position)
 	update_z_index() 
+	update_astar_grid()
 		
 # Function to update the AStar grid
 func update_astar_grid() -> void:
@@ -356,6 +357,41 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 	else:
 		print("No valid path to target tile.")  # Debugging message
 
+# Move to a random tile function
+func move_to_random_tile() -> void:
+	# Only allow movement during the unit's turn
+	if turn_manager != null and turn_manager.current_unit != self:
+		return  # Not this unit's turn, ignore the movement
+
+	if is_moving:
+		return  # Ignore input if the unit is currently moving
+
+	var valid_tiles: Array = []  # Array to store walkable tiles within movement range
+
+	# Loop over all possible tiles within movement range using Manhattan distance
+	for x_offset in range(-movement_range, movement_range + 1):
+		for y_offset in range(-movement_range, movement_range + 1):
+			if abs(x_offset) + abs(y_offset) <= movement_range:
+				var target_tile_pos = tile_pos + Vector2i(x_offset, y_offset)
+
+				# Only consider valid tiles within the bounds of the tilemap
+				if tilemap.get_used_rect().has_point(target_tile_pos) and is_walkable(target_tile_pos):
+					valid_tiles.append(target_tile_pos)  # Add to valid tiles if walkable
+
+	# Check if there are any valid tiles
+	if valid_tiles.size() == 0:
+		print("No valid tiles available for movement.")  # Debugging
+		return
+
+	# Select a random tile from the valid tiles
+	var random_target_tile_pos = valid_tiles[randi() % valid_tiles.size()]
+
+	# Move to the randomly selected tile
+	move_to_tile(tile_pos, random_target_tile_pos)
+
+	print("Unit will move to random tile: ", random_target_tile_pos)  # Debugging
+
+
 # Reset target positions
 func reset_targets() -> void:
 	first_target_position = Vector2i(-1, -1)  # Reset first target position
@@ -423,11 +459,11 @@ func move_to_nearest_non_zombie() -> void:
 			move_to_tile(tile_pos, target_tile_pos)  # Move to the non-zombie unit's tile
 			print("Zombie moving to nearest non-zombie unit at position: ", target_tile_pos)
 		else:
+			move_to_random_tile()
 			print("No non-zombie units within movement range.")
-			end_turn()
 	else:
 		print("No non-zombie units found.")
-		end_turn()
+
 		
 # Zombie AI
 # Attack the nearest player (for zombie behavior)

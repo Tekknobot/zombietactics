@@ -228,6 +228,7 @@ func clear_existing_structures():
 
 # Handle input for restarting the scene and hover functionality
 func _input(event):
-	if event.is_action_pressed("ui_accept"):  # Default is Spacebar
-		get_tree().reload_current_scene()  # Restart the current scene
+	if event.is_action_pressed("ui_accept"):  # Default is Spacebar		
+		GlobalManager.reload_scene()  # Restart the current scene
+
 	

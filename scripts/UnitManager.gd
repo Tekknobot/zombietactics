@@ -361,7 +361,7 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		else:
 			GlobalManager.end_current_unit_turn()
 	else:
-		move_to_random_tile()
+		sprite.play("attack")
 		print("No valid path to target tile.")  # Debugging message
 
 
@@ -462,6 +462,9 @@ func perform_attack(target_tile: Vector2i) -> void:
 			print(unit.unit_type + " attacked at tile: ", target_tile)
 			break  # Exit after attacking the first target unit on the tile
 
+	await get_tree().create_timer(0.5).timeout
+	sprite.play("default")
+
 # Method to take damage (should be part of your player unit script)
 func take_damage(amount: int) -> void:
 	# Assuming you have a health property
@@ -480,8 +483,9 @@ func die() -> void:
 	# Wait for the death animation to finish (adjust duration if necessary)
 	await get_tree().create_timer(0.5).timeout  # Wait for the death animation to finish
 
-	# Spawn the explosion at the unit's current position
-	spawn_explosion(position)  # Pass the current position of the unit
+	if self.unit_type == "Dog":
+		# Spawn the explosion at the unit's current position
+		spawn_explosion(position)  # Pass the current position of the unit
 
 	# Update units in GlobalManager
 	if GlobalManager.units.has(self):  # Check if this unit is in the global list before removing
@@ -524,7 +528,7 @@ func move_to_nearest_non_zombie() -> void:
 			move_to_random_tile()
 			print("No walkable tiles within range found around the non-zombie unit.")
 	else:
-		move_to_random_tile()
+		#move_to_random_tile()
 		print("No non-zombie units found.")
 
 # Function to get walkable tile around a given tile position, within movement range
@@ -560,9 +564,10 @@ func spawn_explosion(position: Vector2) -> void:
 		var explosion_instance = explosion_scene.instantiate()  # This should be valid
 		
 		# Offset the explosion position on the Y-axis
-		var offset_y = 10  # Change this value to adjust the height of the explosion
+		var offset_y = 16  # Change this value to adjust the height of the explosion
 		explosion_instance.position = Vector2(position.x, position.y - offset_y)  # Adjust the position by offset
-
+		explosion_instance.z_index = (tile_pos.x + tile_pos.y) + 1
+		
 		# Add the explosion instance to the MapManager
 		get_tree().get_root().get_node("MapManager").add_child(explosion_instance)
 	else:

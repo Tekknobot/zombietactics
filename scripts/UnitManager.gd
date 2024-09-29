@@ -468,13 +468,15 @@ func die() -> void:
 
 	# Optionally, you can check if the animation is finished before continuing.
 	# This assumes your animation has a specific length; replace '2' with your animation duration if needed.
-	await get_tree().create_timer(2).timeout  # Wait for the death animation to finish
+	await get_tree().create_timer(0.5).timeout  # Wait for the death animation to finish
 
 	# Update units in GlobalManager
 	if GlobalManager.units.has(self):  # Check if this unit is in the global list before removing
 		GlobalManager.units.erase(self)  # Remove this unit from the global list of units
 
 	queue_free()  # Remove the unit from the scene
+	
+	GlobalManager.current_unit_index = 0
 
 # Called when the unit's turn ends
 func end_turn() -> void:

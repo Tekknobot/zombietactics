@@ -436,18 +436,6 @@ func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
 
 # Perform the attack on the target unit
 func perform_attack(target_tile: Vector2i) -> void:
-	# Get the local position of the target tile
-	var target_position = tilemap.map_to_local(target_tile)  # Assuming tile_size is the size of each tile in pixels
-
-	# Determine the direction of the attack
-	var direction = target_position - self.position  # Assuming global_position gives the unit's position in the world
-
-	# Flip the sprite based on the direction
-	if direction.x > 0 and sprite.flip_h:  # Target is to the right and currently facing left
-		sprite.flip_h = true  # Flip to face right
-	elif direction.x < 0 and not sprite.flip_h:  # Target is to the left and currently facing right
-		sprite.flip_h = false  # Flip to face left
-
 	# Play the attack animation
 	sprite.play("attack")  # Play the attack animation
 
@@ -476,11 +464,13 @@ func die() -> void:
 	# Play the death animation
 	sprite.play("death")  # Play the death animation
 
-	# Wait for a specified duration (e.g., 2 seconds) before removing
+	# Optionally, you can check if the animation is finished before continuing.
+	# This assumes your animation has a specific length; replace '2' with your animation duration if needed.
 	await get_tree().create_timer(2).timeout  # Wait for the death animation to finish
 
 	# Update units in GlobalManager
-	GlobalManager.units.erase(self)  # Remove this unit from the global list of units
+	if GlobalManager.units.has(self):  # Check if this unit is in the global list before removing
+		GlobalManager.units.erase(self)  # Remove this unit from the global list of units
 
 	queue_free()  # Remove the unit from the scene
 

@@ -28,43 +28,39 @@ func start_turns() -> void:
 	phase = TurnPhase.PLAYER_TURN  # Ensure we start with player turn
 	start_next_turn()  # Start the first player's turn
 
-# Handles the start of the next unit's turn
 func start_next_turn() -> void:
 	match phase:
 		TurnPhase.PLAYER_TURN:
-			# Look for the next player unit that hasn't moved
 			var next_unit = null
 			for unit in non_zombie_units:
 				if !unit.has_moved:
 					next_unit = unit
-					break  # Found a unit that hasn't moved yet
-			
+					break
+
 			if next_unit != null:
 				current_unit = next_unit
-				print("Player's unit turn: ", current_unit.name)
-				current_unit.call_deferred("start_turn")  # Start player unit's turn
+				current_unit.call_deferred("start_turn")
 			else:
-				# If all player units have moved, switch to the enemy phase
-				print("All player units have moved, switching to enemy phase.")
-				phase = TurnPhase.ENEMY_TURN  # Switch to enemy turn phase
-				start_enemy_turns()  # Start enemy turns
+				phase = TurnPhase.ENEMY_TURN
+				start_enemy_turns()
 
 		TurnPhase.ENEMY_TURN:
-			# Look for the next zombie unit that hasn't moved
 			var next_zombie = null
 			for unit in zombie_units:
 				if !unit.has_moved:
 					next_zombie = unit
-					break  # Found a zombie unit that hasn't moved yet
+					break
 
 			if next_zombie != null:
 				current_unit = next_zombie
-				print("Enemy's unit turn: ", current_unit.name)
-				current_unit.call_deferred("start_turn")  # Start enemy unit's turn
+				current_unit.call_deferred("start_turn")
 			else:
-				# If all enemy units have acted, reset the turn cycle
-				print("All enemy units have acted, resetting turn cycle.")
-				end_turns()  # End the enemy phase and restart the turn cycle
+				if phase == TurnPhase.ENEMY_TURN:
+					print("All enemy units have acted, resetting turn cycle.")
+					end_turns()
+				else:
+					print("Turn cycle stuck, forcing reset.")
+					end_turns()
 
 # Start enemy turns after all player units have moved
 func start_enemy_turns() -> void:

@@ -292,7 +292,7 @@ func _input(event: InputEvent) -> void:
 					
 					selected_unit = null  # Deselect the unit after movement
 					print("Unit moved to second target position: ", second_target_position)  # Debugging
-				else:
+				elif !is_walkable(temp_second_target):
 					print("No Walkable tile.")
 
 # Function to check if the target tile is within movement range
@@ -414,7 +414,10 @@ func check_for_attack() -> void:
 	for target_tile in adjacent_positions:
 		if is_tile_occupied_by_player(target_tile):
 			perform_attack(target_tile)  # Attack if a player unit is found
-
+		elif is_tile_occupied_by_zombie(target_tile):
+			perform_attack(target_tile)  # Attack if a zombie unit is found
+		
+		
 # Check if a given tile is occupied by a player unit
 func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
 	for unit in get_tree().get_nodes_in_group("units"):
@@ -422,21 +425,32 @@ func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
 			return true  # Tile is occupied by a player unit
 	return false  # No player unit on the tile
 
-# Perform the attack on the target unit (non-zombies only)
+# Check if a given tile is occupied by a zombie unit
+func is_tile_occupied_by_zombie(tile_pos: Vector2i) -> bool:
+	for unit in get_tree().get_nodes_in_group("units"):
+		if unit.is_zombie and unit.tile_pos == tile_pos:  # Check if it's a non-zombie unit
+			return true  # Tile is occupied by a player unit
+	return false  # No player unit on the tile
+
+
+# Perform the attack on the target unit (players attack zombies, zombies attack players)
 func perform_attack(target_tile: Vector2i) -> void:
 	# Play the attack animation
 	sprite.play("attack")  # Play the attack animation
 
-	# Determine the target type (non-zombies only)
-	var target_is_zombie = !is_zombie  # If this unit is a player, attack zombies; if a zombie, attack players
+	# Determine the target type based on this unit's type:
+	# If the attacker is a zombie, it should attack non-zombies (players).
+	# If the attacker is a player, it should attack zombies.
+	var target_is_zombie = !is_zombie  # Invert the current unit type to determine target type
 
-	# Find the correct non-zombie unit to deal damage
+	# Find the correct target unit to deal damage to
 	for unit in get_tree().get_nodes_in_group("units"):
-		# Attack only non-zombie units that match the target tile position
-		if not unit.is_zombie and unit.tile_pos == target_tile:
-			unit.take_damage(attack_damage)  # Apply damage to the non-zombie target unit
-			print("Non-Zombie " + unit.unit_type + " attacked at tile: ", target_tile)
-			break  # Exit after attacking the first adjacent non-zombie target unit
+		# Attack only the unit of the opposite type that is on the target tile
+		if unit.is_zombie == target_is_zombie and unit.tile_pos == target_tile:
+			unit.take_damage(attack_damage)  # Apply damage to the target unit
+			print(unit.unit_type + " attacked at tile: ", target_tile)
+			break  # Exit after attacking the first target unit on the tile
+
 
 # Method to take damage (should be part of your player unit script)
 func take_damage(amount: int) -> void:
@@ -471,7 +485,7 @@ func end_turn() -> void:
 	selected_unit = null  # Deselect the unit
 	state = State.IDLE  # Reset state to idle
 	
-# Move towards the nearest non-zombie unit
+# Move towards the nearest non-zombie unit, limited by movement range
 func move_to_nearest_non_zombie() -> void:
 	var nearest_unit: Node2D = null
 	var nearest_distance = INF  # Start with a large distance
@@ -481,27 +495,27 @@ func move_to_nearest_non_zombie() -> void:
 		if unit.is_zombie:
 			continue  # Skip zombie units
 
-		var distance = tile_pos.distance_to(unit.tile_pos)  # Calculate distance to unit
+		var distance = tile_pos.distance_to(unit.tile_pos)  # Calculate distance to the unit
 		if distance < nearest_distance:
 			nearest_distance = distance
-			nearest_unit = unit  # Update nearest non-zombie unit
+			nearest_unit = unit  # Update the nearest non-zombie unit
 
 	if nearest_unit:
-		# Get surrounding walkable cells of the nearest non-zombie unit
-		var walkable_tile = get_walkable_tile_around(nearest_unit.tile_pos)
+		# Get a walkable tile around the nearest non-zombie unit within movement range
+		var walkable_tile = get_walkable_tile_within_range(nearest_unit.tile_pos)
 		
-		if walkable_tile != Vector2i(-1, -1):  # If there's a walkable tile found
+		if walkable_tile != Vector2i(-1, -1):  # If there's a valid walkable tile found
 			move_to_tile(tile_pos, walkable_tile)  # Move to the walkable tile
 			print("Zombie moving to walkable tile around nearest non-zombie at position: ", walkable_tile)
 		else:
 			move_to_random_tile()
-			print("No walkable tiles found around the non-zombie unit.")
+			print("No walkable tiles within range found around the non-zombie unit.")
 	else:
 		move_to_random_tile()
 		print("No non-zombie units found.")
 
-# Function to get walkable tile around a given tile position
-func get_walkable_tile_around(target_tile_pos: Vector2i) -> Vector2i:
+# Function to get walkable tile around a given tile position, within movement range
+func get_walkable_tile_within_range(target_tile_pos: Vector2i) -> Vector2i:
 	var surrounding_tiles = [
 		target_tile_pos + Vector2i(1, 0),   # Right
 		target_tile_pos + Vector2i(-1, 0),  # Left
@@ -509,17 +523,16 @@ func get_walkable_tile_around(target_tile_pos: Vector2i) -> Vector2i:
 		target_tile_pos + Vector2i(0, -1),  # Up
 	]
 
-	# Check each surrounding tile to see if it's walkable
+	# Check each surrounding tile to see if it's walkable and within movement range
 	for tile in surrounding_tiles:
-		if is_tile_walkable(tile):
-			return tile  # Return the first walkable tile found
+		if is_tile_walkable(tile) and tile_pos.distance_to(tile) <= movement_range:
+			return tile  # Return the first walkable tile within range
 
-	return Vector2i(-1, -1)  # Return an invalid tile if no walkable tile is found
+	return Vector2i(-1, -1)  # Return an invalid tile if no valid walkable tile is found
 
 # Function to check if a tile is walkable
 func is_tile_walkable(tile_pos: Vector2i) -> bool:
 	# Logic to check if the tile is walkable (e.g., not blocked by obstacles)
-	# This could involve checking the tilemap, pathfinding grid, or another source of walkability info.
 	return !is_tile_blocked(tile_pos)
 
 # Example function to check if a tile is blocked (replace with actual logic)
@@ -527,4 +540,3 @@ func is_tile_blocked(tile_pos: Vector2i) -> bool:
 	# Example logic: check if the tile is blocked by an obstacle or other unit
 	# You can integrate your tilemap's walkability check here
 	return false  # Placeholder: replace with actual check for blocked tiles
-	

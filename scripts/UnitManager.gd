@@ -19,6 +19,7 @@ var state: State = State.IDLE  # Current state of the unit
 @export var attack_damage: int = 5  # General attack damage for all units
 @export var movement_range: int = 3  # Default movement range
 @export var unit_type: String
+@export var health: int = 5
 
 # Define public variables for target positions
 @export var first_target_position: Vector2i = Vector2i(-1, -1)  # Position of the first click
@@ -356,6 +357,7 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		# Signal that the unit's turn is done
 		end_turn()
 		GlobalManager.end_current_unit_turn()
+		check_for_attack()
 		print("Unit moved to tile: ", tile_pos)  # Debugging
 	else:
 		print("No valid path to target tile.")  # Debugging message
@@ -405,25 +407,89 @@ func start_turn() -> void:
 	state = State.IDLE  # The unit starts in the idle state
 	is_moving = false  # Ensure that the unit is not in the middle of a move
 	selected_unit = self  # Mark this unit as the selected one
-	#show_walkable_tiles()  # Show movement options
 	if is_zombie:
-		clear_walkable_tiles()
-		move_to_nearest_non_zombie()
+		await move_to_nearest_non_zombie()  # Move towards the nearest non-zombie unit
+
+	if !is_zombie:
+		check_for_attack()  # Check for adjacent player units to attack
+
+
+# Check for adjacent player units to attack
+func check_for_attack() -> void:
+	var adjacent_positions = [
+		tile_pos + Vector2i(1, 0),   # Right
+		tile_pos + Vector2i(-1, 0),  # Left
+		tile_pos + Vector2i(0, 1),   # Down
+		tile_pos + Vector2i(0, -1)   # Up
+	]
+	
+	for target_tile in adjacent_positions:
+		if is_tile_occupied_by_player(target_tile):
+			perform_attack(target_tile)  # Attack if a player unit is found
+
+# Check if a given tile is occupied by a player unit
+func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
+	for unit in get_tree().get_nodes_in_group("units"):
+		if unit.is_zombie and unit.tile_pos == tile_pos:  # Check if it's a non-zombie unit
+			return true  # Tile is occupied by a player unit
+	return false  # No player unit on the tile
+
+# Perform the attack on the target unit
+func perform_attack(target_tile: Vector2i) -> void:
+	# Get the local position of the target tile
+	var target_position = tilemap.map_to_local(target_tile)  # Assuming tile_size is the size of each tile in pixels
+
+	# Determine the direction of the attack
+	var direction = target_position - self.position  # Assuming global_position gives the unit's position in the world
+
+	# Flip the sprite based on the direction
+	if direction.x > 0 and sprite.flip_h:  # Target is to the right and currently facing left
+		sprite.flip_h = true  # Flip to face right
+	elif direction.x < 0 and not sprite.flip_h:  # Target is to the left and currently facing right
+		sprite.flip_h = false  # Flip to face left
+
+	# Play the attack animation
+	sprite.play("attack")  # Play the attack animation
+
+	# Determine the target type (player or zombie)
+	var target_is_zombie = !is_zombie  # If this unit is a player, attack zombies; if a zombie, attack players
+
+	# Find the correct unit to deal damage
+	for unit in get_tree().get_nodes_in_group("units"):
+		if unit.is_zombie == target_is_zombie and unit.tile_pos == target_tile:
+			unit.take_damage(attack_damage)  # Apply damage to the target unit
+			print(unit.unit_type + " attacked at tile: ", target_tile)
+			break  # Exit after attacking the first adjacent target unit
+
+# Method to take damage (should be part of your player unit script)
+func take_damage(amount: int) -> void:
+	# Assuming you have a health property
+	health -= amount
+	if health <= 0:
+		die()  # Handle zombie death
+	else:
+		# Optional: Play damage feedback animation/sound
+		sprite.play("hurt")  # Play a hurt animation or sound
+
+# Handle player death
+func die() -> void:
+	# Play the death animation
+	sprite.play("death")  # Play the death animation
+
+	# Wait for a specified duration (e.g., 2 seconds) before removing
+	await get_tree().create_timer(2).timeout  # Wait for the death animation to finish
+
+	# Update units in GlobalManager
+	GlobalManager.units.erase(self)  # Remove this unit from the global list of units
+
+	queue_free()  # Remove the unit from the scene
 
 # Called when the unit's turn ends
 func end_turn() -> void:
 	clear_walkable_tiles()  # Clear any walkable tile markers
 	selected_unit = null  # Deselect the unit
 	state = State.IDLE  # Reset state to idle
-
-# Check if any non-zombie units are within range (for zombie behavior)
-func is_non_zombie_within_range() -> bool:
-	for non_zombie_unit in get_tree().get_nodes_in_group("units"):  # Assuming non-zombie units are in the "units" group
-		if non_zombie_unit.has_method("is_zombie") and not non_zombie_unit.is_zombie():
-			if tile_pos.distance_to(non_zombie_unit.tile_pos) <= attack_range:
-				return true
-	return false
-
+	
 # Move towards the nearest non-zombie unit
 func move_to_nearest_non_zombie() -> void:
 	var nearest_unit: Node2D = null
@@ -452,20 +518,3 @@ func move_to_nearest_non_zombie() -> void:
 	else:
 		print("No non-zombie units found.")
 		
-# Zombie AI
-# Attack the nearest player (for zombie behavior)
-func attack_nearest_player() -> void:
-	var nearest_player: Node2D = null
-	var nearest_distance = INF  # Use a very high number as initial distance
-
-	for player in get_tree().get_nodes_in_group("players"):
-		var distance = tile_pos.distance_to(player.tile_pos)
-		if distance < nearest_distance:
-			nearest_distance = distance
-			nearest_player = player
-
-	if nearest_player:
-		# Play attack animation
-		sprite.play("attack")  # Adjust to your animation name
-		nearest_player.take_damage(attack_damage)  # Assuming the player has a take_damage method
-		print("Zombie attacked player at position: ", nearest_player.tile_pos)

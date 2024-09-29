@@ -292,6 +292,8 @@ func _input(event: InputEvent) -> void:
 					
 					selected_unit = null  # Deselect the unit after movement
 					print("Unit moved to second target position: ", second_target_position)  # Debugging
+				else:
+					print("No Walkable tile.")
 
 # Function to check if the target tile is within movement range
 func is_within_range(target_tile_pos: Vector2i) -> bool:
@@ -485,16 +487,44 @@ func move_to_nearest_non_zombie() -> void:
 			nearest_unit = unit  # Update nearest non-zombie unit
 
 	if nearest_unit:
-		# Only move if the nearest unit is within a certain range
-		if nearest_distance <= movement_range:
-			# Move towards the nearest unit's tile position
-			var target_tile_pos = nearest_unit.tile_pos
-			move_to_tile(tile_pos, target_tile_pos)  # Move to the non-zombie unit's tile
-			print("Zombie moving to nearest non-zombie unit at position: ", target_tile_pos)
+		# Get surrounding walkable cells of the nearest non-zombie unit
+		var walkable_tile = get_walkable_tile_around(nearest_unit.tile_pos)
+		
+		if walkable_tile != Vector2i(-1, -1):  # If there's a walkable tile found
+			move_to_tile(tile_pos, walkable_tile)  # Move to the walkable tile
+			print("Zombie moving to walkable tile around nearest non-zombie at position: ", walkable_tile)
 		else:
 			move_to_random_tile()
-			print("No non-zombie units within movement range.")
+			print("No walkable tiles found around the non-zombie unit.")
 	else:
 		move_to_random_tile()
 		print("No non-zombie units found.")
-		
+
+# Function to get walkable tile around a given tile position
+func get_walkable_tile_around(target_tile_pos: Vector2i) -> Vector2i:
+	var surrounding_tiles = [
+		target_tile_pos + Vector2i(1, 0),   # Right
+		target_tile_pos + Vector2i(-1, 0),  # Left
+		target_tile_pos + Vector2i(0, 1),   # Down
+		target_tile_pos + Vector2i(0, -1),  # Up
+	]
+
+	# Check each surrounding tile to see if it's walkable
+	for tile in surrounding_tiles:
+		if is_tile_walkable(tile):
+			return tile  # Return the first walkable tile found
+
+	return Vector2i(-1, -1)  # Return an invalid tile if no walkable tile is found
+
+# Function to check if a tile is walkable
+func is_tile_walkable(tile_pos: Vector2i) -> bool:
+	# Logic to check if the tile is walkable (e.g., not blocked by obstacles)
+	# This could involve checking the tilemap, pathfinding grid, or another source of walkability info.
+	return !is_tile_blocked(tile_pos)
+
+# Example function to check if a tile is blocked (replace with actual logic)
+func is_tile_blocked(tile_pos: Vector2i) -> bool:
+	# Example logic: check if the tile is blocked by an obstacle or other unit
+	# You can integrate your tilemap's walkability check here
+	return false  # Placeholder: replace with actual check for blocked tiles
+	

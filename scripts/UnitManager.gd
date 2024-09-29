@@ -244,6 +244,8 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 # Handle input events based on the current state
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("mouse_left"):
+		clear_walkable_tiles()
+		
 		# Get the tile position of the mouse click
 		var mouse_pos = get_global_mouse_position()
 		mouse_pos.y += 8  # Adjust offset if necessary

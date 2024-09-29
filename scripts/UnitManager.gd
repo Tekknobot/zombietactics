@@ -49,6 +49,9 @@ var has_moved
 # This flag is used to differentiate zombies from non-zombie units
 @export var is_zombie: bool
 
+var explosion_scene: PackedScene = preload("res://assets/scenes/vfx/explosion.scn")
+
+
 # Called when the node enters the scene
 func _ready() -> void:
 	# Try to find the TileMap
@@ -345,14 +348,22 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		if is_zombie:
 			self.has_moved = true
 		
-		# Signal that the unit's turn is done
-		end_turn()
-		check_for_attack()
-		GlobalManager.end_current_unit_turn()
-		print("Unit moved to tile: ", tile_pos)  # Debugging
+		# Check if there are any units to attack
+		var did_attack = await check_for_attack()  # This should return true if an attack occurred
+		
+		# Wait for a moment before ending the turn
+		await get_tree().create_timer(0.25).timeout
+		
+		# End the unit's turn only after the attack finishes
+		if not did_attack:
+			GlobalManager.end_current_unit_turn()
+			print("Unit moved to tile: ", tile_pos)  # Debugging
+		else:
+			GlobalManager.end_current_unit_turn()
 	else:
 		move_to_random_tile()
 		print("No valid path to target tile.")  # Debugging message
+
 
 # Move to a random tile function
 func move_to_random_tile() -> void:
@@ -451,7 +462,6 @@ func perform_attack(target_tile: Vector2i) -> void:
 			print(unit.unit_type + " attacked at tile: ", target_tile)
 			break  # Exit after attacking the first target unit on the tile
 
-
 # Method to take damage (should be part of your player unit script)
 func take_damage(amount: int) -> void:
 	# Assuming you have a health property
@@ -467,16 +477,19 @@ func die() -> void:
 	# Play the death animation
 	sprite.play("death")  # Play the death animation
 
-	# Optionally, you can check if the animation is finished before continuing.
-	# This assumes your animation has a specific length; replace '2' with your animation duration if needed.
+	# Wait for the death animation to finish (adjust duration if necessary)
 	await get_tree().create_timer(0.5).timeout  # Wait for the death animation to finish
+
+	# Spawn the explosion at the unit's current position
+	spawn_explosion(position)  # Pass the current position of the unit
 
 	# Update units in GlobalManager
 	if GlobalManager.units.has(self):  # Check if this unit is in the global list before removing
 		GlobalManager.units.erase(self)  # Remove this unit from the global list of units
 
 	queue_free()  # Remove the unit from the scene
-	
+
+	# Reset current unit index to 0 in the GlobalManager
 	GlobalManager.current_unit_index = 0
 
 # Called when the unit's turn ends
@@ -540,3 +553,17 @@ func is_tile_blocked(tile_pos: Vector2i) -> bool:
 	# Example logic: check if the tile is blocked by an obstacle or other unit
 	# You can integrate your tilemap's walkability check here
 	return false  # Placeholder: replace with actual check for blocked tiles
+
+func spawn_explosion(position: Vector2) -> void:
+	# Ensure explosion_scene is loaded correctly
+	if explosion_scene:
+		var explosion_instance = explosion_scene.instantiate()  # This should be valid
+		
+		# Offset the explosion position on the Y-axis
+		var offset_y = 10  # Change this value to adjust the height of the explosion
+		explosion_instance.position = Vector2(position.x, position.y - offset_y)  # Adjust the position by offset
+
+		# Add the explosion instance to the MapManager
+		get_tree().get_root().get_node("MapManager").add_child(explosion_instance)
+	else:
+		print("Error: explosion_scene is not loaded properly.")

@@ -405,8 +405,9 @@ func start_turn() -> void:
 	state = State.IDLE  # The unit starts in the idle state
 	is_moving = false  # Ensure that the unit is not in the middle of a move
 	selected_unit = self  # Mark this unit as the selected one
-	show_walkable_tiles()  # Show movement options
+	#show_walkable_tiles()  # Show movement options
 	if is_zombie:
+		clear_walkable_tiles()
 		move_to_nearest_non_zombie()
 
 # Called when the unit's turn ends

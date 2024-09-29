@@ -355,7 +355,7 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		
 		# Signal that the unit's turn is done
 		end_turn()
-
+		GlobalManager.end_current_unit_turn()
 		print("Unit moved to tile: ", tile_pos)  # Debugging
 	else:
 		print("No valid path to target tile.")  # Debugging message
@@ -394,7 +394,6 @@ func move_to_random_tile() -> void:
 
 	print("Unit will move to random tile: ", random_target_tile_pos)  # Debugging
 
-
 # Reset target positions
 func reset_targets() -> void:
 	first_target_position = Vector2i(-1, -1)  # Reset first target position
@@ -406,30 +405,15 @@ func start_turn() -> void:
 	state = State.IDLE  # The unit starts in the idle state
 	is_moving = false  # Ensure that the unit is not in the middle of a move
 	selected_unit = self  # Mark this unit as the selected one
-	# show_walkable_tiles()  # Show movement options
-	
-	# Zombie AI Logic (inside _process or any relevant method)
-	if is_zombie and state == State.IDLE:
-		# Check for players within attack range
-		if is_non_zombie_within_range():
-			state = State.ATTACKING
-			attack_nearest_player()  # Call the attack function when in range	
-		else:
-			move_to_nearest_non_zombie()
+	show_walkable_tiles()  # Show movement options
+	if is_zombie:
+		move_to_nearest_non_zombie()
 
 # Called when the unit's turn ends
 func end_turn() -> void:
 	clear_walkable_tiles()  # Clear any walkable tile markers
 	selected_unit = null  # Deselect the unit
 	state = State.IDLE  # Reset state to idle
-
-	turn_manager = get_tree().get_root().get_node("MapManager/TurnManager")  # Adjust the path accordingly
-	
-	if turn_manager != null:
-		print("Ending turn for unit: ", self.name)  # Debugging: which unit is ending its turn
-		turn_manager.end_current_unit_turn()  # Signal the TurnManager
-	else:
-		print("Error: turn_manager is null.")  # Debugging: check if turn_manager is assigned
 
 # Check if any non-zombie units are within range (for zombie behavior)
 func is_non_zombie_within_range() -> bool:
@@ -466,7 +450,6 @@ func move_to_nearest_non_zombie() -> void:
 			print("No non-zombie units within movement range.")
 	else:
 		print("No non-zombie units found.")
-
 		
 # Zombie AI
 # Attack the nearest player (for zombie behavior)

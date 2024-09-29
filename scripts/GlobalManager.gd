@@ -48,10 +48,15 @@ func end_current_unit_turn() -> void:
 	movement_status[current_unit_index] = true
 	units_moved += 1
 
-	# Check if all units have moved
-	if units_moved >= units.size():
-		print("All units have moved once!")
-		reset_units_movement()  # Reset for the next turn
+	# ** Reset movement status after each individual move **
+	reset_individual_unit_movement()
 
+	# Move to the next unit
 	current_unit_index = (current_unit_index + 1) % units.size()  # Cycle through units
 	start_current_unit_turn()  # Start the next unit's turn
+
+# ** Add a function to reset the individual unit's movement **
+func reset_individual_unit_movement() -> void:
+	# Reset movement status for the current unit after their turn ends
+	movement_status[current_unit_index] = false  # Set the current unit's status back to 'false'
+	print("Movement reset for unit: ", units[current_unit_index].name)

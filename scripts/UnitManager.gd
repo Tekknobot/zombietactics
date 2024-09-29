@@ -48,7 +48,6 @@ var has_moved
 
 # This flag is used to differentiate zombies from non-zombie units
 @export var is_zombie: bool
-var turn_manager: Node2D = null  # Reference to the TurnManager
 
 # Called when the node enters the scene
 func _ready() -> void:
@@ -58,14 +57,6 @@ func _ready() -> void:
 		print("Error: TileMap not found!")
 	else:
 		print("TileMap found: ", tilemap.name)
-
-	# Try to find the TurnManager
-	turn_manager = get_tree().get_root().get_node("MapManager/TurnManager")  # Adjust the path accordingly
-	if turn_manager == null:
-		print("Error: TurnManager not found!")
-	else:
-		print("TurnManager found: ", turn_manager.name)
-
 
 	# Create a new AStarGrid instance
 	astar_grid = AStarGrid2D.new()
@@ -309,10 +300,6 @@ func is_within_range(target_tile_pos: Vector2i) -> bool:
 
 # Move to tile function, updated to check if it's the unit's turn
 func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
-	# Only allow movement during the unit's turn
-	if turn_manager != null and turn_manager.current_unit != self:
-		return  # Not this unit's turn, ignore the movement
-
 	if is_moving:
 		return  # Ignore input if the unit is currently moving
 
@@ -358,18 +345,15 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		
 		# Signal that the unit's turn is done
 		end_turn()
-		GlobalManager.end_current_unit_turn()
 		check_for_attack()
+		GlobalManager.end_current_unit_turn()
 		print("Unit moved to tile: ", tile_pos)  # Debugging
 	else:
+		move_to_random_tile()
 		print("No valid path to target tile.")  # Debugging message
 
 # Move to a random tile function
 func move_to_random_tile() -> void:
-	# Only allow movement during the unit's turn
-	if turn_manager != null and turn_manager.current_unit != self:
-		return  # Not this unit's turn, ignore the movement
-
 	if is_moving:
 		return  # Ignore input if the unit is currently moving
 
@@ -432,24 +416,25 @@ func check_for_attack() -> void:
 # Check if a given tile is occupied by a player unit
 func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
 	for unit in get_tree().get_nodes_in_group("units"):
-		if unit.is_zombie and unit.tile_pos == tile_pos:  # Check if it's a non-zombie unit
+		if !unit.is_zombie and unit.tile_pos == tile_pos:  # Check if it's a non-zombie unit
 			return true  # Tile is occupied by a player unit
 	return false  # No player unit on the tile
 
-# Perform the attack on the target unit
+# Perform the attack on the target unit (non-zombies only)
 func perform_attack(target_tile: Vector2i) -> void:
 	# Play the attack animation
 	sprite.play("attack")  # Play the attack animation
 
-	# Determine the target type (player or zombie)
+	# Determine the target type (non-zombies only)
 	var target_is_zombie = !is_zombie  # If this unit is a player, attack zombies; if a zombie, attack players
 
-	# Find the correct unit to deal damage
+	# Find the correct non-zombie unit to deal damage
 	for unit in get_tree().get_nodes_in_group("units"):
-		if unit.is_zombie == target_is_zombie and unit.tile_pos == target_tile:
-			unit.take_damage(attack_damage)  # Apply damage to the target unit
-			print(unit.unit_type + " attacked at tile: ", target_tile)
-			break  # Exit after attacking the first adjacent target unit
+		# Attack only non-zombie units that match the target tile position
+		if not unit.is_zombie and unit.tile_pos == target_tile:
+			unit.take_damage(attack_damage)  # Apply damage to the non-zombie target unit
+			print("Non-Zombie " + unit.unit_type + " attacked at tile: ", target_tile)
+			break  # Exit after attacking the first adjacent non-zombie target unit
 
 # Method to take damage (should be part of your player unit script)
 func take_damage(amount: int) -> void:
@@ -510,5 +495,6 @@ func move_to_nearest_non_zombie() -> void:
 			move_to_random_tile()
 			print("No non-zombie units within movement range.")
 	else:
+		move_to_random_tile()
 		print("No non-zombie units found.")
 		

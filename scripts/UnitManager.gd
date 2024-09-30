@@ -1,5 +1,8 @@
 extends Node2D
 
+# Add this line to make the class globally accessible
+class_name UnitManager
+
 # Unit states
 enum State {
 	IDLE,
@@ -356,7 +359,6 @@ func reset_targets() -> void:
 func start_turn() -> void:
 	state = State.IDLE  # The unit starts in the idle state
 	is_moving = false  # Ensure that the unit is not in the middle of a move
-	selected_unit = self  # Mark this unit as the selected one
 	if is_zombie:
 		await move_to_nearest_non_zombie()  # Move towards the nearest non-zombie unit
 
@@ -591,7 +593,7 @@ func _input(event: InputEvent) -> void:
 			State.IDLE:
 				# If the unit is clicked, toggle selection and show walkable tiles
 				if tile_pos == target_tile_pos:
-					selected_unit = self  # Track this unit as selected
+					GlobalManager.select_unit(self)   # Mark this unit as the selected one
 					hud.update_hud_for_unit(self.unit_type, self.health, self.maxhealth, self.attack_damage)
 					state = State.SELECTED  # Change state to SELECTED
 					
@@ -642,3 +644,21 @@ func _input(event: InputEvent) -> void:
 					print("Unit moved to second target position: ", second_target_position)  # Debugging
 				elif !is_walkable(temp_second_target):
 					print("No Walkable tile.")
+
+# This method is called to visually and logically select the unit
+func select() -> void:
+	state = State.SELECTED  # Set the unit's state to SELECTED
+	# Add visual indication (for example, changing sprite or adding an outline)
+	sprite.modulate = Color(1, 1, 1)  # Change sprite color to yellow to indicate selection
+	# Show walkable or attackable tiles, if any
+	#show_walkable_tiles()
+	print("Unit selected: ", self.unit_type)
+
+# This method is called to deselect the unit
+func deselect() -> void:
+	state = State.IDLE  # Reset the unit's state to IDLE
+	# Revert visual changes
+	sprite.modulate = Color(1, 1, 1)  # Reset sprite color to its default value
+	# Hide walkable or attackable tiles, if any
+	clear_walkable_tiles()
+	print("Unit deselected: ", self.unit_type)

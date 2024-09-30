@@ -16,6 +16,9 @@ var movement_status_zombies: Array = []  # Track movement status for zombies
 var unit_check_timer: Timer
 var zombie_turn: bool = false  # Track if it's zombie turn or not
 
+# Reference the UnitManager class instead of Unit
+var current_selected_unit: UnitManager = null  # Now stores the currently selected unit
+
 func _ready() -> void:
 	print("Scene ready.")
 	setup_timer()  # Call the function to set up the timer
@@ -174,3 +177,11 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept"):  # Check for space bar input
 		reload_scene()  # Reload the scene when the space bar is pressed
 		return
+
+# Method to select a unit
+func select_unit(unit: UnitManager) -> void:
+	if current_selected_unit and current_selected_unit != unit:
+		current_selected_unit.deselect()  # Deselect the previously selected unit
+
+	current_selected_unit = unit
+	current_selected_unit.select()  # Call the select method on the new selected unit

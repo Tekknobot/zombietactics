@@ -31,7 +31,7 @@ func _ready() -> void:
 func update_health(current_health: int, max_health: int) -> void:
 	healthbar.max_value = max_health
 	healthbar.value = current_health
-	unit_health.text = str(current_health) + "/" + str(max_health)
+	unit_health.text = "HP: " + str(current_health) + "-" + str(max_health)
 
 # Public function to update the unit name
 func update_unit_name(name: String) -> void:
@@ -39,7 +39,7 @@ func update_unit_name(name: String) -> void:
 
 # Public function to update the unit damage
 func update_unit_damage(damage: int) -> void:
-	unit_damage.text = str(damage)
+	unit_damage.text = "POW: " + str(damage)
 
 # Public function to update the portrait based on unit name (e.g., "Zombie", "Merc", "Soldier", "Dog")
 func update_portrait(unit_type: String) -> void:

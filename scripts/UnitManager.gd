@@ -20,6 +20,7 @@ var state: State = State.IDLE  # Current state of the unit
 @export var movement_range: int = 3  # Default movement range
 @export var unit_type: String
 @export var health: int = 5
+@export var maxhealth: int = 5
 
 # Define public variables for target positions
 @export var first_target_position: Vector2i = Vector2i(-1, -1)  # Position of the first click
@@ -32,6 +33,8 @@ var last_target_tile_pos
 # Reference to the TileMap and AStarGrid
 var tilemap: TileMap = null
 var astar_grid: AStarGrid2D = null  # Reference to the AStarGrid2D
+
+var hud: Control = null
 
 # Walkable tile prefab for visualization
 var walkable_tile_prefab: PackedScene = preload("res://assets/scenes/UI/move_tile.tscn")
@@ -59,6 +62,9 @@ var explosion_scene: PackedScene = preload("res://assets/scenes/vfx/explosion.sc
 func _ready() -> void:
 	# Try to find the TileMap
 	tilemap = get_tree().get_root().get_node("MapManager/TileMap")  # Adjust path based on your scene structure
+	
+	hud = get_tree().get_root().get_node("MapManager/HUD")
+	
 	if tilemap == null:
 		print("Error: TileMap not found!")
 	else:
@@ -569,6 +575,7 @@ func _input(event: InputEvent) -> void:
 				# If the unit is clicked, toggle selection and show walkable tiles
 				if tile_pos == target_tile_pos:
 					selected_unit = self  # Track this unit as selected
+					hud.update_hud_for_unit(self.unit_type, self.health, self.maxhealth, self.attack_damage)
 					state = State.SELECTED  # Change state to SELECTED
 					
 					# Temporarily make the unit's current tile walkable in AStar

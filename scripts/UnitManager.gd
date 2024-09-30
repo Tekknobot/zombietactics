@@ -339,7 +339,10 @@ func move_to_random_tile() -> void:
 	var random_target_tile_pos = valid_tiles[randi() % valid_tiles.size()]
 
 	# Move to the randomly selected tile
-	move_to_tile(tile_pos, random_target_tile_pos)
+	if GlobalManager.zombie_turn and self.is_zombie:
+		move_to_tile(tile_pos, random_target_tile_pos)
+	if !GlobalManager.zombie_turn and !self.is_zombie:
+		move_to_tile(tile_pos, random_target_tile_pos)
 
 	print("Unit will move to random tile: ", random_target_tile_pos)  # Debugging
 
@@ -514,7 +517,11 @@ func move_to_nearest_non_zombie() -> void:
 		var walkable_tile = get_walkable_tile_within_range(nearest_unit.tile_pos)
 		
 		if walkable_tile != Vector2i(-1, -1):  # If there's a valid walkable tile found
-			move_to_tile(tile_pos, walkable_tile)  # Move to the walkable tile
+			# Move to the randomly selected tile
+			if GlobalManager.zombie_turn and self.is_zombie:
+				move_to_tile(tile_pos, walkable_tile)  # Move to the walkable tile
+			if !GlobalManager.zombie_turn and !self.is_zombie:
+				move_to_tile(tile_pos, walkable_tile)  # Move to the walkable tile
 			print("Zombie moving to walkable tile around nearest non-zombie at position: ", walkable_tile)
 		else:
 			move_to_random_tile()
@@ -619,7 +626,11 @@ func _input(event: InputEvent) -> void:
 					
 					# Move to the tile, making sure the start tile is not solid
 					astar_grid.set_point_solid(tile_pos, false)  # Make sure the starting tile is walkable
-					move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
+					
+					if GlobalManager.zombie_turn and self.is_zombie:
+						move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
+					if !GlobalManager.zombie_turn and !self.is_zombie:
+						move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
 					
 					clear_walkable_tiles()  # Clear markers after movement
 					state = State.IDLE  # Return to IDLE after moving

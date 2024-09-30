@@ -446,12 +446,10 @@ func is_tile_occupied_by_zombie(tile_pos: Vector2i) -> bool:
 
 # Perform the attack on the target unit (players attack zombies, zombies attack players)
 func perform_attack(target_tile: Vector2i) -> void:
-	# Play the attack animation
+	# Play the attack animation for the first time
 	sprite.play("attack")  # Play the attack animation
 
-	# Determine the target type based on this unit's type:
-	# If the attacker is a zombie, it should attack non-zombies (players).
-	# If the attacker is a player, it should attack zombies.
+	# Determine the target type based on this unit's type
 	var target_is_zombie = !is_zombie  # Invert the current unit type to determine target type
 
 	# Find the correct target unit to deal damage to
@@ -462,8 +460,17 @@ func perform_attack(target_tile: Vector2i) -> void:
 			print(unit.unit_type + " attacked at tile: ", target_tile)
 			break  # Exit after attacking the first target unit on the tile
 
-	await get_tree().create_timer(0.5).timeout
-	sprite.play("default")
+	# Wait for a moment before flipping the sprite and playing the animation again
+	await get_tree().create_timer(0.5).timeout  # Wait for the duration of the attack animation
+
+	sprite.flip_h = true  # Flip the sprite for the second attack
+	sprite.play("attack")  # Play the attack animation again
+
+	# Wait for the second attack animation to complete
+	await get_tree().create_timer(0.5).timeout  # Wait for the duration of the attack animation
+
+	sprite.flip_h = false  # Flip back the sprite to its original state
+	sprite.play("default")  # Reset to the default animation
 
 # Method to take damage (should be part of your player unit script)
 func take_damage(amount: int) -> void:

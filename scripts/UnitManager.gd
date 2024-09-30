@@ -474,9 +474,13 @@ func die() -> void:
 		# Spawn the explosion at the unit's current position
 		spawn_explosion(position)  # Pass the current position of the unit
 
-	# Update units in GlobalManager
-	if GlobalManager.units.has(self):  # Check if this unit is in the global list before removing
-		GlobalManager.units.erase(self)  # Remove this unit from the global list of units
+	if is_zombie:
+		# Update units in GlobalManager
+		if GlobalManager.zombie_units.has(self):  # Check if this unit is in the global list before removing
+			GlobalManager.zombie_units.erase(self)  # Remove this unit from the global list of units
+	else:
+		if GlobalManager.non_zombie_units.has(self):  # Check if this unit is in the global list before removing
+			GlobalManager.non_zombie_units.erase(self)  # Remove this unit from the global list of units		
 
 	queue_free()  # Remove the unit from the scene
 

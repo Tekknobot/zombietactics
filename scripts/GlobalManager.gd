@@ -9,13 +9,18 @@ var movement_status: Array = []  # Track movement status for each unit
 var unit_check_timer: Timer
 
 func _ready() -> void:
-	# Initialize the timer
-	unit_check_timer = Timer.new()
-	unit_check_timer.wait_time = 1.0  # Check every second
-	unit_check_timer.connect("timeout", Callable(self, "_check_units"))  # Using Callable to connect
-	add_child(unit_check_timer)  # Add the timer as a child to the scene
+	setup_timer()  # Call the function to set up the timer
+	_check_units()  # Initial check for units when the scene is ready
+
+func setup_timer() -> void:
+	# Initialize the timer if it doesn't already exist
+	if unit_check_timer == null:
+		unit_check_timer = Timer.new()
+		unit_check_timer.wait_time = 0.5  # Short delay before checking for units
+		unit_check_timer.connect("timeout", Callable(self, "_check_units"))
+		add_child(unit_check_timer)  # Add the timer as a child to the scene
+
 	unit_check_timer.start()  # Start the timer
-	_check_units()  # Check units immediately at the start
 
 func _check_units() -> void:
 	# Get all nodes in the 'units' group
@@ -27,6 +32,8 @@ func _check_units() -> void:
 		reset_units_movement()  # Initialize movement tracking
 		current_unit_index = 0  # Start with the first unit
 		start_current_unit_turn()
+	else:
+		print("No units available. Checking again...")  # Debugging output for no units
 
 func reset_units_movement() -> void:
 	units_moved = 0  # Reset the counter
@@ -69,10 +76,12 @@ func reset_manager() -> void:
 	current_unit_index = 0  # Reset current unit index
 	units_moved = 0  # Reset units moved counter
 	movement_status.clear()  # Clear movement status array
-	unit_check_timer.stop()  # Stop the timer if running
+	if unit_check_timer != null:
+		unit_check_timer.stop()  # Stop the timer if running
 	print("GlobalManager reset.")
 
 # Method to be called when reloading the scene
 func reload_scene() -> void:
 	reset_manager()  # Reset the GlobalManager state
 	get_tree().reload_current_scene()  # Reload the current scene
+	setup_timer()  # Set up and start the timer again after scene reload

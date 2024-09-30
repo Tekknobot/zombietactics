@@ -571,6 +571,9 @@ func spawn_explosion(position: Vector2) -> void:
 
 # Handle input events based on the current state
 func _input(event: InputEvent) -> void:
+	if GlobalManager.zombie_turn:
+		return
+	
 	if event.is_action_pressed("mouse_left"):
 		clear_walkable_tiles()
 		

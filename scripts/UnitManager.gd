@@ -414,6 +414,11 @@ func perform_attack(target_tile: Vector2i) -> void:
 	if target_unit:
 		flash_target(target_unit)  # Call the flash effect function
 
+		# Update the HUD if the target unit is not a zombie
+		if !target_unit.is_zombie:
+			# Update the HUD for the attacked unit
+			hud.update_hud_for_unit(target_unit.unit_type, target_unit.health, target_unit.maxhealth, target_unit.attack_damage)
+
 	# Wait for a moment before flipping the sprite and playing the animation again
 	await get_tree().create_timer(0.5).timeout  # Wait for the duration of the attack animation
 
@@ -425,7 +430,7 @@ func perform_attack(target_tile: Vector2i) -> void:
 
 	sprite.flip_h = false  # Flip back the sprite to its original state
 	sprite.play("default")  # Reset to the default animation
-
+	
 # Function to flash the target unit as a visual effect
 func flash_target(target_unit) -> void:
 	# Ensure the target unit is still valid before proceeding

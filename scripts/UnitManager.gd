@@ -307,7 +307,8 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		else:
 			GlobalManager.end_current_unit_turn()
 	else:
-		sprite.play("attack")
+		flash_target(self)
+		GlobalManager.end_current_unit_turn()
 		print("No valid path to target tile.")  # Debugging message
 
 
@@ -330,6 +331,7 @@ func move_to_random_tile() -> void:
 
 	# Check if there are any valid tiles
 	if valid_tiles.size() == 0:
+		flash_target(self)
 		print("No valid tiles available for movement.")  # Debugging
 		return
 

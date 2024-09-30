@@ -18,7 +18,7 @@ var map_ready: bool = false  # Flag to check if map is ready
 var max_soldiers: int = 1
 var max_mercenaries: int = 1
 var max_dogs: int = 1  # Maximum number of dogs to spawn
-var max_zombies: int = 9  # Updated for clarity
+var max_zombies: int = 6  # Updated for clarity
 
 # Number of zombie clusters to spawn
 var number_of_zombie_clusters: int = 3  # Adjust this to the desired number of zombie clusters

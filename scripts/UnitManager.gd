@@ -249,6 +249,7 @@ func is_within_range(target_tile_pos: Vector2i) -> bool:
 	var distance = abs(tile_pos.x - target_tile_pos.x) + abs(tile_pos.y - target_tile_pos.y)
 	return distance <= movement_range
 
+# Move to tile function, updated to check if it's the unit's turn
 func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 	if is_moving:
 		return  # Ignore input if the unit is currently moving
@@ -258,6 +259,9 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 	if path.size() > 0:
 		is_moving = true  # Lock the unit while it's moving
 
+		# Store the last position before moving
+		last_position = position
+
 		# Start the movement animation
 		sprite.play("move")  # Assuming the walking animation is named "move"
 
@@ -266,30 +270,47 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 			var target_world_pos = tilemap.map_to_local(point)
 			await move_to_position(target_world_pos)
 
+		# Get the world position of the target tile
+		var target_world_pos = tilemap.map_to_local(target_tile_pos)			
+		# Move the unit to the target tile's world position
+		position = target_world_pos
+
+		# Determine the direction of movement based on current and last position
+		if position.x > last_position.x:
+			scale.x = -1  # Facing right (East)
+		elif position.x < last_position.x:
+			scale.x = 1  # Facing left (West)
+
 		# Update the unit's tile position after reaching the final point in the path
 		tile_pos = target_tile_pos
+		# Update the z_index based on the new tile position
 		update_z_index()
 
 		# Stop the movement animation and switch to idle animation
 		sprite.play("default")  # Assuming the idle animation is named "idle"
 		
 		is_moving = false  # Unlock the unit after movement
-
-		# Check for nearby enemies to attack
-		var did_attack = await check_for_attack()
-
-		# Mark the unit as having moved if it actually moved or attacked
-		if path.size() > 0 or did_attack:
+		
+		if is_zombie:
 			self.has_moved = true
-
+		
+		# Check if there are any units to attack
+		var did_attack = await check_for_attack()  # This should return true if an attack occurred
+		
 		# Wait for a moment before ending the turn
 		await get_tree().create_timer(0.25).timeout
-
-		# End the unit's turn
-		GlobalManager.end_current_unit_turn()
+		
+		# End the unit's turn only after the attack finishes
+		if not did_attack:
+			GlobalManager.end_current_unit_turn()
+			print("Unit moved to tile: ", tile_pos)  # Debugging
+		else:
+			GlobalManager.end_current_unit_turn()
 	else:
 		flash_target(self)
+		GlobalManager.end_current_unit_turn()
 		print("No valid path to target tile.")  # Debugging message
+
 
 # Move to a random tile function
 func move_to_random_tile() -> void:
@@ -450,22 +471,17 @@ func die() -> void:
 	await get_tree().create_timer(0.5).timeout  # Wait for the death animation to finish
 
 	if self.unit_type == "Dog":
-		# Spawn the explosion at the unit's current position (specific to Dog unit)
+		# Spawn the explosion at the unit's current position
 		spawn_explosion(position)  # Pass the current position of the unit
 
-	# Update units in GlobalManager (handle both zombie and non-zombie arrays if split)
-	if GlobalManager.non_zombie_units.has(self):
-		GlobalManager.non_zombie_units.erase(self)  # Remove this unit from the non-zombie list
-	elif GlobalManager.zombie_units.has(self):
-		GlobalManager.zombie_units.erase(self)  # Remove this unit from the zombie list
-
-	# Check if there are still units left to act, and reset the unit index accordingly
-	if GlobalManager.non_zombie_units.size() > 0 or GlobalManager.zombie_units.size() > 0:
-		GlobalManager.current_unit_index = 0
-	else:
-		print("All units have been defeated.")  # Optional: handle a game-over state
+	# Update units in GlobalManager
+	if GlobalManager.units.has(self):  # Check if this unit is in the global list before removing
+		GlobalManager.units.erase(self)  # Remove this unit from the global list of units
 
 	queue_free()  # Remove the unit from the scene
+
+	# Reset current unit index to 0 in the GlobalManager
+	GlobalManager.current_unit_index = 0
 
 # Called when the unit's turn ends
 func end_turn() -> void:

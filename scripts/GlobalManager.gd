@@ -1,12 +1,20 @@
 extends Node2D
 
-var units: Array = []  # Array to hold all units
-var current_unit_index: int = 0  # Index of the current unit
+var non_zombie_units: Array = []  # Array to hold non-zombie units
+var zombie_units: Array = []  # Array to hold zombie units
+
+var current_unit_index: int = 0  # Index of the current non-zombie unit
+var current_zombie_index: int = 0  # Index of the current zombie unit
+
 var units_moved: int = 0  # Counter for units that have moved
-var movement_status: Array = []  # Track movement status for each unit
+var zombies_moved: int = 0  # Counter for zombies that have moved
+
+var movement_status_non_zombies: Array = []  # Track movement status for non-zombies
+var movement_status_zombies: Array = []  # Track movement status for zombies
 
 # Timer for checking units
 var unit_check_timer: Timer
+var zombie_turn: bool = false  # Track if it's zombie turn or not
 
 func _ready() -> void:
 	setup_timer()  # Call the function to set up the timer
@@ -24,64 +32,107 @@ func setup_timer() -> void:
 
 func _check_units() -> void:
 	# Get all nodes in the 'units' group
-	units = get_tree().get_nodes_in_group("units")
-	print("Checking units... Found: ", units.size())  # Debugging output
+	var all_units = get_tree().get_nodes_in_group("units")
+	print("Checking units... Found: ", all_units.size())  # Debugging output
 
-	if units.size() > 0:
+	# Clear previous unit lists
+	non_zombie_units.clear()
+	zombie_units.clear()
+
+	# Split units into zombie and non-zombie arrays
+	for unit in all_units:
+		if unit.is_zombie:
+			zombie_units.append(unit)
+		else:
+			non_zombie_units.append(unit)
+
+	print("Non-zombie units found: ", non_zombie_units.size())
+	print("Zombie units found: ", zombie_units.size())
+
+	if non_zombie_units.size() > 0 or zombie_units.size() > 0:
 		unit_check_timer.stop()  # Stop checking if units are found
 		reset_units_movement()  # Initialize movement tracking
-		current_unit_index = 0  # Start with the first unit
-		start_current_unit_turn()
+		current_unit_index = 0  # Start with the first non-zombie unit
+		zombie_turn = false  # Start with non-zombie units
+		start_current_unit_turn()  # Start first non-zombie unit turn
 	else:
 		print("No units available. Checking again...")  # Debugging output for no units
 
 func reset_units_movement() -> void:
-	units_moved = 0  # Reset the counter
-	movement_status.clear()  # Clear the movement status array
-	for unit in units:
-		movement_status.append(false)  # Initialize with false (not moved)
+	units_moved = 0  # Reset non-zombie movement counter
+	zombies_moved = 0  # Reset zombie movement counter
+	movement_status_non_zombies.clear()  # Clear non-zombie movement status array
+	movement_status_zombies.clear()  # Clear zombie movement status array
+
+	# Initialize movement status for non-zombies
+	for unit in non_zombie_units:
+		movement_status_non_zombies.append(false)
+
+	# Initialize movement status for zombies
+	for unit in zombie_units:
+		movement_status_zombies.append(false)
 
 func start_current_unit_turn() -> void:
-	if units.size() == 0:
-		print("No units available.")
-		return
+	if zombie_turn:
+		if zombie_units.size() == 0:
+			print("No zombies available.")
+			return
 
-	var current_unit = units[current_unit_index]
-	current_unit.start_turn()  # Call start_turn on the current unit
+		var current_zombie = zombie_units[current_zombie_index]
+		current_zombie.start_turn()  # Call start_turn on the current zombie
+	else:
+		if non_zombie_units.size() == 0:
+			print("No non-zombies available.")
+			return
+
+		var current_unit = non_zombie_units[current_unit_index]
+		current_unit.start_turn()  # Call start_turn on the current non-zombie unit
 
 func end_current_unit_turn() -> void:
-	if units.size() == 0:
-		print("No units available for ending turn.")
-		return
+	if zombie_turn:
+		if zombie_units.size() == 0:
+			print("No zombies available for ending turn.")
+			return
 
-	var current_unit = units[current_unit_index]
-	current_unit.end_turn()  # Call end_turn on the current unit
+		var current_zombie = zombie_units[current_zombie_index]
+		current_zombie.end_turn()  # Call end_turn on the current zombie
 
-	# Mark the current unit as having moved
-	movement_status[current_unit_index] = true
-	units_moved += 1
+		# Mark the current zombie as having moved
+		movement_status_zombies[current_zombie_index] = true
+		zombies_moved += 1
 
-	# Check if all units have moved before resetting
-	if units_moved >= units.size():
-		print("All units have moved. Resetting for the next turn.")
-		reset_units_movement()
+		print("Zombies moved: ", zombies_moved, "/", zombie_units.size())
 
-	# Move to the next unit
-	current_unit_index = (current_unit_index + 1) % units.size()  # Cycle through units
-	start_current_unit_turn()  # Start the next unit's turn
+		# Check if all zombies have moved before switching to non-zombies
+		if zombies_moved >= zombie_units.size():
+			print("All zombies have moved. Switching to non-zombies.")
+			reset_units_movement()  # Reset movement status for both sets of units
+			zombie_turn = false  # Switch to non-zombie turn
 
-# Method to reset the GlobalManager state
-func reset_manager() -> void:
-	units.clear()  # Clear the units array
-	current_unit_index = 0  # Reset current unit index
-	units_moved = 0  # Reset units moved counter
-	movement_status.clear()  # Clear movement status array
-	if unit_check_timer != null:
-		unit_check_timer.stop()  # Stop the timer if running
-	print("GlobalManager reset.")
+		# Move to the next zombie
+		current_zombie_index = (current_zombie_index + 1) % zombie_units.size()  # Cycle through zombies
+	else:
+		if non_zombie_units.size() == 0:
+			print("No non-zombies available for ending turn.")
+			return
 
-# Method to be called when reloading the scene
-func reload_scene() -> void:
-	reset_manager()  # Reset the GlobalManager state
-	get_tree().reload_current_scene()  # Reload the current scene
-	setup_timer()  # Set up and start the timer again after scene reload
+		var current_unit = non_zombie_units[current_unit_index]
+		current_unit.end_turn()  # Call end_turn on the current non-zombie unit
+
+		# Mark the current non-zombie as having moved
+		movement_status_non_zombies[current_unit_index] = true
+		units_moved += 1
+
+		print("Non-zombies moved: ", units_moved, "/", non_zombie_units.size())
+
+		# Check if all non-zombies have moved before switching to zombies
+		if units_moved >= non_zombie_units.size():
+			print("All non-zombies have moved. Switching to zombies.")
+			reset_units_movement()  # Reset movement status for both sets of units
+			zombie_turn = true  # Switch to zombie turn
+
+		# Move to the next non-zombie
+		current_unit_index = (current_unit_index + 1) % non_zombie_units.size()  # Cycle through non-zombies
+
+	# Start the next unit's turn (whether zombie or non-zombie)
+	start_current_unit_turn()

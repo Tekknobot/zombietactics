@@ -225,10 +225,3 @@ func clear_existing_structures():
 	# Remove all children that are in the "structures" group
 	for structure in get_tree().get_nodes_in_group("structures"):
 		structure.queue_free()  # Remove the structure from the scene
-
-# Handle input for restarting the scene and hover functionality
-func _input(event):
-	if event.is_action_pressed("ui_accept"):  # Default is Spacebar		
-		GlobalManager.reload_scene()  # Restart the current scene
-
-	

@@ -357,10 +357,6 @@ func start_turn() -> void:
 	if is_zombie:
 		await move_to_nearest_non_zombie()  # Move towards the nearest non-zombie unit
 
-	if !is_zombie:
-		check_for_attack()  # Check for adjacent player units to attack
-
-
 # Check for adjacent player units to attack
 func check_for_attack() -> void:
 	var adjacent_positions = [

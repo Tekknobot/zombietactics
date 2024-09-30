@@ -37,6 +37,9 @@ var astar_grid: AStarGrid2D = null  # Reference to the AStarGrid2D
 var walkable_tile_prefab: PackedScene = preload("res://assets/scenes/UI/move_tile.tscn")
 var walkable_tiles: Array = []  # Stores references to walkable tile indicators
 
+var attackable_tile_prefab: PackedScene = preload("res://assets/scenes/UI/attack_tile.tscn")
+var attackable_tiles = []  # List to track attackable tile positions
+
 # Reference to the unit's sprite
 var sprite: AnimatedSprite2D = null
 
@@ -235,69 +238,6 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 			return true  # Unit is present on this tile
 	return false  # No unit present on this tile
 
-# Handle input events based on the current state
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("mouse_left"):
-		clear_walkable_tiles()
-		
-		# Get the tile position of the mouse click
-		var mouse_pos = get_global_mouse_position()
-		mouse_pos.y += 8  # Adjust offset if necessary
-
-		# Convert the mouse position to tile coordinates
-		var target_tile_pos = tilemap.local_to_map(tilemap.to_local(mouse_pos))
-
-		match state:
-			State.IDLE:
-				# If the unit is clicked, toggle selection and show walkable tiles
-				if tile_pos == target_tile_pos:
-					selected_unit = self  # Track this unit as selected
-					state = State.SELECTED  # Change state to SELECTED
-					
-					# Temporarily make the unit's current tile walkable in AStar
-					astar_grid.set_point_solid(tile_pos, false)
-					
-					show_walkable_tiles()  # Show movement options when selected
-					first_target_position = target_tile_pos  # Store the first click position
-					print("Unit selected. First target position: ", first_target_position)  # Debugging
-
-			State.SELECTED:
-				# If the user clicks the same tile again, deselect the unit
-				if tile_pos == target_tile_pos:
-					state = State.IDLE  # Deselect the unit
-					clear_walkable_tiles()  # Clear walkable tile indicators
-					reset_targets()  # Reset target positions
-					
-					# Restore the solid state of the current tile
-					astar_grid.set_point_solid(tile_pos, true)
-					
-					selected_unit = null  # Deselect the unit
-					print("Unit deselected.")  # Debugging
-					return
-
-				# Use temporary variables to store the targets
-				var temp_first_target = first_target_position
-				var temp_second_target = target_tile_pos
-
-				# Check if the clicked tile is walkable and not the same as the first target
-				if is_walkable(temp_second_target) and temp_first_target != temp_second_target:
-					second_target_position = temp_second_target  # Set second target position
-					
-					# Move to the tile, making sure the start tile is not solid
-					astar_grid.set_point_solid(tile_pos, false)  # Make sure the starting tile is walkable
-					move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
-					
-					clear_walkable_tiles()  # Clear markers after movement
-					state = State.IDLE  # Return to IDLE after moving
-					
-					# Restore the solid state of the tile after moving
-					astar_grid.set_point_solid(tile_pos, true)
-					
-					selected_unit = null  # Deselect the unit after movement
-					print("Unit moved to second target position: ", second_target_position)  # Debugging
-				elif !is_walkable(temp_second_target):
-					print("No Walkable tile.")
-
 # Function to check if the target tile is within movement range
 func is_within_range(target_tile_pos: Vector2i) -> bool:
 	var distance = abs(tile_pos.x - target_tile_pos.x) + abs(tile_pos.y - target_tile_pos.y)
@@ -453,12 +393,18 @@ func perform_attack(target_tile: Vector2i) -> void:
 	var target_is_zombie = !is_zombie  # Invert the current unit type to determine target type
 
 	# Find the correct target unit to deal damage to
+	var target_unit = null
 	for unit in get_tree().get_nodes_in_group("units"):
 		# Attack only the unit of the opposite type that is on the target tile
 		if unit.is_zombie == target_is_zombie and unit.tile_pos == target_tile:
-			unit.take_damage(attack_damage)  # Apply damage to the target unit
+			target_unit = unit  # Keep a reference to the target unit
+			target_unit.take_damage(attack_damage)  # Apply damage to the target unit
 			print(unit.unit_type + " attacked at tile: ", target_tile)
 			break  # Exit after attacking the first target unit on the tile
+
+	# Flash the target unit if it was hit
+	if target_unit:
+		flash_target(target_unit)  # Call the flash effect function
 
 	# Wait for a moment before flipping the sprite and playing the animation again
 	await get_tree().create_timer(0.5).timeout  # Wait for the duration of the attack animation
@@ -471,6 +417,32 @@ func perform_attack(target_tile: Vector2i) -> void:
 
 	sprite.flip_h = false  # Flip back the sprite to its original state
 	sprite.play("default")  # Reset to the default animation
+
+# Function to flash the target unit as a visual effect
+func flash_target(target_unit) -> void:
+	# Ensure the target unit is still valid before proceeding
+	if not is_instance_valid(target_unit):
+		return  # Exit the function if the target unit is no longer valid
+
+	# Change the target unit's modulate color to create a flash effect
+	var original_color = target_unit.modulate  # Store the original color
+	var flash_color = Color(1, 0, 0)  # Flash red color
+	var flash_duration = 0.25  # Duration for the flash effect
+	var flash_interval = 0.1  # Time to wait between flashes
+
+	# Calculate the number of flashes based on the duration and interval
+	var flashes_count = int(flash_duration / flash_interval)
+
+	# Flash back and forth for the specified duration
+	for i in range(flashes_count):
+		# Alternate between original and flash color
+		target_unit.modulate = flash_color if (i % 2 == 0) else original_color
+		await get_tree().create_timer(flash_interval).timeout  # Wait for the interval
+
+	# Restore the original color after flashing
+	if is_instance_valid(target_unit):  # Check again before restoring
+		target_unit.modulate = original_color
+
 
 # Method to take damage (should be part of your player unit script)
 func take_damage(amount: int) -> void:
@@ -579,3 +551,66 @@ func spawn_explosion(position: Vector2) -> void:
 		get_tree().get_root().get_node("MapManager").add_child(explosion_instance)
 	else:
 		print("Error: explosion_scene is not loaded properly.")
+
+# Handle input events based on the current state
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("mouse_left"):
+		clear_walkable_tiles()
+		
+		# Get the tile position of the mouse click
+		var mouse_pos = get_global_mouse_position()
+		mouse_pos.y += 8  # Adjust offset if necessary
+
+		# Convert the mouse position to tile coordinates
+		var target_tile_pos = tilemap.local_to_map(tilemap.to_local(mouse_pos))
+
+		match state:
+			State.IDLE:
+				# If the unit is clicked, toggle selection and show walkable tiles
+				if tile_pos == target_tile_pos:
+					selected_unit = self  # Track this unit as selected
+					state = State.SELECTED  # Change state to SELECTED
+					
+					# Temporarily make the unit's current tile walkable in AStar
+					astar_grid.set_point_solid(tile_pos, false)
+					
+					show_walkable_tiles()  # Show movement options when selected
+					first_target_position = target_tile_pos  # Store the first click position
+					print("Unit selected. First target position: ", first_target_position)  # Debugging
+
+			State.SELECTED:
+				# If the user clicks the same tile again, deselect the unit
+				if tile_pos == target_tile_pos:
+					state = State.IDLE  # Deselect the unit
+					clear_walkable_tiles()  # Clear walkable tile indicators
+					reset_targets()  # Reset target positions
+					
+					# Restore the solid state of the current tile
+					astar_grid.set_point_solid(tile_pos, true)
+					
+					selected_unit = null  # Deselect the unit
+					print("Unit deselected.")  # Debugging
+					return
+
+				# Use temporary variables to store the targets
+				var temp_first_target = first_target_position
+				var temp_second_target = target_tile_pos
+
+				# Check if the clicked tile is walkable and not the same as the first target
+				if is_walkable(temp_second_target) and temp_first_target != temp_second_target:
+					second_target_position = temp_second_target  # Set second target position
+					
+					# Move to the tile, making sure the start tile is not solid
+					astar_grid.set_point_solid(tile_pos, false)  # Make sure the starting tile is walkable
+					move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
+					
+					clear_walkable_tiles()  # Clear markers after movement
+					state = State.IDLE  # Return to IDLE after moving
+					
+					# Restore the solid state of the tile after moving
+					astar_grid.set_point_solid(tile_pos, true)
+					
+					selected_unit = null  # Deselect the unit after movement
+					print("Unit moved to second target position: ", second_target_position)  # Debugging
+				elif !is_walkable(temp_second_target):
+					print("No Walkable tile.")

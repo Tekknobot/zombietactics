@@ -22,6 +22,7 @@ GlobalManager="*res://scripts/GlobalManager.gd"
 [display]
 
 window/size/mode=2
+window/stretch/mode="viewport"
 
 [editor]
 
@@ -44,3 +45,4 @@ mouse_right={
 
 textures/canvas_textures/default_texture_filter=0
 environment/defaults/default_clear_color=Color(0.0962047, 0.0962048, 0.0962047, 1)
+2d/snap/snap_2d_transforms_to_pixel=true

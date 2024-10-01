@@ -39,9 +39,23 @@ var map_ready = false
 
 # Array to store structure coordinates
 var structure_coordinates = []
-
 # Array to store water coordinates
 var water_coordinates = []
+
+# Maximum number of each structure type to spawn
+@export var max_districts: int = 1  # Maximum number of districts
+@export var max_stadiums: int = 1   # Maximum number of stadiums
+@export var max_towers: int = 1     # Maximum number of towers
+@export var max_buildings: int = 10  # Maximum number of buildings
+# Add properties for maximum and minimum spacing between structures
+@export var min_distance_between_structures: int = 3  # Minimum distance between structures
+
+
+# Counters for spawned structures
+var district_count: int = 0
+var stadium_count: int = 0
+var tower_count: int = 0
+var building_count: int = 0
 
 # Called when the node enters the scene tree for the first time
 func _ready():
@@ -172,6 +186,9 @@ func handle_road_tile(x: int, y: int, road_tile: int):
 		set_tile(x, y, road_tile)
 
 func spawn_structures():
+	# Store positions of spawned structures for distance checks
+	var spawned_positions: Array = []
+
 	for x in range(grid_width):
 		for y in range(grid_height):
 			# Get the tile ID based on the noise value for this position
@@ -179,25 +196,68 @@ func spawn_structures():
 
 			# Only spawn on DIRT or GRASS and make sure the tile is not a road or already occupied
 			if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id) and not is_occupied(Vector2i(x, y)):
-				if rng.randi_range(0, 100) < 100:  # 50% chance to spawn a structure
+				if rng.randi_range(0, 100) < 100:  # 100% chance (you may want to adjust this)
 					var structure_type = rng.randi_range(0, 4)
+
 					match structure_type:
 						0:
-							spawn_structure(BUILDING_SCENE, x, y)  # Allow multiple buildings
+							if building_count < max_buildings:  # Check building limit
+								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [1, 2, 3]):  # Check against districts, stadiums, and towers
+									spawn_structure(BUILDING_SCENE, x, y)  # Allow multiple buildings
+									building_count += 1
+									spawned_positions.append(Vector2i(x, y))  # Track this position
 						1:
-							if not district_spawned:  # Only spawn one district
-								spawn_structure(DISTRICT_SCENE, x, y)
-								district_spawned = true
+							if district_count < max_districts:  # Only spawn up to max districts
+								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [0, 2, 3]):  # Check against buildings, stadiums, and towers
+									spawn_structure(DISTRICT_SCENE, x, y)
+									district_count += 1
+									spawned_positions.append(Vector2i(x, y))  # Track this position
 						2:
-							if not stadium_spawned:  # Only spawn one stadium
-								spawn_structure(STADIUM_SCENE, x, y)
-								stadium_spawned = true
+							if stadium_count < max_stadiums:  # Only spawn up to max stadiums
+								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [0, 1, 3]):  # Check against buildings, districts, and towers
+									spawn_structure(STADIUM_SCENE, x, y)
+									stadium_count += 1
+									spawned_positions.append(Vector2i(x, y))  # Track this position
 						3:
-							if not tower_spawned:  # Only spawn one tower
-								spawn_structure(TOWER_SCENE, x, y)
-								tower_spawned = true
-								
+							if tower_count < max_towers:  # Only spawn up to max towers
+								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [0, 1, 2]):  # Check against buildings, districts, and stadiums
+									spawn_structure(TOWER_SCENE, x, y)
+									tower_count += 1
+									spawned_positions.append(Vector2i(x, y))  # Track this position
+
 	map_ready = true
+
+# Function to check if a structure can be spawned based on minimum distance
+func can_spawn(new_pos: Vector2i, existing_positions: Array, min_distance: int, excluded_types: Array) -> bool:
+	# Check against the existing positions to maintain distance
+	for pos in existing_positions:
+		if new_pos.distance_to(pos) < min_distance:
+			return false  # Too close to an existing structure
+
+	# Now check against the excluded types if they are present in the nearby area
+	for excluded_type in excluded_types:
+		# Check positions around the new_pos for other structures
+		for dx in range(-1, 2):  # Check the 3x3 grid around new_pos
+			for dy in range(-1, 2):
+				if dx == 0 and dy == 0:
+					continue  # Skip the new position itself
+				var check_pos = new_pos + Vector2i(dx, dy)
+				if is_valid_position(check_pos) and is_structure_type(check_pos, excluded_type):  # Check if this position is valid and contains an excluded structure type
+					return false  # Too close to an excluded structure type
+
+	return true  # Valid position for spawning
+
+# Function to check if a position is valid for checking
+func is_valid_position(pos: Vector2i) -> bool:
+	# Add any necessary checks to see if the position is within the map bounds
+	return pos.x >= 0 and pos.x < grid_width and pos.y >= 0 and pos.y < grid_height
+
+# Function to check if a structure type is present at a given position
+func is_structure_type(pos: Vector2i, structure_type: int) -> bool:
+	# Implement your logic to check if the position has the corresponding structure type
+	# For example, you may have a method to get the structure type at a given position
+	# Here, just a placeholder return value
+	return false  # Replace with actual check
 
 # Helper function to check if a tile is a road tile
 func is_road(tile_id: int) -> bool:

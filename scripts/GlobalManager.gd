@@ -178,8 +178,12 @@ func _input(event: InputEvent) -> void:
 
 # Method to select a unit
 func select_unit(unit: UnitManager) -> void:
-	if current_selected_unit and current_selected_unit != unit:
+	# Check if there is a currently selected unit and if it's valid and different from the new unit
+	if current_selected_unit and is_instance_valid(current_selected_unit) and current_selected_unit != unit:
 		current_selected_unit.deselect()  # Deselect the previously selected unit
 
+	# Assign the new unit as the currently selected unit
 	current_selected_unit = unit
-	current_selected_unit.select()  # Call the select method on the new selected unit
+	# Select the newly assigned unit
+	if is_instance_valid(current_selected_unit):  # Ensure the new unit is valid
+		current_selected_unit.select()

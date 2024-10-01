@@ -179,7 +179,7 @@ func spawn_structures():
 
 			# Only spawn on DIRT or GRASS and make sure the tile is not a road or already occupied
 			if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id) and not is_occupied(Vector2i(x, y)):
-				if rng.randi_range(0, 100) < 50:  # 50% chance to spawn a structure
+				if rng.randi_range(0, 100) < 100:  # 50% chance to spawn a structure
 					var structure_type = rng.randi_range(0, 4)
 					match structure_type:
 						0:

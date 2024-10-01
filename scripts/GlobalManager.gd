@@ -148,15 +148,13 @@ func end_current_unit_turn() -> void:
 	# Start the next unit's turn (whether zombie or non-zombie)
 	start_current_unit_turn()
 
-# Method to reload the scene and reset the manager and timer
 func reload_scene() -> void:
 	print("Reloading the scene...")
+	current_selected_unit = null  # Clear current selection before reloading
 	reset_manager()  # Reset the GlobalManager state
-	# Restart the scene after resetting
 	get_tree().reload_current_scene()  # Reload the current scene
-	# Ensure the timer will check for units again after the reload
 	setup_timer()  # Set up the timer again after scene reload
-	
+
 # Method to reset the GlobalManager state
 func reset_manager() -> void:
 	print("Resetting GlobalManager state.")

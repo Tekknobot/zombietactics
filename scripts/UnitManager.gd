@@ -43,9 +43,6 @@ var hud: Control = null
 var walkable_tile_prefab: PackedScene = preload("res://assets/scenes/UI/move_tile.tscn")
 var walkable_tiles: Array = []  # Stores references to walkable tile indicators
 
-var attackable_tile_prefab: PackedScene = preload("res://assets/scenes/UI/attack_tile.tscn")
-var attackable_tiles = []  # List to track attackable tile positions
-
 # Reference to the unit's sprite
 var sprite: AnimatedSprite2D = null
 
@@ -53,7 +50,7 @@ var last_position: Vector2  # Variable to store the last position of the unit
 
 var selected_unit: Node2D = null  # Track the currently selected unit
 
-var has_moved
+var armed_attack
 
 # This flag is used to differentiate zombies from non-zombie units
 @export var is_zombie: bool
@@ -629,9 +626,9 @@ func _input(event: InputEvent) -> void:
 					# Move to the tile, making sure the start tile is not solid
 					astar_grid.set_point_solid(tile_pos, false)  # Make sure the starting tile is walkable
 					
-					if GlobalManager.zombie_turn and self.is_zombie:
+					if GlobalManager.zombie_turn and self.is_zombie and !armed_attack:
 						move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
-					if !GlobalManager.zombie_turn and !self.is_zombie:
+					if !GlobalManager.zombie_turn and !self.is_zombie and !armed_attack:
 						move_to_tile(temp_first_target, second_target_position)  # Move to the clicked tile position
 					
 					clear_walkable_tiles()  # Clear markers after movement

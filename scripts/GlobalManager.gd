@@ -187,3 +187,18 @@ func select_unit(unit: UnitManager) -> void:
 	# Select the newly assigned unit
 	if is_instance_valid(current_selected_unit):  # Ensure the new unit is valid
 		current_selected_unit.select()
+
+# Function to get a unit by its type (either from zombie or non-zombie units)
+func get_unit_by_type(unit_type: String) -> UnitManager:
+	# First, check non-zombie units
+	for unit in non_zombie_units:
+		if unit.unit_type == unit_type:
+			return unit  # Return the unit instance if found in non-zombie units
+
+	# Then, check zombie units
+	for unit in zombie_units:
+		if unit.unit_type == unit_type:
+			return unit  # Return the unit instance if found in zombie units
+
+	# If no matching unit is found, return null
+	return null

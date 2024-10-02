@@ -50,7 +50,7 @@ var last_position: Vector2  # Variable to store the last position of the unit
 
 var selected_unit: Node2D = null  # Track the currently selected unit
 
-var armed_attack
+var armed_attack = false
 
 # This flag is used to differentiate zombies from non-zombie units
 @export var is_zombie: bool
@@ -223,6 +223,25 @@ func is_walkable(tile_pos: Vector2i) -> bool:
 
 	# If no walkable tiles match, check other conditions: not water, not a structure, and not a unit present
 	return not is_water(tile_pos) and not is_structure(tile_pos) and not is_unit_present(tile_pos)
+
+# Check if the tile is walkable
+func is_attackable(tile_pos: Vector2i) -> bool:
+	# Calculate the Manhattan distance between the current tile and the target tile
+	var distance = abs(tile_pos.x - self.tile_pos.x) + abs(tile_pos.y - self.tile_pos.y)
+	
+	# Ensure the tile is within movement range
+	if distance > movement_range:
+		return false  # If the tile is beyond movement range, it is not walkable
+
+	# Check if the tile position is in the list of walkable tiles
+	for walkable_tile in walkable_tiles:
+		# Check if the current walkable tile matches the position being checked
+		if walkable_tile.position == tilemap.map_to_local(tile_pos):
+			return true  # If the tile is a walkable tile, return true
+
+	# If no walkable tiles match, check other conditions: not water, not a structure, and not a unit present
+	return not is_water(tile_pos) and not is_structure(tile_pos)
+
 
 # Check if the tile is water
 func is_water(tile_pos: Vector2i) -> bool:
@@ -578,6 +597,7 @@ func _input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("mouse_left"):
 		clear_walkable_tiles()
+		hud.clear_attackable_tiles()
 		
 		# Get the tile position of the mouse click
 		var mouse_pos = get_global_mouse_position()
@@ -649,6 +669,7 @@ func select() -> void:
 	sprite.modulate = Color(1, 1, 1)  # Change sprite color to yellow to indicate selection
 	# Show walkable or attackable tiles, if any
 	#show_walkable_tiles()
+	armed_attack = false
 	print("Unit selected: ", self.unit_type)
 
 # This method is called to deselect the unit

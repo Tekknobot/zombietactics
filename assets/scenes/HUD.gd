@@ -23,6 +23,8 @@ var global_manager = null  # Reference to the GlobalManager
 var waiting_for_attack_target = false  # Flag to indicate waiting for attack target
 var attack_range: int  # Attack range of the selected unit
 
+var attackable_tiles: Array = []  # Array to store currently active attackable tiles
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Get references to HUD elements by their node paths
@@ -82,6 +84,7 @@ func _on_attack_button_down() -> void:
 			print("Attack button pressed! Waiting for target...")
 			waiting_for_attack_target = true
 			selected_unit.armed_attack = true
+			
 			highlight_attackable_tiles()  # Highlight attackable tiles
 		else:
 			print("This unit cannot attack right now.")
@@ -90,11 +93,10 @@ func _on_attack_button_down() -> void:
 
 # Function to clear previously shown attackable tiles
 func clear_attackable_tiles() -> void:
-	# Iterate through children of the TileMap and remove attackable tiles
-	for child in tile_map.get_children():
-		if child.name == "AttackableTile":  # Ensure to check the naming convention used for your prefab
-			print("Removing attackable tile at position: ", child.position)  # Debugging output
-			child.queue_free()  # Remove it from the scene
+	for attackable_tile in attackable_tiles:
+		attackable_tile.queue_free()  # Remove it from the scene
+		print("Removed attackable tile at: ", attackable_tile.position)  # Debugging line
+	attackable_tiles.clear()  # Clear the array
 
 # Highlight attackable tiles based on the selected unit's attack range
 func highlight_attackable_tiles() -> void:
@@ -112,13 +114,16 @@ func highlight_attackable_tiles() -> void:
 					# Ensure the target tile position is within the bounds of the TileMap
 					if tile_map.get_used_rect().has_point(target_tile_pos):  # Only process valid tile positions
 						# Check if the tile is walkable or if it is an enemy unit
-						if selected_unit.is_walkable(target_tile_pos):  # You can customize this condition based on your game logic
+						if selected_unit.is_attackable(target_tile_pos):  # You can customize this condition based on your game logic
 							# Instance the attackable tile prefab at the target position
 							var attackable_tile = attackable_tile_prefab.instantiate()
 							var attackable_tile_world_pos = tile_map.map_to_local(target_tile_pos)  # Convert tile position to world position
 							attackable_tile.position = attackable_tile_world_pos  # Set the position of the attackable tile
 							attackable_tile.name = "AttackableTile"  # Assign a name to the tile for identification
 							tile_map.add_child(attackable_tile)  # Add to the TileMap or main scene
+
+							# Add the new tile to the active tiles array
+							attackable_tiles.append(attackable_tile)
 
 							# Debugging information
 							print("Added attackable tile at position: ", target_tile_pos, " (World position: ", attackable_tile_world_pos, ")")
@@ -140,7 +145,10 @@ func on_enemy_unit_clicked(enemy_unit) -> void:
 			execute_attack_on_enemy(enemy_unit)
 		else:
 			print("Enemy out of range.")
-		waiting_for_attack_target = false  # Stop waiting after target selection
+	else:
+		# If no target was selected, reset armed attack state
+		selected_unit.armed_attack = false  # Cancel armed attack if no valid target
+	waiting_for_attack_target = false  # Stop waiting after target selection
 
 # Function to execute the attack logic
 func execute_attack_on_enemy(enemy_unit) -> void:
@@ -153,12 +161,8 @@ func execute_attack_on_enemy(enemy_unit) -> void:
 	# Optionally flash the enemy red or show damage dealt (using UnitManager's feedback)
 	unit_manager.flash_target(enemy_unit, Color(1, 0, 0))  # This is a placeholder for feedback
 
+	# Set armed_attack to false after the attack
+	selected_unit.armed_attack = false  # Reset armed attack state
+
 	# End the turn after the attack
 	global_manager.end_current_unit_turn()  # Call to end the current unit's turn
-
-# Public function to manually select a unit (useful for testing or external triggers)
-func select_unit(unit_type: String) -> void:
-	# Get the unit's current stats from the UnitManager or GlobalManager
-	var unit = global_manager.get_unit_by_type(unit_type)
-	if unit:
-		update_hud_for_unit(unit_type, unit.health, unit.max_health, unit.attack_damage)

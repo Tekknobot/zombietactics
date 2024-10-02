@@ -310,9 +310,6 @@ func move_to_tile(first_tile_pos: Vector2i, target_tile_pos: Vector2i) -> void:
 		
 		is_moving = false  # Unlock the unit after movement
 		
-		if is_zombie:
-			self.has_moved = true
-		
 		# Check if there are any units to attack
 		var did_attack = await check_for_attack()  # This should return true if an attack occurred
 		
@@ -671,6 +668,8 @@ func select() -> void:
 	#show_walkable_tiles()
 	armed_attack = false
 	print("Unit selected: ", self.unit_type)
+	if is_zombie:
+		hud.on_enemy_unit_clicked(self)
 
 # This method is called to deselect the unit
 func deselect() -> void:
@@ -680,3 +679,22 @@ func deselect() -> void:
 	# Hide walkable or attackable tiles, if any
 	clear_walkable_tiles()
 	print("Unit deselected: ", self.unit_type)
+
+# Assuming you have access to unit positions and their attack range
+func is_in_attack_range(selected_unit, enemy_unit) -> bool:
+	# Get the tile positions of the selected unit and enemy unit
+	var selected_unit_pos = tilemap.local_to_map(selected_unit.position)  # Convert world position to tile position
+	var enemy_unit_pos = tilemap.local_to_map(enemy_unit.position)  # Convert world position to tile position
+
+	# Calculate the Manhattan distance
+	var distance = abs(selected_unit_pos.x - enemy_unit_pos.x) + abs(selected_unit_pos.y - enemy_unit_pos.y)
+
+	# Compare distance with the attack range
+	return distance <= selected_unit.attack_range
+
+
+func attack():
+	sprite.play("attack")
+	await get_tree().create_timer(0.5).timeout
+	sprite.play("default")
+	

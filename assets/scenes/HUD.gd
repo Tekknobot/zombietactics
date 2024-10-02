@@ -139,8 +139,8 @@ func highlight_attackable_tiles() -> void:
 # This function will be called when an enemy unit is clicked (needs to be hooked into the input system)
 func on_enemy_unit_clicked(enemy_unit) -> void:
 	if waiting_for_attack_target and selected_unit:
-		# Check if the enemy is in range using UnitManager
-		if unit_manager.is_in_attack_range(selected_unit, enemy_unit):
+		# Check if the enemy is in range using the new function
+		if selected_unit.is_in_attack_range(selected_unit, enemy_unit):
 			print("Enemy in range! Attacking...")
 			execute_attack_on_enemy(enemy_unit)
 		else:
@@ -153,16 +153,16 @@ func on_enemy_unit_clicked(enemy_unit) -> void:
 # Function to execute the attack logic
 func execute_attack_on_enemy(enemy_unit) -> void:
 	# Ensure the selected unit has an attack method (and that it's implemented)
-	selected_unit.attack(enemy_unit)
-
+	selected_unit.attack()
+	
 	# Assuming the enemy unit has 'health' and 'max_health' properties
-	update_health(enemy_unit.health, enemy_unit.max_health)
+	update_health(enemy_unit.health, enemy_unit.maxhealth)
 
 	# Optionally flash the enemy red or show damage dealt (using UnitManager's feedback)
-	unit_manager.flash_target(enemy_unit, Color(1, 0, 0))  # This is a placeholder for feedback
+	enemy_unit.flash_target(enemy_unit)  # This is a placeholder for feedback
 
 	# Set armed_attack to false after the attack
 	selected_unit.armed_attack = false  # Reset armed attack state
 
 	# End the turn after the attack
-	global_manager.end_current_unit_turn()  # Call to end the current unit's turn
+	GlobalManager.end_current_unit_turn()  # Call to end the current unit's turn

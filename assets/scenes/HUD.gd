@@ -156,7 +156,7 @@ func execute_attack_on_enemy(enemy_unit) -> void:
 	selected_unit.attack()
 	
 	# Assuming the enemy unit has 'health' and 'max_health' properties
-	update_health(enemy_unit.health, enemy_unit.maxhealth)
+	enemy_unit.take_damage(selected_unit.attack_damage) 
 
 	# Optionally flash the enemy red or show damage dealt (using UnitManager's feedback)
 	enemy_unit.flash_target(enemy_unit)  # This is a placeholder for feedback

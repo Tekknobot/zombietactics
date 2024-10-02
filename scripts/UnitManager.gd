@@ -505,6 +505,7 @@ func die() -> void:
 
 	# Reset current unit index to 0 in the GlobalManager
 	GlobalManager.current_unit_index = 0
+	clear_walkable_tiles()
 
 # Called when the unit's turn ends
 func end_turn() -> void:
@@ -666,10 +667,12 @@ func select() -> void:
 	sprite.modulate = Color(1, 1, 1)  # Change sprite color to yellow to indicate selection
 	# Show walkable or attackable tiles, if any
 	#show_walkable_tiles()
-	armed_attack = false
 	print("Unit selected: ", self.unit_type)
 	if is_zombie:
 		hud.on_enemy_unit_clicked(self)
+		clear_walkable_tiles()	
+		
+	armed_attack = false
 
 # This method is called to deselect the unit
 func deselect() -> void:
@@ -691,7 +694,6 @@ func is_in_attack_range(selected_unit, enemy_unit) -> bool:
 
 	# Compare distance with the attack range
 	return distance <= selected_unit.attack_range
-
 
 func attack():
 	sprite.play("attack")

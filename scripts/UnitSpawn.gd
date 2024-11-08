@@ -87,19 +87,17 @@ func is_occupied(tile_pos: Vector2i) -> bool:
 
 # Handle input events for mouse clicks
 func _input(event):
+	# Prevent input if spawning is disabled
+	if not can_spawn:
+		return
+
 	if event is InputEventMouseButton and event.pressed:
 		# Convert mouse position to local space (taking into account map's position)
 		var mouse_position = get_global_mouse_position()
 		mouse_position.y += 8  # Adjust for the tile size
 		
-		# Print debug info to ensure the correct conversion
-		print("Mouse position:", mouse_position)
-		
 		# Convert mouse position to local coordinates within the TileMap
 		var local_pos = tilemap.to_local(mouse_position)
-		
-		# Print debug info to verify the local position
-		print("Local position:", local_pos)
 		
 		# Convert local position to tile coordinates (using 16x16 grid size)
 		var tile_pos = tilemap.local_to_map(local_pos)
@@ -107,9 +105,6 @@ func _input(event):
 		# Clamp tile coordinates to stay within bounds of a 16x16 grid (0 to 15 for both x and y)
 		tile_pos.x = clamp(tile_pos.x, 0, 15)
 		tile_pos.y = clamp(tile_pos.y, 0, 15)
-		
-		# Print tile position for debug
-		print("Tile position (clamped):", tile_pos)  # Debug output to check tile position
 		
 		# Ensure the tile is within bounds
 		if is_within_bounds(tile_pos):
@@ -162,6 +157,6 @@ func spawn_zombies():
 		else:
 			print("Tile is not spawnable or occupied. Retrying...")
 	
-	# After zombies are spawned, disable further spawning
+	# After zombies are spawned, disable further spawning and input handling
 	can_spawn = false
-	print("All units and zombies have been spawned. Further spawning is disabled.")
+	print("All units and zombies have been spawned. Further spawning and input handling are disabled.")

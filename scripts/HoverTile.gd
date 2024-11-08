@@ -24,7 +24,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	# Get the current global mouse position
 	var mouse_pos: Vector2 = get_global_mouse_position()
-	
+
 	# Offset to align the hover tile if necessary
 	mouse_pos.y += 8  # Adjust based on tile size
 
@@ -47,11 +47,11 @@ func _process(delta: float) -> void:
 
 # Function to check if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:
-	# Get the size of the tilemap (assuming rectangular bounds)
-	var map_size: Vector2i = tilemap.get_used_rect().size
+	# Get the size of the tilemap's used area (this is the relevant area)
+	var map_rect: Rect2i = tilemap.get_used_rect()
 
-	# Check if the tile position is within the bounds of the tilemap
-	return tile_pos.x >= 0 and tile_pos.y >= 0 and tile_pos.x < map_size.x and tile_pos.y < map_size.y
+	# Check if the tile position is within the bounds of the tilemap's used area
+	return tile_pos.x >= map_rect.position.x and tile_pos.y >= map_rect.position.y and tile_pos.x < map_rect.position.x + map_rect.size.x and tile_pos.y < map_rect.position.y + map_rect.size.y
 
 # Function to check for player unit clicks
 func check_for_click(tile_pos: Vector2i) -> void:
@@ -63,17 +63,24 @@ func check_for_click(tile_pos: Vector2i) -> void:
 	if Input.is_action_just_pressed("mouse_left"):  # Use your preferred click action
 		# If awaiting a movement click and the clicked tile is in the movement range, move the player
 		if awaiting_movement_click and tile_pos in movement_range_tiles:
-			selected_player.move_player_to_target(tile_pos)  # Pass delta instead of world_pos
-			clear_selection()  # Clear selection after movement
+			# Clear the movement tiles
+			clear_movement_tiles()
+						
+			# Move the selected player to the target tile
+			selected_player.move_player_to_target(tile_pos)
+
+			if selected_player.selected == true:
+				clear_selection()
+				
 			return
-		
+
 		# Otherwise, check if a player unit is clicked to select it
 		var players = get_tree().get_nodes_in_group("player_units")  # Ensure all player units are in the "player_units" group
 		for player in players:
+			# Check if the player's global position matches the clicked world position
 			if player.global_position == world_pos:
-				# If a player is clicked, select it
-				if selected_player != player:
-					select_player(player)
+				# If a player is clicked, select it and clear the current selection
+				select_player(player)
 				return
 
 		# If clicked on an empty tile and not awaiting movement, clear the selection
@@ -83,11 +90,12 @@ func check_for_click(tile_pos: Vector2i) -> void:
 # Function to select a player unit
 func select_player(player: Area2D) -> void:
 	# If there's an already selected player, clear its movement tiles
-	if selected_player:
+	if selected_player and selected_player != player:
 		clear_selection()
 
 	# Set the new selected player
 	selected_player = player
+	selected_player.selected = true
 	# Display its movement tiles and store the tiles within range
 	movement_range_tiles = selected_player.get_movement_tiles()  # Assuming the player has this method
 	selected_player.display_movement_tiles()  # Show movement tiles
@@ -95,8 +103,14 @@ func select_player(player: Area2D) -> void:
 
 # Function to clear the previously selected player and their movement tiles
 func clear_selection() -> void:
-	if selected_player:
-		selected_player.clear_movement_tiles()  # Hide movement tiles
-		selected_player = null
+	# Clear movement tiles and deselect the current player
+	clear_movement_tiles()
 	movement_range_tiles.clear()
 	awaiting_movement_click = false
+	selected_player.selected = false
+	selected_player = null
+
+# Function to clear movement tiles after a move or deselection
+func clear_movement_tiles() -> void:
+	if selected_player.selected == true:
+		selected_player.clear_movement_tiles()  # Hide movement tiles after move

@@ -28,6 +28,10 @@ var move_speed: float = 100.0  # Movement speed for the soldier
 # Constants
 const WATER_TILE_ID = 1  # Replace with the actual tile ID for water
 
+var awaiting_movement_click: bool = false
+
+@export var selected: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -171,6 +175,10 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
 
+	# Once the path is calculated, move the player to the target (will also update selected_player state)
+	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
+	# Do not clear selection here. We keep selected_player intact.
+
 # Function to move the soldier along the path
 func move_along_path(delta: float) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -182,7 +190,7 @@ func move_along_path(delta: float) -> void:
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
 		
 		# Convert the target position to world position (center of the tile)
-		var target_world_pos = tilemap.map_to_local(target_pos) + Vector2(0,0) / 2  # Ensure it's the center of the tile
+		var target_world_pos = tilemap.map_to_local(target_pos) + Vector2(0, 0) / 2  # Ensure it's the center of the tile
 		
 		# Calculate the direction to the target position
 		var direction = (target_world_pos - position).normalized()
@@ -199,7 +207,10 @@ func move_along_path(delta: float) -> void:
 
 	# If we've reached the last tile, stop moving
 	if path_index >= current_path.size():
-		print("Path completed!")
+		#print("Path completed!")
+		# Retain the selection after completing the path
+		# Don't clear the selection, ensure that selected_player is still set
+		awaiting_movement_click = false  # Finish the movement click state
 
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:

@@ -73,6 +73,12 @@ func display_movement_tiles() -> void:
 			tile_map.add_child(movement_tile_instance)  # Add to the TileMap node directly
 			movement_tiles.append(movement_tile_instance)
 
+# Function to clear displayed movement tiles
+func clear_movement_tiles() -> void:
+	for tile in movement_tiles:
+		tile.queue_free()
+	movement_tiles.clear()
+
 # Helper function to check if a tile is movable
 func is_tile_movable(tile_pos: Vector2i, tile_map: TileMap) -> bool:
 	# 1. Check the tile type (e.g., exclude water tiles)
@@ -117,10 +123,3 @@ func is_unit_on_tile(tile_pos: Vector2i, tile_map: TileMap) -> bool:
 		if tile_pos == unit_tile_pos:
 			return true  # A unit is on this tile
 	return false  # No units found on this tile
-
-
-# Function to clear displayed movement tiles
-func clear_movement_tiles() -> void:
-	for tile in movement_tiles:
-		tile.queue_free()
-	movement_tiles.clear()

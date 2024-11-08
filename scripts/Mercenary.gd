@@ -172,6 +172,8 @@ func calculate_path(target_tile: Vector2i) -> void:
 
 # Update the AStar grid and calculate the path
 func move_player_to_target(target_tile: Vector2i) -> void:
+	get_child(0).play("move")
+	
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
 
@@ -193,8 +195,15 @@ func move_along_path(delta: float) -> void:
 		var target_world_pos = tilemap.map_to_local(target_pos) + Vector2(0, 0) / 2  # Ensure it's the center of the tile
 		
 		# Calculate the direction to the target position
+		# Calculate direction to move in (normalized vector)
 		var direction = (target_world_pos - position).normalized()
-		
+
+		# Determine the direction of movement based on target and current position
+		if direction.x > 0:
+			scale.x = -1  # Facing right (East)
+		elif direction.x < 0:
+			scale.x = 1  # Facing left (West)	
+			
 		# Move the soldier in the direction of the target position, adjusted by delta
 		position += direction * move_speed * delta
 		
@@ -211,7 +220,8 @@ func move_along_path(delta: float) -> void:
 		# Retain the selection after completing the path
 		# Don't clear the selection, ensure that selected_player is still set
 		awaiting_movement_click = false  # Finish the movement click state
-
+		get_child(0).play("default")
+		
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:
 	var map_size: Vector2i = tilemap.get_used_rect().size

@@ -3,11 +3,14 @@ extends Node2D
 # Reference to the TileMap
 var tilemap: TileMap = null
 
-# Reference to the currently hovered player
-var hovered_player: Area2D = null
-
 # Reference to the currently selected player
 var selected_player: Area2D = null
+
+# Track if we are waiting for a second click within the movement range
+var awaiting_movement_click: bool = false
+
+# Store the movement range of the selected player
+var movement_range_tiles: Array[Vector2i] = []
 
 # Called when the node enters the scene
 func _ready() -> void:
@@ -21,7 +24,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	# Get the current global mouse position
 	var mouse_pos: Vector2 = get_global_mouse_position()
-
+	
 	# Offset to align the hover tile if necessary
 	mouse_pos.y += 8  # Adjust based on tile size
 
@@ -52,12 +55,19 @@ func is_within_bounds(tile_pos: Vector2i) -> bool:
 
 # Function to check for player unit clicks
 func check_for_click(tile_pos: Vector2i) -> void:
-	# Convert tile position to world position
-	var world_pos = tilemap.map_to_local(tile_pos)
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	# Convert tile position to world position (tilemap coordinates -> world coordinates)
+	var world_pos = tilemap.map_to_local(tile_pos)  # tile_pos is Vector2i, world_pos will be Vector2
 
 	# Check if the mouse button is clicked
 	if Input.is_action_just_pressed("mouse_left"):  # Use your preferred click action
-		# Check if any player unit is clicked
+		# If awaiting a movement click and the clicked tile is in the movement range, move the player
+		if awaiting_movement_click and tile_pos in movement_range_tiles:
+			selected_player.move_player_to_target(tile_pos)  # Pass delta instead of world_pos
+			clear_selection()  # Clear selection after movement
+			return
+		
+		# Otherwise, check if a player unit is clicked to select it
 		var players = get_tree().get_nodes_in_group("player_units")  # Ensure all player units are in the "player_units" group
 		for player in players:
 			if player.global_position == world_pos:
@@ -66,23 +76,27 @@ func check_for_click(tile_pos: Vector2i) -> void:
 					select_player(player)
 				return
 
-		# If clicked on an empty tile, clear the movement tiles
-		if selected_player:
-			clear_hovered_player()
+		# If clicked on an empty tile and not awaiting movement, clear the selection
+		if selected_player and not awaiting_movement_click:
+			clear_selection()
 
 # Function to select a player unit
 func select_player(player: Area2D) -> void:
 	# If there's an already selected player, clear its movement tiles
 	if selected_player:
-		clear_hovered_player()
+		clear_selection()
 
 	# Set the new selected player
 	selected_player = player
-	# Display its movement tiles
-	selected_player.display_movement_tiles()
+	# Display its movement tiles and store the tiles within range
+	movement_range_tiles = selected_player.get_movement_tiles()  # Assuming the player has this method
+	selected_player.display_movement_tiles()  # Show movement tiles
+	awaiting_movement_click = true  # Enable waiting for second click
 
 # Function to clear the previously selected player and their movement tiles
-func clear_hovered_player() -> void:
+func clear_selection() -> void:
 	if selected_player:
-		selected_player.clear_movement_tiles()
+		selected_player.clear_movement_tiles()  # Hide movement tiles
 		selected_player = null
+	movement_range_tiles.clear()
+	awaiting_movement_click = false

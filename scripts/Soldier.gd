@@ -14,112 +14,210 @@ var tile_pos: Vector2i
 var coord: Vector2
 var layer: int
 
+# Pathfinding system
+var astar: AStarGrid2D = AStarGrid2D.new()
+
+# Tilemap reference
+@export var tilemap: TileMap = null
+
+# Pathfinding variables
+var current_path: Array[Vector2i] = []  # Stores the path tiles
+var path_index: int = 0  # Index for the current step in the path
+var move_speed: float = 100.0  # Movement speed for the soldier
+
+# Constants
+const WATER_TILE_ID = 1  # Replace with the actual tile ID for water
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if tilemap == null:
+		print("Error: Tilemap is not set.")
+		return
+	
 	update_tile_position()
+	setup_astar()
+	visualize_walkable_tiles()
 
 # Called every frame
 func _process(delta: float) -> void:
 	update_tile_position()
+	move_along_path(delta)
 
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
-	# Get the TileMap node
-	var tile_map: TileMap = get_node("/root/MapManager/TileMap")  # Adjust path based on your scene structure
-	
-	# Convert the current position to tile coordinates
-	tile_pos = tile_map.local_to_map(position)
-
-	# Store the tile coordinates
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	tile_pos = tilemap.local_to_map(position)
 	coord = tile_pos
-	
-	# Update z_index for layering based on tile position
 	layer = (tile_pos.x + tile_pos.y) + 1
 	self.z_index = layer
 
-# Function to get all tiles within movement range based on Manhattan distance
+# Function to update the AStar grid based on the current tilemap state
+func update_astar_grid() -> void:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	var grid_width = tilemap.get_used_rect().size.x
+	var grid_height = tilemap.get_used_rect().size.y
+	
+	astar.size = Vector2i(grid_width, grid_height)
+	astar.cell_size = Vector2(1, 1)  # Assuming each cell is 1x1
+	astar.default_compute_heuristic = 1
+	astar.diagonal_mode = 1
+	astar.update()
+	
+	# Update walkable and unwalkable cells
+	for x in range(grid_width):
+		for y in range(grid_height):
+			var tile_id = tilemap.get_cell_source_id(0, Vector2i(x, y))
+			if tile_id == -1 or tile_id == 0 or is_structure(Vector2i(x, y)) or is_unit_present(Vector2i(x, y)):
+				astar.set_point_solid(Vector2i(x, y), true)  # Mark as non-walkable (solid)
+			else:
+				astar.set_point_solid(Vector2i(x, y), false)  # Mark as walkable
+
+# Setup the AStarGrid2D with walkable tiles
+func setup_astar() -> void:
+	update_astar_grid()  # Update AStar grid to reflect current map state
+	print("AStar grid setup completed.")
+
+# Get all tiles within movement range based on Manhattan distance
 func get_movement_tiles() -> Array[Vector2i]:
 	var tiles_in_range: Array[Vector2i] = []
-	var tile_map: TileMap = get_node("/root/MapManager/TileMap")
-
-	# Loop through each tile within range using Manhattan distance
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for x in range(-movement_range, movement_range + 1):
 		for y in range(-movement_range, movement_range + 1):
 			if abs(x) + abs(y) <= movement_range:
 				var target_tile_pos: Vector2i = tile_pos + Vector2i(x, y)
-				# Check if the target tile is within the bounds of the map
-				if tile_map.get_used_rect().has_point(target_tile_pos):
+				if tilemap.get_used_rect().has_point(target_tile_pos):
 					tiles_in_range.append(target_tile_pos)
 
 	return tiles_in_range
 
-# Function to display movement tiles within range
+# Display movement tiles within range
 func display_movement_tiles() -> void:
-	clear_movement_tiles()  # Clear existing movement tiles first
-
-	# Get the TileMap node
-	var tile_map: TileMap = get_node("/root/MapManager/TileMap")
-
-	# Loop through each tile in the movement range and instantiate a movement tile
+	clear_movement_tiles()
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for tile in get_movement_tiles():
-		# Check if the tile is movable (not water, no structures, and no units)
-		if is_tile_movable(tile, tile_map):
-			# Convert the tile position to the correct world position
-			var world_pos: Vector2 = tile_map.map_to_local(tile)
-
-			# Instantiate the movement tile and set its position
+		if is_tile_movable(tile):
+			var world_pos: Vector2 = tilemap.map_to_local(tile)
 			var movement_tile_instance: Node2D = movement_tile_scene.instantiate() as Node2D
-			movement_tile_instance.position = world_pos  # Position within the tile map
-			tile_map.add_child(movement_tile_instance)  # Add to the TileMap node directly
+			movement_tile_instance.position = world_pos
+			tilemap.add_child(movement_tile_instance)
 			movement_tiles.append(movement_tile_instance)
 
-# Function to clear displayed movement tiles
+# Clear displayed movement tiles
 func clear_movement_tiles() -> void:
 	for tile in movement_tiles:
 		tile.queue_free()
 	movement_tiles.clear()
 
-# Helper function to check if a tile is movable
-func is_tile_movable(tile_pos: Vector2i, tile_map: TileMap) -> bool:
-	# 1. Check the tile type (e.g., exclude water tiles)
-	var tile_id = tile_map.get_cell_source_id(0, Vector2i(tile_pos.x, tile_pos.y))  # Ensure 0 is the correct layer
+# Check if a tile is movable
+func is_tile_movable(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
 	if is_water_tile(tile_id):
 		return false
-
-	# 2. Check for structures or obstacles on the tile
-	if is_structure_on_tile(tile_pos, tile_map):
+	if is_structure(tile_pos) or is_unit_present(tile_pos):
 		return false
+	return true
 
-	# 3. Check for units on the tile
-	if is_unit_on_tile(tile_pos, tile_map):
-		return false
-
-	return true  # Tile is clear for movement highlighting
-
-# Helper function to check if a tile ID corresponds to water
+# Check if a tile is a water tile
 func is_water_tile(tile_id: int) -> bool:
-	# Replace 'WATER_TILE_ID' with the actual ID used for water tiles in your tilemap
-	var WATER_TILE_ID = 0  # Example: update with your actual water tile ID
-	return tile_id == WATER_TILE_ID
+	# Replace with the actual condition to check if the tile is water
+	# For example, if water has a specific tile ID, you can check it here
+	return tile_id == 0  # Replace WATER_TILE_ID with the actual water tile ID
 
-# Helper function to check if there is a structure on the tile
-func is_structure_on_tile(tile_pos: Vector2i, tile_map: TileMap) -> bool:
-	var structures = get_tree().get_nodes_in_group("structures")  # Ensure structures are in "structures" group
+
+# Check if there is a structure on the tile
+func is_structure(tile_pos: Vector2i) -> bool:
+	var structures = get_tree().get_nodes_in_group("structures")
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for structure in structures:
-		# Convert structure's global position to tile position
-		var structure_tile_pos = tile_map.local_to_map(tile_map.to_local(structure.global_position))
+		var structure_tile_pos = tilemap.local_to_map(tilemap.to_local(structure.global_position))
 		if tile_pos == structure_tile_pos:
 			return true
 	return false
 
-# Helper function to check if there is a unit on the tile
-func is_unit_on_tile(tile_pos: Vector2i, tile_map: TileMap) -> bool:
-	# Check for units in both "player_units" and "zombies" groups
+# Check if there is a unit on the tile
+func is_unit_present(tile_pos: Vector2i) -> bool:
 	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
-
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for unit in all_units:
-		# Convert unit's global position to tile position
-		var unit_tile_pos = tile_map.local_to_map(tile_map.to_local(unit.global_position))
+		var unit_tile_pos = tilemap.local_to_map(tilemap.to_local(unit.global_position))
 		if tile_pos == unit_tile_pos:
-			return true  # A unit is on this tile
-	return false  # No units found on this tile
+			return true
+	return false
+
+# Function to calculate the path
+func calculate_path(target_tile: Vector2i) -> void:
+	# Make sure the start tile (soldier's current position) is valid
+	var start_tile = tile_pos
+	
+	# Check if target tile is walkable
+	if is_tile_movable(target_tile):
+		# Calculate the path using AStar (this returns a PackedVector2Array)
+		var astar_path: PackedVector2Array = astar.get_point_path(start_tile, target_tile)
+		
+		# Convert PackedVector2Array to Array[Vector2i]
+		current_path.clear()  # Clear any existing path
+		for pos in astar_path:
+			current_path.append(Vector2i(pos.x, pos.y))  # Convert Vector2 to Vector2i
+		
+		path_index = 0  # Reset path index to start at the beginning
+		print("Path calculated:", current_path)
+	else:
+		print("Target tile is not walkable.")
+
+# Update the AStar grid and calculate the path
+func move_player_to_target(target_tile: Vector2i) -> void:
+	update_astar_grid()  # Ensure AStar grid is up to date
+	calculate_path(target_tile)  # Now calculate the path
+
+# Function to move the soldier along the path
+func move_along_path(delta: float) -> void:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	if current_path.is_empty():
+		return  # No path, so don't move
+
+	if path_index < current_path.size():
+		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
+		
+		# Convert the target position to world position (center of the tile)
+		var target_world_pos = tilemap.map_to_local(target_pos) + Vector2(0,0) / 2  # Ensure it's the center of the tile
+		
+		# Calculate the direction to the target position
+		var direction = (target_world_pos - position).normalized()
+		
+		# Move the soldier in the direction of the target position, adjusted by delta
+		position += direction * move_speed * delta
+		
+		# If the soldier has reached the target tile (within a small threshold)
+		if position.distance_to(target_world_pos) <= 1:  # Threshold to determine if we reached the target
+			path_index += 1  # Move to the next tile in the path
+			
+			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
+			update_astar_grid()
+
+	# If we've reached the last tile, stop moving
+	if path_index >= current_path.size():
+		print("Path completed!")
+
+# Visualize all walkable (non-solid) tiles in the A* grid
+func visualize_walkable_tiles() -> void:
+	var map_size: Vector2i = tilemap.get_used_rect().size
+	
+	# Iterate over all tiles in the A* grid and check for walkable (non-solid) tiles
+	for x in range(map_size.x):
+		for y in range(map_size.y):
+			var tile = Vector2i(x, y)
+
+			# Check if the tile is walkable (non-solid)
+			if not astar.is_point_solid(tile):  # This tile is walkable
+				var world_pos: Vector2 = tilemap.map_to_local(tile)
+				var movement_tile_instance: Node2D = movement_tile_scene.instantiate() as Node2D
+				movement_tile_instance.position = world_pos
+				movement_tile_instance.modulate = Color(0.0, 1.0, 0.0, 0.5)  # Example: Green with some transparency for walkable tiles
+				tilemap.add_child(movement_tile_instance)
+				movement_tiles.append(movement_tile_instance)
+
+	# Debug print to confirm visualization
+	print("Visualized walkable tiles.")

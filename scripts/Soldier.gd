@@ -177,8 +177,6 @@ func calculate_path(target_tile: Vector2i) -> void:
 
 # Update the AStar grid and calculate the path
 func move_player_to_target(target_tile: Vector2i) -> void:
-	get_child(0).play("move")
-	
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
 
@@ -194,6 +192,8 @@ func move_along_path(delta: float) -> void:
 		return  # No path, so don't move
 
 	if path_index < current_path.size():
+		get_child(0).play("move")
+		
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
 		
 		# Convert the target position to world position (center of the tile)

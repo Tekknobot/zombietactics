@@ -5,9 +5,13 @@ extends Area2D
 
 # Packed scene for the movement tile (ensure you assign the movement tile scene in the editor)
 @export var movement_tile_scene: PackedScene
+@export var attack_tile_scene: PackedScene
 
 # Store references to instantiated movement tiles for easy cleanup
 var movement_tiles: Array[Node2D] = []
+
+# Store references to instantiated attack range tiles for easy cleanup
+var attack_range_tiles: Array[Node2D] = []
 
 # Soldier's current tile position
 var tile_pos: Vector2i
@@ -23,7 +27,7 @@ var astar: AStarGrid2D = AStarGrid2D.new()
 # Pathfinding variables
 var current_path: Array[Vector2i] = []  # Stores the path tiles
 var path_index: int = 0  # Index for the current step in the path
-var move_speed: float = 100.0  # Movement speed for the soldier
+var move_speed: float = 75.0  # Movement speed for the soldier
 
 # Constants
 const WATER_TILE_ID = 1  # Replace with the actual tile ID for water
@@ -97,7 +101,9 @@ func get_movement_tiles() -> Array[Vector2i]:
 
 # Display movement tiles within range
 func display_movement_tiles() -> void:
-	clear_movement_tiles()
+	clear_movement_tiles()  # Clear existing movement tiles
+	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
+
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for tile in get_movement_tiles():
 		if is_tile_movable(tile):
@@ -128,7 +134,6 @@ func is_water_tile(tile_id: int) -> bool:
 	# Replace with the actual condition to check if the tile is water
 	# For example, if water has a specific tile ID, you can check it here
 	return tile_id == 0  # Replace WATER_TILE_ID with the actual water tile ID
-
 
 # Check if there is a structure on the tile
 func is_structure(tile_pos: Vector2i) -> bool:
@@ -242,3 +247,58 @@ func visualize_walkable_tiles() -> void:
 
 	# Debug print to confirm visualization
 	print("Visualized walkable tiles.")
+
+# Handle right-click to display attack range tiles
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		if selected:  # Only show attack range if the unit is selected
+			display_attack_range_tiles()
+
+# Display attack range tiles around the soldier using the attack_tile_scene
+func display_attack_range_tiles() -> void:
+	clear_movement_tiles()  # Clear existing movement tiles
+	clear_attack_range_tiles()  # First, clear previous attack range tiles
+	
+	# Directions to check: right, left, down, up
+	var directions: Array[Vector2i] = [
+		Vector2i(1, 0),  # Right
+		Vector2i(-1, 0), # Left
+		Vector2i(0, 1),  # Down
+		Vector2i(0, -1)  # Up
+	]
+
+	# For each direction, check and display tiles until we hit a structure, unit, or map boundary
+	for direction in directions:
+		var current_pos = tile_pos
+		while true:
+			# Move one step in the current direction
+			current_pos += direction
+			# Check if the current tile is within bounds
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			if !tilemap.get_used_rect().has_point(current_pos):
+				break  # If we reach out of bounds, stop
+
+			# Retrieve the tile ID at the current position
+			var tile_id = tilemap.get_cell_source_id(0, current_pos)
+
+			# Check if the tile is walkable, or if we have hit a structure/unit
+			# Water tiles will NOT stop the attack range now
+			if is_structure(current_pos) or is_unit_present(current_pos) or is_tile_movable(current_pos) or is_water_tile(tile_id):
+				var world_pos: Vector2 = tilemap.map_to_local(current_pos)
+				var attack_tile_instance: Node2D = attack_tile_scene.instantiate() as Node2D  # Use attack_tile_scene here
+				attack_tile_instance.position = world_pos
+				tilemap.add_child(attack_tile_instance)
+				attack_range_tiles.append(attack_tile_instance)
+				
+				# If we hit a structure or unit, stop here (we include them in the range)
+				if is_structure(current_pos) or is_unit_present(current_pos):
+					break
+			else:
+				# If the tile is not walkable and not a structure/unit, stop here
+				break
+
+# Clear displayed attack range tiles
+func clear_attack_range_tiles() -> void:
+	for tile in attack_range_tiles:
+		tile.queue_free()
+	attack_range_tiles.clear()

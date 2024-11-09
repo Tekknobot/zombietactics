@@ -32,7 +32,8 @@ func _process(delta: float) -> void:
 			
 			# Check if the current frame is the last frame of the "death" animation
 			if animated_sprite.frame == sprite_frames.get_frame_count("death") - 1:
-				print("Death animation finished, destroying zombie.")
+				#print("Death animation finished, destroying zombie.")
+				await get_tree().create_timer(1).timeout
 				queue_free()  # Destroy the zombie once the death animation ends
 
 # Function to update the tile position based on the current Area2D position

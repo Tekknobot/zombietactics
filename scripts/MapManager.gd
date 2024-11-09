@@ -63,6 +63,16 @@ func _ready():
 	hover_tile.visible = false  # Initially hide the hover tile
 	generate_map()
 
+func _process(delta):
+	# Check if the Space key is pressed
+	if Input.is_action_just_pressed("space"):
+		reset_level()
+
+# Reload the current scene to reset the level
+func reset_level():
+	print("Resetting level...")
+	get_tree().reload_current_scene()
+
 func generate_map():
 	clear_existing_structures()  # Clear previous structures
 	structure_coordinates.clear()  # Clear the structure coordinates array

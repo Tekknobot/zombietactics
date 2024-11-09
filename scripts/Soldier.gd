@@ -232,17 +232,16 @@ func move_along_path(delta: float) -> void:
 		# If the soldier has reached the target tile (within a small threshold)
 		if position.distance_to(target_world_pos) <= 1:  # Threshold to determine if we reached the target
 			path_index += 1  # Move to the next tile in the path
-			
+			get_child(0).play("default")
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
 			update_astar_grid()
-
+	
 	# If we've reached the last tile, stop moving
 	if path_index >= current_path.size():
 		#print("Path completed!")
 		# Retain the selection after completing the path
 		# Don't clear the selection, ensure that selected_player is still set
 		awaiting_movement_click = false  # Finish the movement click state
-		get_child(0).play("default")
 		
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:
@@ -305,7 +304,7 @@ func _input(event: InputEvent) -> void:
 					print("Unit is not selected. Can't attack.")  # Debug log
 				if not attack_range_visible:
 					print("Attack range is not visible. Can't attack.")  # Debug log
-
+			
 # Display attack range tiles around the soldier using the attack_tile_scene
 func display_attack_range_tiles() -> void:
 	clear_movement_tiles()  # Clear existing movement tiles
@@ -356,6 +355,8 @@ func clear_attack_range_tiles() -> void:
 	attack_range_tiles.clear()
 
 func attack(target_tile: Vector2i) -> void:
+	get_child(0).play("attack")
+
 	# Check if the target is within the attack range
 	if not is_within_attack_range(target_tile):
 		print("Target is out of range")
@@ -371,7 +372,7 @@ func attack(target_tile: Vector2i) -> void:
 	if projectile == null:
 		print("Error: Failed to instantiate projectile!")
 		return
-	
+
 	# Get the TileMap to get world position of the target
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	if tilemap == null:
@@ -382,8 +383,19 @@ func attack(target_tile: Vector2i) -> void:
 	var target_world_pos = tilemap.map_to_local(target_tile)
 	print("Target world position: ", target_world_pos)
 
-	projectile.target_position = target_world_pos
-	
+	# Determine the direction to the target
+	var target_direction = target_world_pos.x - position.x
+
+	# Flip the sprite based on the target's relative position and current scale.x value
+	if target_direction > 0 and scale.x != -1:  # Target is to the right, but sprite is not facing right
+		scale.x = -1  # Flip sprite to face right
+	elif target_direction < 0 and scale.x != 1:  # Target is to the left, but sprite is not facing left
+		scale.x = 1  # Flip sprite to face left
+	elif target_direction > 0 and scale.x == -1:  # Target is to the right, and sprite is already facing right
+		pass  # No need to flip, sprite is already facing right
+	elif target_direction < 0 and scale.x == 1:  # Target is to the left, and sprite is already facing left
+		pass  # No need to flip, sprite is already facing left
+
 	# Set the initial position of the projectile (e.g., the soldier's position)
 	projectile.position = self.position
 	print("Projectile created at position: ", projectile.position)
@@ -394,6 +406,10 @@ func attack(target_tile: Vector2i) -> void:
 	# Set the target position and speed on the projectile
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
+	
+	await get_tree().create_timer(1).timeout
+	
+	get_child(0).play("default")
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:

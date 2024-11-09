@@ -89,7 +89,7 @@ func check_for_click(tile_pos: Vector2i) -> void:
 
 # Function to select a player unit
 func select_player(player: Area2D) -> void:
-	# If there's an already selected player, clear its movement tiles
+	# If there's an already selected player, clear its attack and movement tiles
 	if selected_player and selected_player != player:
 		clear_selection()
 
@@ -100,6 +100,9 @@ func select_player(player: Area2D) -> void:
 	movement_range_tiles = selected_player.get_movement_tiles()  # Assuming the player has this method
 	selected_player.display_movement_tiles()  # Show movement tiles
 	awaiting_movement_click = true  # Enable waiting for second click
+
+	# Clear the attack tiles for all player units before selecting the new one
+	clear_attack_tiles_for_all_players()
 
 # Function to clear the previously selected player and their movement tiles
 func clear_selection() -> void:
@@ -114,3 +117,12 @@ func clear_selection() -> void:
 func clear_movement_tiles() -> void:
 	if selected_player.selected == true:
 		selected_player.clear_movement_tiles()  # Hide movement tiles after move
+
+# Function to clear the attack range tiles for all player units
+func clear_attack_tiles_for_all_players() -> void:
+	# Get all player units in the "player_units" group
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		# Call the clear_attack_range_tiles function for each player
+		if player is Area2D:
+			player.clear_attack_range_tiles()  # Assuming all player units have the `clear_attack_range_tiles` method

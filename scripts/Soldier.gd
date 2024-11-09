@@ -10,6 +10,9 @@ extends Area2D
 # Store references to instantiated movement tiles for easy cleanup
 var movement_tiles: Array[Node2D] = []
 
+# Declare necessary variables for attack
+@export var projectile_scene: PackedScene  # Packed scene for the projectile
+
 # Store references to instantiated attack range tiles for easy cleanup
 var attack_range_tiles: Array[Node2D] = []
 
@@ -30,11 +33,15 @@ var path_index: int = 0  # Index for the current step in the path
 var move_speed: float = 75.0  # Movement speed for the soldier
 
 # Constants
-const WATER_TILE_ID = 1  # Replace with the actual tile ID for water
+const WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
 var awaiting_movement_click: bool = false
 
 @export var selected: bool = false
+
+var speed = 200.0  # Speed of the projectile in pixels per second
+var target_pos: Vector2  # Target position where the projectile is moving
+var direction: Vector2  # Direction the projectile should move in
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -50,6 +57,16 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	update_tile_position()
 	move_along_path(delta)
+	
+	if target_pos != position:  # Check if the projectile hasn't reached the target yet
+		# Move the projectile in the direction at a constant speed
+		position += direction * speed * delta  # Adjust position by speed and time per frame (delta)
+		
+		# Optionally, you can check if the projectile has reached or passed the target position
+		if position.distance_to(target_pos) <= speed * delta:
+			position = target_pos  # Ensure the projectile stops exactly at the target
+			print("Projectile has reached the target!")
+			queue_free()  # Destroy the projectile once it reaches the target (optional)	
 
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
@@ -248,11 +265,46 @@ func visualize_walkable_tiles() -> void:
 	# Debug print to confirm visualization
 	print("Visualized walkable tiles.")
 
-# Handle right-click to display attack range tiles
+var attack_range_visible: bool = false  # Variable to track if attack range is visible
+
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		if selected:  # Only show attack range if the unit is selected
-			display_attack_range_tiles()
+	if event is InputEventMouseButton:
+		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
+		# Right-click to show attack range (already implemented)
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if selected:  # Only show attack range if the unit is selected
+				print("Right-click detected: Showing attack range.")  # Debug log
+				display_attack_range_tiles()
+				attack_range_visible = true  # Set the attack range visible flag to true
+				print("Attack range is now visible.")  # Debug log
+
+		# Left-click to trigger the attack
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			print("Left-click detected.")  # Debug log
+			# Ensure that the unit is selected before triggering the attack
+			if selected and attack_range_visible:  # Only proceed if attack range is visible
+				# Get the global mouse position and convert it to tilemap coordinates
+				var global_mouse_pos = get_global_mouse_position()
+				global_mouse_pos.y += 8
+				var clicked_tile_pos = tilemap.local_to_map(tilemap.to_local(global_mouse_pos))
+
+				print("Global mouse position: ", global_mouse_pos)  # Debug log
+				print("Clicked on tile (converted): ", clicked_tile_pos)  # Debug log
+
+				# Check if the tile is occupied by a unit or structure
+				if is_unit_present(clicked_tile_pos):
+					print("Attack triggered at position: ", clicked_tile_pos)  # Debug log
+					attack(clicked_tile_pos)
+					attack_range_visible = false  # Reset the attack range visibility after attacking
+					print("Attack range visibility reset.")  # Debug log
+				else:
+					print("Clicked tile is not occupied by a unit or structure.")  # Debug log
+			else:
+				if not selected:
+					print("Unit is not selected. Can't attack.")  # Debug log
+				if not attack_range_visible:
+					print("Attack range is not visible. Can't attack.")  # Debug log
 
 # Display attack range tiles around the soldier using the attack_tile_scene
 func display_attack_range_tiles() -> void:
@@ -302,3 +354,61 @@ func clear_attack_range_tiles() -> void:
 	for tile in attack_range_tiles:
 		tile.queue_free()
 	attack_range_tiles.clear()
+
+func attack(target_tile: Vector2i) -> void:
+	# Check if the target is within the attack range
+	if not is_within_attack_range(target_tile):
+		print("Target is out of range")
+		return
+
+	# Check if projectile_scene is set correctly
+	if projectile_scene == null:
+		print("Error: projectile_scene is not assigned!")
+		return
+
+	# Instantiate the projectile
+	var projectile = projectile_scene.instantiate() as Node2D
+	if projectile == null:
+		print("Error: Failed to instantiate projectile!")
+		return
+	
+	# Get the TileMap to get world position of the target
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	if tilemap == null:
+		print("Error: TileMap not found!")
+		return
+
+	# Get world position of the target tile
+	var target_world_pos = tilemap.map_to_local(target_tile)
+	print("Target world position: ", target_world_pos)
+
+	projectile.target_position = target_world_pos
+	
+	# Set the initial position of the projectile (e.g., the soldier's position)
+	projectile.position = self.position
+	print("Projectile created at position: ", projectile.position)
+
+	# Add the projectile to the scene
+	tilemap.add_child(projectile)
+
+	# Set the target position and speed on the projectile
+	projectile.target_position = target_world_pos
+	projectile.speed = 200.0  # Adjust as needed
+
+# Function to check if the target is within the attack range
+func is_within_attack_range(target_tile: Vector2i) -> bool:
+	# Check if the target tile is within the attack range
+	# Assuming the target is a part of the attack range tiles, which we should have already populated
+	for tile in attack_range_tiles:
+		var tile_position = tile.position
+		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+		var target_pos = tilemap.local_to_map(tile_position)
+		if target_pos == target_tile:
+			return true
+	return false
+
+func _on_projectile_hit_target(area: Area2D) -> void:
+	if area.is_in_group("enemy_units"):
+		print("Projectile hit an enemy!")
+		area.apply_damage(10)  # Example damage
+	area.queue_free()  # Queue the projectile for freeing

@@ -8,9 +8,11 @@ var selected_player: Area2D = null
 
 # Track if we are waiting for a second click within the movement range
 var awaiting_movement_click: bool = false
+var awaiting_attack_click: bool = false  # Flag to track attack mode
 
 # Store the movement range of the selected player
 var movement_range_tiles: Array[Vector2i] = []
+var attack_range_tiles: Array[Vector2i] = []  # Store the attack range tiles
 
 # Called when the node enters the scene
 func _ready() -> void:
@@ -69,9 +71,23 @@ func check_for_click(tile_pos: Vector2i) -> void:
 			# Move the selected player to the target tile
 			selected_player.move_player_to_target(tile_pos)
 
-			if selected_player.selected == true:
-				clear_selection()
-				
+			awaiting_movement_click = false  # Disable movement click
+			awaiting_attack_click = true  # Enable attack click
+			return
+
+		# If awaiting an attack click and the clicked tile is in the attack range, perform the attack
+		if awaiting_attack_click and tile_pos in attack_range_tiles:
+			# Perform the attack action (you'll need to implement the attack logic here)
+			selected_player.attack(tile_pos)
+
+			# After attacking, allow the player to move again or perform further attacks
+			awaiting_attack_click = false
+			attack_range_tiles.clear()
+			selected_player.clear_attack_tiles()  # Assuming this function exists
+
+			# Optionally, allow for another movement or attack cycle
+			# Allow multiple attacks or movement in cycles
+			select_player(selected_player)  # Re-select to show available movement/attack options again
 			return
 
 		# Otherwise, check if a player unit is clicked to select it
@@ -84,7 +100,7 @@ func check_for_click(tile_pos: Vector2i) -> void:
 				return
 
 		# If clicked on an empty tile and not awaiting movement, clear the selection
-		if selected_player and not awaiting_movement_click:
+		if selected_player and not awaiting_movement_click and not awaiting_attack_click:
 			clear_selection()
 
 # Function to select a player unit

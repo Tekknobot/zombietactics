@@ -6,11 +6,11 @@ extends Node2D
 
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
+@export var explosion_radius: float = 16.0  # Radius to check for units at the target position
 
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering
 	z_index = int(position.y)
-
 
 func _process(delta: float) -> void:
 	# Adjust z_index to ensure layering as it moves
@@ -34,7 +34,6 @@ func _process(delta: float) -> void:
 	position += movement
 	print("Projectile position: ", position)
 
-
 func _create_explosion() -> void:
 	# Check if explosion_scene is assigned
 	if explosion_scene == null:
@@ -53,5 +52,20 @@ func _create_explosion() -> void:
 	
 	# Add explosion to the parent scene
 	get_parent().add_child(explosion)
-
 	print("Explosion created at position: ", explosion.position)
+
+	# Check for any zombie units in the target area and destroy them
+	_check_for_zombies_at_target()
+
+func _check_for_zombies_at_target() -> void:
+	# Find all nodes in the group "zombies"
+	for zombie in get_tree().get_nodes_in_group("zombies"):
+		if not zombie is Node2D:
+			continue  # Skip any non-Node2D members of the group
+		
+		# Check if the zombie is within the explosion radius
+		if zombie.position.distance_to(target_position) <= explosion_radius:
+			print("Zombie found at explosion position, destroying:", zombie.name)
+			
+			# Play the death animation on the zombie (assuming it has an animation called "death")
+			zombie.get_child(0).play("death")

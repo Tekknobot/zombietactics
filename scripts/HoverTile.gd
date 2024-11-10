@@ -6,11 +6,11 @@ var tilemap: TileMap = null
 # Reference to the currently selected player
 var selected_player: Area2D = null
 
-# Track if we are waiting for a second click within the movement range
+# Track if we are waiting for a second click within the movement or attack range
 var awaiting_movement_click: bool = false
 var awaiting_attack_click: bool = false  # Flag to track attack mode
 
-# Store the movement range of the selected player
+# Store the movement range and attack range tiles
 var movement_range_tiles: Array[Vector2i] = []
 var attack_range_tiles: Array[Vector2i] = []  # Store the attack range tiles
 
@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 		# Make the hover tile visible when within the bounds
 		visible = true
 
-		# Check if a player unit is clicked and display its movement tiles
+		# Check if a player unit is clicked and display its movement or attack tiles
 		check_for_click(tile_pos)
 	else:
 		# Hide the hover tile when outside the map bounds
@@ -62,77 +62,107 @@ func check_for_click(tile_pos: Vector2i) -> void:
 	var world_pos = tilemap.map_to_local(tile_pos)  # tile_pos is Vector2i, world_pos will be Vector2
 
 	# Check if the mouse button is clicked
-	if Input.is_action_just_pressed("mouse_left"):  # Use your preferred click action
-		# If awaiting a movement click and the clicked tile is in the movement range, move the player
+	if Input.is_action_just_pressed("mouse_left"):  # Left-click for selecting a unit and toggling range
+		# If we're awaiting a movement click, check if it's within movement range
 		if awaiting_movement_click and tile_pos in movement_range_tiles:
-			# Clear the movement tiles
-			clear_movement_tiles()
-						
 			# Move the selected player to the target tile
 			selected_player.move_player_to_target(tile_pos)
 
-			awaiting_movement_click = false  # Disable movement click
-			awaiting_attack_click = true  # Enable attack click
-			return
+			# Clear old movement tiles and display new ones based on the player's updated position
+			clear_movement_tiles()
+			movement_range_tiles = selected_player.get_movement_tiles()  # Assuming the player has this method
+			selected_player.display_movement_tiles()  # Show the updated movement tiles
+			# Do not clear movement tiles immediately; keep them active for repeated movements
 
-		# If awaiting an attack click and the clicked tile is in the attack range, perform the attack
+		# If we're in attack mode and clicked on a valid attack range tile
 		if awaiting_attack_click and tile_pos in attack_range_tiles:
-			# Perform the attack action (you'll need to implement the attack logic here)
-			selected_player.attack(tile_pos)
+			# Call attack logic here (e.g., perform attack)
+			selected_player.attack_target(tile_pos)  # Assuming you have an attack method
 
-			# After attacking, allow the player to move again or perform further attacks
-			awaiting_attack_click = false
-			attack_range_tiles.clear()
-			selected_player.clear_attack_tiles()  # Assuming this function exists
+			# After attack, leave attack tiles visible to allow reselection
+			# Do not clear attack tiles immediately; keep them for repeated attacks
 
-			# Optionally, allow for another movement or attack cycle
-			# Allow multiple attacks or movement in cycles
-			select_player(selected_player)  # Re-select to show available movement/attack options again
-			return
-
-		# Otherwise, check if a player unit is clicked to select it
+		# Select a unit if clicked on one
 		var players = get_tree().get_nodes_in_group("player_units")  # Ensure all player units are in the "player_units" group
 		for player in players:
 			# Check if the player's global position matches the clicked world position
 			if player.global_position == world_pos:
-				# If a player is clicked, select it and clear the current selection
-				select_player(player)
+				# If the player is already selected, toggle between movement and attack
+				if selected_player == player:
+					# Toggle mode between movement and attack
+					if awaiting_attack_click:
+						select_player(player, "movement")  # Toggle to movement
+					else:
+						select_player(player, "attack")  # Toggle to attack
+				else:
+					# Select the new player and show movement range by default
+					select_player(player, "movement")
 				return
 
-		# If clicked on an empty tile and not awaiting movement, clear the selection
+		# If clicked on an empty tile, clear the selection if no action is pending
 		if selected_player and not awaiting_movement_click and not awaiting_attack_click:
 			clear_selection()
 
-# Function to select a player unit
-func select_player(player: Area2D) -> void:
-	# If there's an already selected player, clear its attack and movement tiles
+	elif Input.is_action_just_pressed("mouse_right"):  # Right-click for selecting a unit and showing attack range
+		# Select a unit if clicked on one
+		var players = get_tree().get_nodes_in_group("player_units")  # Ensure all player units are in the "player_units" group
+		for player in players:
+			# Check if the player's global position matches the clicked world position
+			if player.global_position == world_pos:
+				# If a player is clicked, show attack range
+				select_player(player, "attack")
+				return
+
+		# If clicked on an empty tile, clear the selection if no action is pending
+		if selected_player and not awaiting_movement_click and not awaiting_attack_click:
+			clear_selection()
+
+# Function to select a player unit and show the appropriate range (movement or attack)
+func select_player(player: Area2D, mode: String) -> void:
+	# If there's an already selected player, clear its range tiles
 	if selected_player and selected_player != player:
 		clear_selection()
 
 	# Set the new selected player
 	selected_player = player
-	selected_player.selected = true
-	# Display its movement tiles and store the tiles within range
-	movement_range_tiles = selected_player.get_movement_tiles()  # Assuming the player has this method
-	selected_player.display_movement_tiles()  # Show movement tiles
-	awaiting_movement_click = true  # Enable waiting for second click
+	selected_player.selected = true  # Set the selected flag
+	
+	# Display movement or attack range tiles
+	if mode == "movement":
+		movement_range_tiles = selected_player.get_movement_tiles()  # Assuming the player has this method
+		selected_player.display_movement_tiles()  # Show movement tiles
+		awaiting_movement_click = true  # Enable waiting for second click
 
-	# Clear the attack tiles for all player units before selecting the new one
-	clear_attack_tiles_for_all_players()
+		# Clear the attack tiles for all player units before selecting the new one
+		clear_attack_tiles_for_all_players()
+	elif mode == "attack":
+		selected_player.display_attack_range_tiles()  # Show attack tiles
+		awaiting_attack_click = true  # Enable waiting for second click
 
-# Function to clear the previously selected player and their movement tiles
+		# Clear the movement tiles for all player units before selecting the new one
+		clear_movement_tiles()
+
+# Function to clear the previously selected player and their movement/attack tiles
 func clear_selection() -> void:
-	# Clear movement tiles and deselect the current player
+	# Clear both movement and attack tiles and deselect the current player
 	clear_movement_tiles()
+	clear_attack_tiles_for_all_players()
 	movement_range_tiles.clear()
+	attack_range_tiles.clear()
 	awaiting_movement_click = false
-	selected_player.selected = false
+	awaiting_attack_click = false
+	if selected_player:
+		selected_player.selected = false  # Deselect the player
 	selected_player = null
 
 # Function to clear movement tiles after a move or deselection
 func clear_movement_tiles() -> void:
-	if selected_player.selected == true:
-		selected_player.clear_movement_tiles()  # Hide movement tiles after move
+	# Get all player units in the "player_units" group
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		# Call the clear_movement_tiles function for each player
+		if player is Area2D:
+			player.clear_movement_tiles()  # Assuming all player units have the `clear_movement_tiles` method
 
 # Function to clear the attack range tiles for all player units
 func clear_attack_tiles_for_all_players() -> void:

@@ -355,7 +355,6 @@ func clear_attack_range_tiles() -> void:
 	attack_range_tiles.clear()
 
 func attack(target_tile: Vector2i) -> void:
-	get_child(0).play("attack")
 
 	# Check if the target is within the attack range
 	if not is_within_attack_range(target_tile):
@@ -382,7 +381,9 @@ func attack(target_tile: Vector2i) -> void:
 	# Get world position of the target tile
 	var target_world_pos = tilemap.map_to_local(target_tile)
 	print("Target world position: ", target_world_pos)
-
+	
+	get_child(0).play("attack")
+	
 	# Determine the direction to the target
 	var target_direction = target_world_pos.x - position.x
 

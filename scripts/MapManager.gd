@@ -66,7 +66,8 @@ func _ready():
 func _process(delta):
 	# Check if the Space key is pressed
 	if Input.is_action_just_pressed("space"):
-		reset_level()
+		#reset_level()
+		pass
 
 # Reload the current scene to reset the level
 func reset_level():

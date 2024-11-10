@@ -43,6 +43,9 @@ var speed = 200.0  # Speed of the projectile in pixels per second
 var target_pos: Vector2  # Target position where the projectile is moving
 var direction: Vector2  # Direction the projectile should move in
 
+var has_attacked: bool = false
+var has_moved: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -208,7 +211,7 @@ func move_along_path(delta: float) -> void:
 	if current_path.is_empty():
 		return  # No path, so don't move
 
-	if path_index < current_path.size():
+	if path_index < current_path.size() and self.has_moved == false:
 		get_child(0).play("move")
 		
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
@@ -242,6 +245,7 @@ func move_along_path(delta: float) -> void:
 		# Retain the selection after completing the path
 		# Don't clear the selection, ensure that selected_player is still set
 		awaiting_movement_click = false  # Finish the movement click state
+		self.has_moved = true
 		
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:
@@ -270,13 +274,14 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-		# Right-click to show attack range (already implemented)
-		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			if selected:  # Only show attack range if the unit is selected
-				print("Right-click detected: Showing attack range.")  # Debug log
-				display_attack_range_tiles()
-				attack_range_visible = true  # Set the attack range visible flag to true
-				print("Attack range is now visible.")  # Debug log
+		if self.has_attacked == false:
+			# Right-click to show attack range (already implemented)
+			if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+				if selected:  # Only show attack range if the unit is selected
+					print("Right-click detected: Showing attack range.")  # Debug log
+					display_attack_range_tiles()
+					attack_range_visible = true  # Set the attack range visible flag to true
+					print("Attack range is now visible.")  # Debug log
 
 		# Left-click to trigger the attack
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -411,6 +416,8 @@ func attack(target_tile: Vector2i) -> void:
 	await get_tree().create_timer(1).timeout
 	
 	get_child(0).play("default")
+	self.has_attacked = true
+	clear_attack_range_tiles()
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:

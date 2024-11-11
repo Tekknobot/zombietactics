@@ -85,6 +85,10 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			# Deselect the currently selected player, if any
 			if selected_player:
 				selected_player.selected = false
+				# Ensure any previous selected player stops processing
+				selected_player.set_process_input(false)
+				selected_player.set_process(false)
+
 			# Select the new player
 			selected_player = player
 			selected_player.selected = true
@@ -109,7 +113,7 @@ func toggle_attack_mode() -> void:
 			selected_player.display_attack_range_tiles()
 			attack_range_tiles = selected_player.get_attack_tiles()
 		# If the unit is in attack mode, switch back to movement mode
-		elif selected_player:
+		else:
 			clear_action_tiles()
 			show_movement_tiles(selected_player)
 

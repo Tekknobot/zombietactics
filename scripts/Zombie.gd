@@ -26,23 +26,42 @@ const WATER_TILE_ID = 0
 func _ready() -> void:
 	update_tile_position()
 	update_astar_grid()
+
+	# Get the MapManager node first, then access its child UnitSpawn and its children units
+	var map_manager = get_node("/root/MapManager")    
+	var unitspawn = map_manager.get_node("UnitSpawn")
 	
-	# Get the MapManager node first, then access its child hovertile
-	var map_manager = get_node("/root/MapManager")
-	var hovertile = map_manager.get_node("HoverTile")
-	
-	if hovertile:
-		hovertile.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
-	else:
-		print("Hovertile not detected.")
+	# List of unit names
+	var units = ["Soldier", "Mercenary", "Dog"]
+
+	# Iterate over the unit names and connect the signal
+	for unit_name in units:
+		var unit = unitspawn.get_node(unit_name)
+		unit.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
 
 # Called every frame
 func _process(delta: float) -> void:
+	# Check if the zombie has an AnimatedSprite2D node
+	var animated_sprite = get_node("AnimatedSprite2D") as AnimatedSprite2D
+	if animated_sprite:
+		# Check if the current animation is "death"
+		if animated_sprite.animation == "death":
+			# Get the SpriteFrames resource for the current animation
+			var sprite_frames = animated_sprite.sprite_frames
+			
+			# Check if the current frame is the last frame of the "death" animation
+			if animated_sprite.frame == sprite_frames.get_frame_count("death") - 1:
+				print("Death animation finished, destroying zombie.")
+				self.remove_from_group("zombies")				
+				self.visible = false
+				#queue_free()  # Destroy the zombie once the death animation ends
+			
 	update_tile_position()
 	move_along_path(delta)
 
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
+	print("Player action completed!")
 	find_and_chase_player_and_move(get_process_delta_time())
 
 # Setup the AStarGrid2D with walkable tiles
@@ -104,9 +123,24 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		return a.zombie_id < b.zombie_id
 	)
 
+	# Ensure that active_zombie_id does not exceed the number of zombies in the group
+	if zombies.size() == 0:
+		print("No zombies available.")
+		return
+
 	# Loop through zombies and allow them to move one after another
-	for zombie in zombies:
+	var current_zombie_index = 0
+
+	while current_zombie_index < zombies.size():
+		var zombie = zombies[current_zombie_index]
+
 		if zombie.zombie_id == active_zombie_id:
+			# If the zombie has been removed from the group, skip it
+			if not zombie.is_in_group("zombies"):
+				print("Zombie ID %d removed, skipping..." % active_zombie_id)
+				current_zombie_index += 1
+				continue  # Skip this iteration and move to the next zombie
+
 			# Find the closest player for the active zombie
 			var closest_player: Area2D = null
 			var min_distance = INF
@@ -151,16 +185,20 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 					if current_zombie_tile_pos.distance_to(target_tile_pos) <= target_reach_threshold:
 						print("Zombie ID:", zombie.zombie_id, " reached target tile:", target_tile_pos)
 
-						active_zombie_id += 1
-						update_astar_grid()
-						
-						# If we've gone past the last zombie, reset to the first one
-						if active_zombie_id > zombies.size():
-							active_zombie_id = 1
+						# Check if the zombie is still in the group after completing the action
+						if zombie.is_in_group("zombies"):
+							active_zombie_id += 1
 							update_astar_grid()
-			
+
+							# If we've gone past the last zombie, reset to the first one
+							if active_zombie_id > zombies.size():
+								active_zombie_id = 1
+								update_astar_grid()
+
 			await get_tree().create_timer(1).timeout  # Wait for the specified delay in seconds
-			# No break here, so the loop continues and next zombie is processed
+
+		# Move to the next zombie in the list
+		current_zombie_index += 1
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	var walkable_tiles: Array[Vector2i] = []

@@ -10,8 +10,6 @@ var selected_player: Area2D = null
 var movement_range_tiles: Array[Vector2i] = []
 var attack_range_tiles: Array[Vector2i] = []
 
-signal player_action_completed
-
 # Called when the node enters the scene
 func _ready() -> void:
 	tilemap = get_node("/root/MapManager/TileMap")
@@ -63,15 +61,12 @@ func check_for_click(tile_pos: Vector2i) -> void:
 func move_selected_player(tile_pos: Vector2i) -> void:
 	selected_player.move_player_to_target(tile_pos)
 	clear_action_tiles()
-	await get_tree().create_timer(1).timeout
-	on_player_action_completed()
 
 # Attacks the target at the specified tile
 func attack_selected_player(tile_pos: Vector2i) -> void:
 	selected_player.attack(tile_pos)
 	clear_action_tiles()
 	await get_tree().create_timer(1).timeout
-	on_player_action_completed()
 
 # Selects a unit at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:
@@ -145,7 +140,3 @@ func clear_attack_tiles_for_all_players() -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		player.clear_attack_range_tiles()
-
-# Call this function after every player action
-func on_player_action_completed():
-	emit_signal("player_action_completed")

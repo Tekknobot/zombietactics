@@ -41,6 +41,8 @@ var speed = 200.0  # Speed of the projectile in pixels per second
 var target_pos: Vector2  # Target position where the projectile is moving
 var direction: Vector2  # Direction the projectile should move in
 
+signal player_action_completed
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -458,6 +460,7 @@ func attack(target_tile: Vector2i) -> void:
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
+	on_player_action_completed()
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:
@@ -477,3 +480,7 @@ func _on_projectile_hit_target(area: Area2D) -> void:
 		area.apply_damage(10)  # Example damage
 		await area.get_child(0).play("death")
 	area.queue_free()  # Queue the projectile for freeing
+
+# Call this function after every player action
+func on_player_action_completed():
+	emit_signal("player_action_completed")

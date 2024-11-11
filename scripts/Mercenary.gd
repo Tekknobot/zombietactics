@@ -35,16 +35,11 @@ var move_speed: float = 75.0  # Movement speed for the soldier
 # Constants
 const WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
-var awaiting_movement_click: bool = false
-
 @export var selected: bool = false
 
 var speed = 200.0  # Speed of the projectile in pixels per second
 var target_pos: Vector2  # Target position where the projectile is moving
 var direction: Vector2  # Direction the projectile should move in
-
-var has_attacked: bool = false
-var has_moved: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -211,7 +206,7 @@ func move_along_path(delta: float) -> void:
 	if current_path.is_empty():
 		return  # No path, so don't move
 
-	if path_index < current_path.size() and self.has_moved == false:
+	if path_index < current_path.size():
 		get_child(0).play("move")
 		
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
@@ -239,14 +234,6 @@ func move_along_path(delta: float) -> void:
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
 			update_astar_grid()
 	
-	# If we've reached the last tile, stop moving
-	if path_index >= current_path.size():
-		#print("Path completed!")
-		# Retain the selection after completing the path
-		# Don't clear the selection, ensure that selected_player is still set
-		awaiting_movement_click = false  # Finish the movement click state
-		self.has_moved = true
-		
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:
 	var map_size: Vector2i = tilemap.get_used_rect().size
@@ -274,14 +261,13 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-		if self.has_attacked == false:
-			# Right-click to show attack range (already implemented)
-			if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-				if selected:  # Only show attack range if the unit is selected
-					print("Right-click detected: Showing attack range.")  # Debug log
-					display_attack_range_tiles()
-					attack_range_visible = true  # Set the attack range visible flag to true
-					print("Attack range is now visible.")  # Debug log
+		# Right-click to show attack range (already implemented)
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if selected:  # Only show attack range if the unit is selected
+				print("Right-click detected: Showing attack range.")  # Debug log
+				display_attack_range_tiles()
+				attack_range_visible = true  # Set the attack range visible flag to true
+				print("Attack range is now visible.")  # Debug log
 
 		# Left-click to trigger the attack
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -353,6 +339,51 @@ func display_attack_range_tiles() -> void:
 				# If the tile is not walkable and not a structure/unit, stop here
 				break
 
+# Get the positions of attack range tiles around the soldier
+func get_attack_tiles() -> Array[Vector2i]:
+	var attack_tiles: Array[Vector2i] = []  # Array to store positions in attack range
+
+	# Define directions to check: right, left, down, up
+	var directions: Array[Vector2i] = [
+		Vector2i(1, 0),  # Right
+		Vector2i(-1, 0), # Left
+		Vector2i(0, 1),  # Down
+		Vector2i(0, -1)  # Up
+	]
+
+	# Get the current tilemap and starting position
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var current_pos = tile_pos  # Assuming `tile_pos` is the soldier's current tile position
+
+	# Loop through each direction and calculate attack tiles
+	for direction in directions:
+		var check_pos = current_pos
+		while true:
+			# Move one step in the current direction
+			check_pos += direction
+
+			# Check if the position is within the tilemap bounds
+			if !tilemap.get_used_rect().has_point(check_pos):
+				break  # Stop if out of bounds
+
+			# Get the tile ID at the current position
+			var tile_id = tilemap.get_cell_source_id(0, check_pos)
+
+			# Check if this tile should be included in the attack range
+			if is_structure(check_pos) or is_unit_present(check_pos) or is_tile_movable(check_pos) or is_water_tile(tile_id):
+				# Add the current position to the attack range
+				attack_tiles.append(check_pos)
+
+				# Stop if we hit a structure or unit, as these block further range in that direction
+				if is_structure(check_pos) or is_unit_present(check_pos):
+					break
+			else:
+				# If the tile is not walkable and is not a structure/unit, stop here
+				break
+
+	# Return the array of attack range positions
+	return attack_tiles
+
 # Clear displayed attack range tiles
 func clear_attack_range_tiles() -> void:
 	for tile in attack_range_tiles:
@@ -416,7 +447,6 @@ func attack(target_tile: Vector2i) -> void:
 	await get_tree().create_timer(1).timeout
 	
 	get_child(0).play("default")
-	self.has_attacked = true
 	clear_attack_range_tiles()
 
 # Function to check if the target is within the attack range

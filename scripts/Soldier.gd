@@ -76,25 +76,35 @@ func update_tile_position() -> void:
 
 # Function to update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:
+	# Get the tilemap and determine its grid size
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	
 	var grid_width = tilemap.get_used_rect().size.x
 	var grid_height = tilemap.get_used_rect().size.y
 	
+	# Set the size and properties of the AStar grid
 	astar.size = Vector2i(grid_width, grid_height)
-	astar.cell_size = Vector2(1, 1)  # Assuming each cell is 1x1
-	astar.default_compute_heuristic = 1
-	astar.diagonal_mode = 1
+	astar.cell_size = Vector2(1, 1)  # Each cell corresponds to a single tile
+	astar.default_compute_heuristic = 1  # Use Manhattan heuristic
+	astar.diagonal_mode = 1              # Enable diagonal movement if desired
+	
+	# Clear any previous configuration to avoid conflicts
 	astar.update()
 	
-	# Update walkable and unwalkable cells
+	# Iterate over each tile in the tilemap to set walkable and non-walkable cells
 	for x in range(grid_width):
 		for y in range(grid_height):
-			var tile_id = tilemap.get_cell_source_id(0, Vector2i(x, y))
-			if tile_id == -1 or tile_id == 0 or is_structure(Vector2i(x, y)) or is_unit_present(Vector2i(x, y)):
-				astar.set_point_solid(Vector2i(x, y), true)  # Mark as non-walkable (solid)
-			else:
-				astar.set_point_solid(Vector2i(x, y), false)  # Mark as walkable
+			var tile_position = Vector2i(x, y)
+			var tile_id = tilemap.get_cell_source_id(0, tile_position)
+			
+			# Determine if the tile should be walkable
+			var is_solid = (tile_id == -1 or tile_id == WATER_TILE_ID 
+							or is_structure(tile_position) 
+							or is_unit_present(tile_position))
+			
+			# Mark the tile in the AStar grid
+			astar.set_point_solid(tile_position, is_solid)
+
+	print("AStar grid updated with size:", grid_width, "x", grid_height)
 
 # Setup the AStarGrid2D with walkable tiles
 func setup_astar() -> void:

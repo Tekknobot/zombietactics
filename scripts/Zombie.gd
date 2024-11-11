@@ -51,7 +51,7 @@ func _process(delta: float) -> void:
 			
 			# Check if the current frame is the last frame of the "death" animation
 			if animated_sprite.frame == sprite_frames.get_frame_count("death") - 1:
-				print("Death animation finished, destroying zombie.")
+				#print("Death animation finished, destroying zombie.")
 				self.remove_from_group("zombies")				
 				self.visible = false
 				#queue_free()  # Destroy the zombie once the death animation ends
@@ -112,8 +112,11 @@ func update_tile_position() -> void:
 
 var active_zombie_id = 1  # Start with the first zombie's ID
 var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
+var zombies: Array  # This will store the zombies sorted by zombie_id
 
+# This function is responsible for finding the closest player and moving the zombie along its path
 func find_and_chase_player_and_move(delta_time: float) -> void:
+	# Update the AStar grid before moving zombies
 	update_astar_grid()
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
@@ -123,19 +126,18 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		return a.zombie_id < b.zombie_id
 	)
 
-	# Ensure that active_zombie_id does not exceed the number of zombies in the group
+	# Ensure that active_zombie_id does not exceed the number of zombies
 	if zombies.size() == 0:
 		print("No zombies available.")
 		return
 
-	# Loop through zombies and allow them to move one after another
+	# Loop through zombies and move them one by one
 	var current_zombie_index = 0
-
 	while current_zombie_index < zombies.size():
 		var zombie = zombies[current_zombie_index]
 
 		if zombie.zombie_id == active_zombie_id:
-			# If the zombie has been removed from the group, skip it
+			# Skip the zombie if it has been removed from the group
 			if not zombie.is_in_group("zombies"):
 				print("Zombie ID %d removed, skipping..." % active_zombie_id)
 				current_zombie_index += 1
@@ -167,9 +169,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 				else:
 					# Set the path for the zombie if a valid path is found
 					zombie.current_path = current_path
-
 					print("Moving Zombie ID:", zombie.zombie_id)
-					
+
 					# Move this zombie along its path
 					zombie.move_along_path(delta_time)
 
@@ -185,7 +186,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 					if current_zombie_tile_pos.distance_to(target_tile_pos) <= target_reach_threshold:
 						print("Zombie ID:", zombie.zombie_id, " reached target tile:", target_tile_pos)
 
-						# Check if the zombie is still in the group after completing the action
+						# If the zombie is still in the group after completing the action
 						if zombie.is_in_group("zombies"):
 							active_zombie_id += 1
 							update_astar_grid()
@@ -195,10 +196,17 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 								active_zombie_id = 1
 								update_astar_grid()
 
-			await get_tree().create_timer(1).timeout  # Wait for the specified delay in seconds
+			# Delay before moving the next zombie
+			await get_tree().create_timer(1).timeout  # Wait for 1 second before moving the next zombie
 
 		# Move to the next zombie in the list
 		current_zombie_index += 1
+		
+# Helper function to move to the next zombie in the list
+func move_to_next_zombie() -> void:
+	active_zombie_id += 1
+	if active_zombie_id > zombies.size():
+		active_zombie_id = 1  # Reset back to the first zombie if we exceed the list
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	var walkable_tiles: Array[Vector2i] = []
@@ -225,10 +233,12 @@ func move_along_path(delta: float) -> void:
 	if current_path.is_empty():
 		return  # No path, so don't move
 
-	if path_index < current_path.size():
-		if path_index >= movement_range:
-			return		
-			
+	# Ensure we don't move past the allowed movement range (3 tiles)
+	if path_index >= min(current_path.size(), movement_range):
+		return  # Stop moving once we've reached the maximum movement range
+
+
+	if path_index < current_path.size():	
 		# Play the "move" animation
 		get_child(0).play("move")
 		

@@ -268,6 +268,7 @@ func visualize_walkable_tiles() -> void:
 	print("Visualized walkable tiles.")
 
 var attack_range_visible: bool = false  # Variable to track if attack range is visible
+var last_attack_time = 0.0  # Time of the last attack to debounce inputs
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -283,7 +284,14 @@ func _input(event: InputEvent) -> void:
 
 		# Left-click to trigger the attack
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			# Debounce to prevent multiple triggerings
+			var current_time = Time.get_ticks_msec()  # Get the current time in seconds
+			if current_time - last_attack_time < 0.01:  # 0.2 seconds debounce
+				return  # Ignore the event if within debounce time
+
 			print("Left-click detected.")  # Debug log
+			last_attack_time = current_time  # Update the last attack time
+
 			# Ensure that the unit is selected before triggering the attack
 			if selected and attack_range_visible:  # Only proceed if attack range is visible
 				# Get the global mouse position and convert it to tilemap coordinates

@@ -210,7 +210,7 @@ func check_for_attack() -> void:
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			
 			# Get world position of the target tile
-			var target_world_pos = tilemap.map_to_local(player.position)
+			var target_world_pos = player.position
 			print("Target world position: ", target_world_pos)
 			
 			# Determine the direction to the target

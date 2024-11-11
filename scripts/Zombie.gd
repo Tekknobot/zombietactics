@@ -82,9 +82,6 @@ func update_astar_grid() -> void:
 	astar.default_compute_heuristic = 1  # Use Manhattan heuristic
 	astar.diagonal_mode = 1              # Enable diagonal movement if desired
 	
-	# Clear any previous configuration to avoid conflicts
-	astar.update()
-	
 	# Iterate over each tile in the tilemap to set walkable and non-walkable cells
 	for x in range(grid_width):
 		for y in range(grid_height):
@@ -99,7 +96,10 @@ func update_astar_grid() -> void:
 			# Mark the tile in the AStar grid
 			astar.set_point_solid(tile_position, is_solid)
 
-	print("AStar grid updated with size:", grid_width, "x", grid_height)
+	#print("AStar grid updated with size:", grid_width, "x", grid_height)
+	
+	# Clear any previous configuration to avoid conflicts
+	astar.update()
 
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
@@ -117,10 +117,11 @@ var zombies: Array  # This will store the zombies sorted by zombie_id
 func find_and_chase_player_and_move(delta_time: float) -> void:
 	# Update the AStar grid before moving zombies
 	update_astar_grid()
+	
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
 	# Find all zombies in the group and sort by `zombie_id`
-	zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies = get_tree().get_nodes_in_group("zombies")
 	zombies.sort_custom(func(a, b):
 		return a.zombie_id < b.zombie_id
 	)
@@ -149,49 +150,126 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 			# Identify the closest adjacent tile to the zombie
 			for adj_tile in adjacent_tiles:
-				var distance = zombie.tile_pos.distance_to(adj_tile)  # `zombie.tile_pos` for the current zombie
+				var distance = zombie.tile_pos.distance_to(adj_tile)
 				if distance < min_distance:
 					min_distance = distance
 					closest_player = player
 					best_adjacent_tile = adj_tile
-
+		
+		update_astar_grid()
+		
 		# Calculate path to the best adjacent tile if a valid target is found
 		if closest_player and best_adjacent_tile != Vector2i():
-			var current_path = astar.get_point_path(zombie.tile_pos, best_adjacent_tile)  # `zombie.tile_pos`
-			if current_path.size() == 0:
-				print("No path found for Zombie ID:", zombie.zombie_id)
+			var current_path = astar.get_point_path(zombie.tile_pos, best_adjacent_tile)
+			if current_path.size() > 0:
+				zombie.current_path = current_path
+				zombie.path_index = 0  # Reset path index to start from the first point
 			else:
-				# Set the path for the zombie if a valid path is found
-				zombie.current_path = current_path  # Update the path for the current zombie
-				print("Moving Zombie ID:", zombie.zombie_id)
+				print("No path found for Zombie ID:", zombie.zombie_id)
 
-				# Ensure the path_index is within bounds before accessing the path
-				if zombie.path_index < zombie.current_path.size():
-					var current_zombie_tile_pos = tilemap.local_to_map(zombie.position)  # Using `zombie.position`
-					var target_tile_pos = zombie.current_path[zombie.path_index]  # Safely access the path index
+		update_astar_grid()
+		
+		# Move the zombie step by step along its path
+		if zombie.path_index < zombie.current_path.size():
+			var target_pos = zombie.current_path[zombie.path_index]
+			var movement_vector = (target_pos - zombie.position).normalized()
 
-					# Debugging output for tracking movement
-					print("Zombie Tile Position:", current_zombie_tile_pos)
-					print("Target Tile Position:", target_tile_pos)
+			# Move the zombie toward the next path point
+			zombie.position += movement_vector * move_speed * delta_time
 
-					# Now compare both positions as tile positions (Vector2i)
-					if current_zombie_tile_pos.distance_to(target_tile_pos) <= target_reach_threshold:
-						print("Zombie ID:", zombie.zombie_id, " reached target tile:", target_tile_pos)
+			# Check if the zombie has reached the target point
+			if zombie.position.distance_to(target_pos) <= target_reach_threshold:
+				# Zombie reached the current target point, so increment the path index
+				zombie.path_index += 1
+				
+				update_astar_grid()
+				# After moving, check for attack opportunities
+				
+				# If the zombie has completed its path, ensure to re-evaluate or update paths if necessary
+				if zombie.path_index >= zombie.current_path.size():
+					print("Zombie ID:", zombie.zombie_id, " has reached its final destination.")
 
-						# If the zombie is still in the group after completing the action
-						if zombie.is_in_group("zombies"):
-							# Update path or move to next zombie
-							update_astar_grid()
+		else:
+			update_astar_grid()
+			
+			print("Zombie ID %d has no valid path to move." % zombie.zombie_id)
 
-				else:
-					# If the path_index is invalid, print a message and skip this iteration
-					print("Invalid path_index:", zombie.path_index, "Path size:", zombie.current_path.size())
-					continue  # Skip this zombie if the path index is invalid
+		check_for_attack()
+		# Wait before processing the next zombie
+		await get_tree().create_timer(0.5).timeout  # This introduces a delay, giving each zombie time to move
 
-		# Add a delay before moving the next zombie to ensure sequential movement
-		await get_tree().create_timer(1).timeout  # Wait for 1 second before moving the next zombie
+# Function to check adjacency and trigger attack if necessary
+func check_for_attack() -> void:
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	
+	# Check each player for adjacency and attack
+	for player in players:
+		# Check if the player is adjacent to this zombie
+		if is_adjacent_to_tile(tile_pos, player):
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			
+			# Get world position of the target tile
+			var target_world_pos = tilemap.map_to_local(player.position)
+			print("Target world position: ", target_world_pos)
+			
+			# Determine the direction to the target
+			var target_direction = target_world_pos.x - position.x
+
+			# Flip the sprite based on the target's relative position and current scale.x value
+			if target_direction > 0 and scale.x != -1:  # Target is to the right, but sprite is not facing right
+				scale.x = -1  # Flip sprite to face right
+			elif target_direction < 0 and scale.x != 1:  # Target is to the left, but sprite is not facing left
+				scale.x = 1  # Flip sprite to face left
+			elif target_direction > 0 and scale.x == -1:  # Target is to the right, and sprite is already facing right
+				pass  # No need to flip, sprite is already facing right
+			elif target_direction < 0 and scale.x == 1:  # Target is to the left, and sprite is already facing left
+				pass  # No need to flip, sprite is already facing left
+			
+			
+			self.get_child(0).play("attack")
+			print("Zombie just attacked.")
+			attack_player(player)
+
+# Function to check if the zombie is adjacent to a specific tile
+func is_adjacent_to_tile(zombie_tile: Vector2i, player: Area2D) -> bool:
+	# Get the tilemap
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	# Get the player's tile position
+	var player_tile_pos = tilemap.local_to_map(player.global_position)
+	
+	# Get the surrounding tiles of the zombie's current position
+	var surrounding_cells = tilemap.get_surrounding_cells(zombie_tile)
+	
+	# Check if any of the surrounding cells match the player's tile position
+	for tile in surrounding_cells:
+		if tile == player_tile_pos:
+			return true  # Player is adjacent to the zombie
+	
+	# If no surrounding cell matches, return false
+	return false
+
+# Function to handle the attack logic
+func attack_player(player: Area2D) -> void:
+	# Assuming the player has an AnimatedSprite2D node or any other visual node
+	var sprite = player.get_node("AnimatedSprite2D")  # Get the AnimatedSprite2D or visual representation of the player
+	
+	if sprite:
+		# Modulate the color to a bright red (indicating the attack)
+		sprite.modulate = Color(1, 0, 0)  # Red color to indicate damage or attack
+		
+		# Start a timer to reset the modulate back to the original color after 0.1 second
+		await get_tree().create_timer(0.2).timeout  # Wait 0.1 seconds for a quick flash
+		
+		# Reset the modulate to the original color (full color, no effect)
+		sprite.modulate = Color(1, 1, 1)  # Reset back to the original color (white/full color)
+	
+	# Print a debug message
+	print("Zombie attacks player at position:", player.global_position)
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
+	
 	var walkable_tiles: Array[Vector2i] = []
 	
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -203,12 +281,8 @@ func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	for tile in surrounding_cells:
 		if !astar.is_point_solid(tile):  # Check if the tile is walkable
 			walkable_tiles.append(tile)
-
+	
 	return walkable_tiles
-
-# Check if a tile is adjacent to the current position
-func is_adjacent_to_tile(target_tile_pos: Vector2i) -> bool:
-	return abs(tile_pos.x - target_tile_pos.x) + abs(tile_pos.y - target_tile_pos.y) == 1
 
 func move_along_path(delta: float) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -250,15 +324,6 @@ func move_along_path(delta: float) -> void:
 			# After moving, update the AStar grid for any changes (optional)
 			update_astar_grid()
 			
-
-# Attack the player unit
-func attack_player(player: Area2D) -> void:
-	# Trigger the player's death animation
-	if player.has_method("play_death_animation"):
-		player.play_death_animation()
-	# Optionally add zombie-specific attack animation or effects here
-	print("Zombie attacks player at position:", player.global_position)
-
 # Check if a tile is movable
 func is_tile_movable(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

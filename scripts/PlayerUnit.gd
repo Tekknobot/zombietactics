@@ -456,7 +456,7 @@ func attack(target_tile: Vector2i) -> void:
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(2).timeout
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()

@@ -110,73 +110,65 @@ func update_tile_position() -> void:
 	self.z_index = layer
 	astar.set_point_solid(position, true)
 
-var active_zombie_id = 1  # Start with the first zombie's ID
+var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
 var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
 var zombies: Array  # This will store the zombies sorted by zombie_id
 
-# This function is responsible for finding the closest player and moving the zombie along its path
 func find_and_chase_player_and_move(delta_time: float) -> void:
 	# Update the AStar grid before moving zombies
 	update_astar_grid()
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
 	# Find all zombies in the group and sort by `zombie_id`
-	var zombies = get_tree().get_nodes_in_group("zombies")
+	zombies = get_tree().get_nodes_in_group("zombies")
 	zombies.sort_custom(func(a, b):
 		return a.zombie_id < b.zombie_id
 	)
 
-	# Ensure that active_zombie_id does not exceed the number of zombies
+	# Ensure that zombies exist before proceeding
 	if zombies.size() == 0:
 		print("No zombies available.")
 		return
 
-	# Loop through zombies and move them one by one
-	var current_zombie_index = 0
-	while current_zombie_index < zombies.size():
-		var zombie = zombies[current_zombie_index]
+	# Loop through zombies and move them one by one based on their ID
+	for zombie in zombies:
+		# Skip the zombie if it has been removed from the group
+		if not zombie.is_in_group("zombies"):
+			print("Zombie ID %d removed, skipping..." % zombie.zombie_id)
+			continue  # Skip this zombie and move to the next one
 
-		if zombie.zombie_id == active_zombie_id:
-			# Skip the zombie if it has been removed from the group
-			if not zombie.is_in_group("zombies"):
-				print("Zombie ID %d removed, skipping..." % active_zombie_id)
-				current_zombie_index += 1
-				continue  # Skip this iteration and move to the next zombie
+		# Find the closest player for this zombie
+		var closest_player: Area2D = null
+		var min_distance = INF
+		var best_adjacent_tile: Vector2i = Vector2i()
 
-			# Find the closest player for the active zombie
-			var closest_player: Area2D = null
-			var min_distance = INF
-			var best_adjacent_tile: Vector2i = Vector2i()
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			var player_tile_pos = tilemap.local_to_map(player.global_position)
+			var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
 
-			var players = get_tree().get_nodes_in_group("player_units")
-			for player in players:
-				var player_tile_pos = tilemap.local_to_map(player.global_position)
-				var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
+			# Identify the closest adjacent tile to the zombie
+			for adj_tile in adjacent_tiles:
+				var distance = zombie.tile_pos.distance_to(adj_tile)  # `zombie.tile_pos` for the current zombie
+				if distance < min_distance:
+					min_distance = distance
+					closest_player = player
+					best_adjacent_tile = adj_tile
 
-				# Identify the closest adjacent tile to the active zombie
-				for adj_tile in adjacent_tiles:
-					var distance = zombie.tile_pos.distance_to(adj_tile)
-					if distance < min_distance:
-						min_distance = distance
-						closest_player = player
-						best_adjacent_tile = adj_tile
+		# Calculate path to the best adjacent tile if a valid target is found
+		if closest_player and best_adjacent_tile != Vector2i():
+			var current_path = astar.get_point_path(zombie.tile_pos, best_adjacent_tile)  # `zombie.tile_pos`
+			if current_path.size() == 0:
+				print("No path found for Zombie ID:", zombie.zombie_id)
+			else:
+				# Set the path for the zombie if a valid path is found
+				zombie.current_path = current_path  # Update the path for the current zombie
+				print("Moving Zombie ID:", zombie.zombie_id)
 
-			# Calculate path to the best adjacent tile if a valid target is found
-			if closest_player and best_adjacent_tile != Vector2i():
-				var current_path = astar.get_point_path(zombie.tile_pos, best_adjacent_tile)
-				if current_path.size() == 0:
-					print("No path found for Zombie ID:", zombie.zombie_id)
-				else:
-					# Set the path for the zombie if a valid path is found
-					zombie.current_path = current_path
-					print("Moving Zombie ID:", zombie.zombie_id)
-
-					# Move this zombie along its path
-					zombie.move_along_path(delta_time)
-
-					# Compare the zombie's tile position to the target tile position within a threshold
-					var current_zombie_tile_pos = tilemap.local_to_map(zombie.position)
-					var target_tile_pos = current_path[zombie.path_index]
+				# Ensure the path_index is within bounds before accessing the path
+				if zombie.path_index < zombie.current_path.size():
+					var current_zombie_tile_pos = tilemap.local_to_map(zombie.position)  # Using `zombie.position`
+					var target_tile_pos = zombie.current_path[zombie.path_index]  # Safely access the path index
 
 					# Debugging output for tracking movement
 					print("Zombie Tile Position:", current_zombie_tile_pos)
@@ -188,25 +180,16 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 						# If the zombie is still in the group after completing the action
 						if zombie.is_in_group("zombies"):
-							active_zombie_id += 1
+							# Update path or move to next zombie
 							update_astar_grid()
 
-							# If we've gone past the last zombie, reset to the first one
-							if active_zombie_id > zombies.size():
-								active_zombie_id = 1
-								update_astar_grid()
+				else:
+					# If the path_index is invalid, print a message and skip this iteration
+					print("Invalid path_index:", zombie.path_index, "Path size:", zombie.current_path.size())
+					continue  # Skip this zombie if the path index is invalid
 
-			# Delay before moving the next zombie
-			await get_tree().create_timer(1).timeout  # Wait for 1 second before moving the next zombie
-
-		# Move to the next zombie in the list
-		current_zombie_index += 1
-		
-# Helper function to move to the next zombie in the list
-func move_to_next_zombie() -> void:
-	active_zombie_id += 1
-	if active_zombie_id > zombies.size():
-		active_zombie_id = 1  # Reset back to the first zombie if we exceed the list
+		# Add a delay before moving the next zombie to ensure sequential movement
+		await get_tree().create_timer(1).timeout  # Wait for 1 second before moving the next zombie
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	var walkable_tiles: Array[Vector2i] = []

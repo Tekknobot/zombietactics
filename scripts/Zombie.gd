@@ -23,6 +23,8 @@ var move_speed: float = 75.0
 
 const WATER_TILE_ID = 0
 
+var attacks: int = 0
+
 func _ready() -> void:
 	update_tile_position()
 	update_astar_grid()
@@ -183,23 +185,37 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 				zombie.path_index += 1
 				
 				update_astar_grid()
-				# After moving, check for attack opportunities
 				
 				# If the zombie has completed its path, ensure to re-evaluate or update paths if necessary
 				if zombie.path_index >= zombie.current_path.size():
 					print("Zombie ID:", zombie.zombie_id, " has reached its final destination.")
-
+					
 		else:
 			update_astar_grid()
-			
 			print("Zombie ID %d has no valid path to move." % zombie.zombie_id)
-
-		check_for_attack()
+		
+		if attacks == 1:
+			pass
+		else:
+			# Call the attack check once per zombie after its movement
+			check_for_attack()  # This will check for attacks after the zombie has moved
+			
 		# Wait before processing the next zombie
-		await get_tree().create_timer(0.5).timeout  # This introduces a delay, giving each zombie time to move
+		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
+	
+	attacks = 0
+	
+var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
 
 # Function to check adjacency and trigger attack if necessary
 func check_for_attack() -> void:
+	# Prevent checking if the zombie has already attacked
+	if is_attacking:
+		return
+	
+	# Set the attack flag to true
+	is_attacking = true
+	
 	# Get all player units in the game
 	var players = get_tree().get_nodes_in_group("player_units")
 	
@@ -225,11 +241,21 @@ func check_for_attack() -> void:
 				pass  # No need to flip, sprite is already facing right
 			elif target_direction < 0 and scale.x == 1:  # Target is to the left, and sprite is already facing left
 				pass  # No need to flip, sprite is already facing left
-			
-			
+
+			# Play attack animation on the zombie
 			self.get_child(0).play("attack")
 			print("Zombie just attacked.")
+			
+			# Call the attack player function
 			attack_player(player)
+			
+			# After the first attack, exit the loop
+			break
+	
+	# Reset the attack flag after a small delay to avoid multiple attacks in the same cycle/frame
+	await get_tree().create_timer(0.5).timeout  # Adjust the delay as needed
+	is_attacking = false
+
 
 # Function to check if the zombie is adjacent to a specific tile
 func is_adjacent_to_tile(zombie_tile: Vector2i, player: Area2D) -> bool:
@@ -267,6 +293,8 @@ func attack_player(player: Area2D) -> void:
 	
 	# Print a debug message
 	print("Zombie attacks player at position:", player.global_position)
+	
+	attacks += 1
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	

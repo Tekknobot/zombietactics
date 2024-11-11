@@ -1,6 +1,14 @@
 extends Area2D
 
-@export var movement_range: int = 3
+# Define the zombie_id property here
+@export var zombie_id: int  # Default to -1, will be set later
+var next_zombie_id: int = 1
+
+# Movement range for zombies, they can move only up to this range
+@export var movement_range = 3
+var zombies_moving = []  # List to track the zombies that are currently moving
+var zombie_path_index = 0  # To track which zombie should move next
+var tile_size = 32  # Or whatever your tile size is in pixels
 @export var movement_tile_scene: PackedScene
 @export var tilemap: TileMap = null
 
@@ -36,7 +44,7 @@ func _process(delta: float) -> void:
 
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
-	find_and_chase_nearest_player()
+	find_and_chase_player_and_move(get_process_delta_time())
 
 # Setup the AStarGrid2D with walkable tiles
 func setup_astar() -> void:
@@ -83,44 +91,58 @@ func update_tile_position() -> void:
 	layer = (tile_pos.x + tile_pos.y) + 1
 	self.z_index = layer
 
-func find_and_chase_nearest_player() -> void:
-	update_astar_grid()  # Update AStar grid before calculating path
+func find_and_chase_player_and_move(delta_time: float) -> void:
+	update_astar_grid()
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var closest_player: Area2D = null
-	var min_distance = INF
-	var best_adjacent_tile: Vector2i = Vector2i()  # Stores the best adjacent tile to approach
 
-	# Find the nearest player based on tile distance from the zombie
-	var players = get_tree().get_nodes_in_group("player_units")
-	for player in players:
-		# Convert player's global position to tile position
-		var player_tile_pos = tilemap.local_to_map(player.global_position)
-		
-		# Find all adjacent, walkable tiles around the player
-		var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
+	# Sort zombies in the `zombies` group by their `zombie_id` to ensure they move in order
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	zombies.sort_custom(func(a, b):
+		return a.zombie_id < b.zombie_id
+	)  # Sort in ascending order by `zombie_id`
 
-		# Determine the closest adjacent walkable tile
-		for adj_tile in adjacent_tiles:
-			var distance = tile_pos.distance_to(adj_tile)
-			if distance < min_distance:
-				min_distance = distance
-				closest_player = player
-				best_adjacent_tile = adj_tile
+	# Process each zombie sequentially based on their `zombie_id`
+	for zombie in zombies:
+		if zombie.zombie_id == next_zombie_id:
+			# Find the closest player for this zombie
+			var closest_player: Area2D = null
+			var min_distance = INF
+			var best_adjacent_tile: Vector2i = Vector2i()
+			
+			var players = get_tree().get_nodes_in_group("player_units")
+			for player in players:
+				var player_tile_pos = tilemap.local_to_map(player.global_position)
+				var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
 
-	# Proceed with pathfinding if a valid pathable tile is found
-	if closest_player and best_adjacent_tile != Vector2i():
-		# Calculate the path
-		current_path = astar.get_point_path(tile_pos, best_adjacent_tile)
-		path_index = 0  # Reset the path index
-		
-		if current_path.size() == 0:
-			print("No path found to an adjacent tile near the player!")
-		else:
-			print("Zombie Path found:", current_path)
-			move_along_path(get_process_delta_time())  # Start moving along the path
-	else:
-		print("No valid adjacent tile found.")
-	
+				# Identify the closest adjacent tile to the zombie
+				for adj_tile in adjacent_tiles:
+					var distance = zombie.tile_pos.distance_to(adj_tile)
+					if distance < min_distance:
+						min_distance = distance
+						closest_player = player
+						best_adjacent_tile = adj_tile
+
+			# Calculate path to the best adjacent tile if a valid target is found
+			if closest_player and best_adjacent_tile != Vector2i():
+				var current_path = astar.get_point_path(zombie.tile_pos, best_adjacent_tile)
+				if current_path.size() == 0:
+					print("No path found for Zombie ID:", zombie.zombie_id)
+				else:
+					print("Path found for Zombie ID:", zombie.zombie_id, ":", current_path)
+					# Set the path and path index directly on the zombie instance
+					zombie.current_path = current_path
+					zombie.path_index = 0
+
+					# Move this zombie along its path
+					print("Moving Zombie ID:", zombie.zombie_id)
+					zombie.move_along_path(delta_time)
+
+					# If the zombie has completed its path, increment `next_zombie_id`
+					if zombie.path_index >= current_path.size():
+						next_zombie_id += 1
+					break  # Process only one zombie per function call
+			break  # Exit loop after processing one zombie
+
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	var walkable_tiles: Array[Vector2i] = []
 	
@@ -136,8 +158,7 @@ func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 
 	return walkable_tiles
 
-
-# Check if the specified tile is adjacent to the current position
+# Check if a tile is adjacent to the current position
 func is_adjacent_to_tile(target_tile_pos: Vector2i) -> bool:
 	return abs(tile_pos.x - target_tile_pos.x) + abs(tile_pos.y - target_tile_pos.y) == 1
 
@@ -164,7 +185,7 @@ func move_along_path(delta: float) -> void:
 		if direction.x > 0:
 			scale.x = -1  # Facing right (East)
 		elif direction.x < 0:
-			scale.x = 1  # Facing left (West)	
+			scale.x = 1  # Facing left (West)  
 		
 		# Move towards the target position
 		position += direction * move_speed * delta

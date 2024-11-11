@@ -16,6 +16,9 @@ const WATER = 0  # Replace with the actual tile ID for water
 var player_units_spawned = 0
 var can_spawn = true  # Flag to control if further spawning is allowed
 
+# Track unique zombie IDs
+var zombie_id_counter = 0  # Counter to assign unique IDs to zombies
+
 func _ready():
 	# Wait for a few frames to ensure the TileMap has generated fully
 	await get_tree().process_frame  # Waits for one frame
@@ -72,10 +75,18 @@ func spawn_zombies():
 			var zombie_instance = unit_zombie.instantiate()
 			zombie_instance.position = tilemap.map_to_local(spawn_position)
 			zombie_instance.z_index = int(zombie_instance.position.y)
+			
+			# Assign a unique ID to the zombie
+			zombie_instance.set("zombie_id", zombie_id_counter)  # Set a custom property for the unique ID
+			zombie_id_counter += 1  # Increment the zombie ID for the next one
+			
+			# Add to scene tree and zombie units group
 			add_child(zombie_instance)
 			zombie_instance.add_to_group("zombies")
 			spawn_attempts += 1
-			print("Zombie spawned at:", spawn_position)
+			print("Zombie spawned at:", spawn_position, "with ID:", zombie_instance.zombie_id)
+			
+			zombie_instance.zombie_id = zombie_id_counter
 	
 	# Disable further spawning once all zombies are spawned
 	can_spawn = false

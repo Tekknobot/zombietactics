@@ -63,12 +63,14 @@ func check_for_click(tile_pos: Vector2i) -> void:
 func move_selected_player(tile_pos: Vector2i) -> void:
 	selected_player.move_player_to_target(tile_pos)
 	clear_action_tiles()
+	await get_tree().create_timer(1).timeout
 	on_player_action_completed()
 
 # Attacks the target at the specified tile
 func attack_selected_player(tile_pos: Vector2i) -> void:
 	selected_player.attack(tile_pos)
 	clear_action_tiles()
+	await get_tree().create_timer(1).timeout
 	on_player_action_completed()
 
 # Selects a unit at the given tile position

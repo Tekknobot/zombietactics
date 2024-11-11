@@ -7,7 +7,6 @@ var next_zombie_id: int = 1
 # Movement range for zombies, they can move only up to this range
 @export var movement_range = 3
 var zombies_moving = []  # List to track the zombies that are currently moving
-var zombie_path_index = 0  # To track which zombie should move next
 var tile_size = 32  # Or whatever your tile size is in pixels
 @export var movement_tile_scene: PackedScene
 @export var tilemap: TileMap = null
@@ -90,31 +89,35 @@ func update_tile_position() -> void:
 	coord = tile_pos
 	layer = (tile_pos.x + tile_pos.y) + 1
 	self.z_index = layer
+	astar.set_point_solid(position, true)
+
+var active_zombie_id = 1  # Start with the first zombie's ID
+var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
 
 func find_and_chase_player_and_move(delta_time: float) -> void:
 	update_astar_grid()
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-	# Sort zombies in the `zombies` group by their `zombie_id` to ensure they move in order
+	# Find all zombies in the group and sort by `zombie_id`
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	zombies.sort_custom(func(a, b):
 		return a.zombie_id < b.zombie_id
-	)  # Sort in ascending order by `zombie_id`
+	)
 
-	# Process each zombie sequentially based on their `zombie_id`
+	# Loop through zombies and allow them to move one after another
 	for zombie in zombies:
-		if zombie.zombie_id == next_zombie_id:
-			# Find the closest player for this zombie
+		if zombie.zombie_id == active_zombie_id:
+			# Find the closest player for the active zombie
 			var closest_player: Area2D = null
 			var min_distance = INF
 			var best_adjacent_tile: Vector2i = Vector2i()
-			
+
 			var players = get_tree().get_nodes_in_group("player_units")
 			for player in players:
 				var player_tile_pos = tilemap.local_to_map(player.global_position)
 				var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
 
-				# Identify the closest adjacent tile to the zombie
+				# Identify the closest adjacent tile to the active zombie
 				for adj_tile in adjacent_tiles:
 					var distance = zombie.tile_pos.distance_to(adj_tile)
 					if distance < min_distance:
@@ -128,20 +131,36 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 				if current_path.size() == 0:
 					print("No path found for Zombie ID:", zombie.zombie_id)
 				else:
-					print("Path found for Zombie ID:", zombie.zombie_id, ":", current_path)
-					# Set the path and path index directly on the zombie instance
+					# Set the path for the zombie if a valid path is found
 					zombie.current_path = current_path
-					zombie.path_index = 0
 
-					# Move this zombie along its path
 					print("Moving Zombie ID:", zombie.zombie_id)
+					
+					# Move this zombie along its path
 					zombie.move_along_path(delta_time)
 
-					# If the zombie has completed its path, increment `next_zombie_id`
-					if zombie.path_index >= current_path.size():
-						next_zombie_id += 1
-					break  # Process only one zombie per function call
-			break  # Exit loop after processing one zombie
+					# Compare the zombie's tile position to the target tile position within a threshold
+					var current_zombie_tile_pos = tilemap.local_to_map(zombie.position)
+					var target_tile_pos = current_path[zombie.path_index]
+
+					# Debugging output for tracking movement
+					print("Zombie Tile Position:", current_zombie_tile_pos)
+					print("Target Tile Position:", target_tile_pos)
+
+					# Now compare both positions as tile positions (Vector2i)
+					if current_zombie_tile_pos.distance_to(target_tile_pos) <= target_reach_threshold:
+						print("Zombie ID:", zombie.zombie_id, " reached target tile:", target_tile_pos)
+
+						active_zombie_id += 1
+						update_astar_grid()
+						
+						# If we've gone past the last zombie, reset to the first one
+						if active_zombie_id > zombies.size():
+							active_zombie_id = 1
+							update_astar_grid()
+			
+			await get_tree().create_timer(1).timeout  # Wait for the specified delay in seconds
+			# No break here, so the loop continues and next zombie is processed
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	var walkable_tiles: Array[Vector2i] = []
@@ -169,6 +188,9 @@ func move_along_path(delta: float) -> void:
 		return  # No path, so don't move
 
 	if path_index < current_path.size():
+		if path_index >= movement_range:
+			return		
+			
 		# Play the "move" animation
 		get_child(0).play("move")
 		
@@ -196,6 +218,7 @@ func move_along_path(delta: float) -> void:
 			get_child(0).play("default")  # Play idle animation when not moving
 			# After moving, update the AStar grid for any changes (optional)
 			update_astar_grid()
+			
 
 # Attack the player unit
 func attack_player(player: Area2D) -> void:

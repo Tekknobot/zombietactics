@@ -1,0 +1,72 @@
+[gd_scene load_steps=7 format=3 uid="uid://rdlfqfdmhgit"]
+
+[ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
+[ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_65y7a"]
+bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6fi2p"]
+bg_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mnlj"]
+bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u1erf"]
+bg_color = Color(1, 1, 0, 1)
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+
+[node name="Portrait" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -154.0
+offset_right = 152.0
+offset_bottom = -26.0
+grow_vertical = 0
+texture = ExtResource("1_v0rww")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(8, 128)
+layout_mode = 0
+offset_left = 14.0
+offset_top = -154.0
+offset_right = 22.0
+offset_bottom = -26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_65y7a")
+theme_override_styles/fill = SubResource("StyleBoxFlat_6fi2p")
+value = 100.0
+fill_mode = 3
+show_percentage = false
+
+[node name="XPBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(8, 128)
+layout_mode = 0
+offset_left = 154.0
+offset_top = -154.0
+offset_right = 162.0
+offset_bottom = -26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_7mnlj")
+theme_override_styles/fill = SubResource("StyleBoxFlat_u1erf")
+value = 10.0
+fill_mode = 3
+show_percentage = false
+
+[node name="Name" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = -29.0
+offset_right = 153.0
+offset_bottom = -3.0
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+text = "Dutch Major"

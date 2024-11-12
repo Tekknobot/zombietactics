@@ -1,4 +1,8 @@
+# PlayerUnit.gd
 extends Area2D
+
+# Declare the class
+class_name PlayerUnit
 
 # Movement range for the soldier
 @export var movement_range: int = 3  # Adjustable movement range
@@ -43,6 +47,22 @@ var direction: Vector2  # Direction the projectile should move in
 
 signal player_action_completed
 
+# Player's health properties
+var max_health: int = 100
+var current_health: int = 100
+
+# Player's portrait texture
+@export var portrait_texture: Texture
+
+# Player's name (optional)
+@export var player_name: String
+
+var hud: Control
+
+# Player's health properties
+var max_xp: int = 100
+var current_xp: int = 10
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -52,6 +72,11 @@ func _ready() -> void:
 	update_tile_position()
 	setup_astar()
 	visualize_walkable_tiles()
+	
+	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud = hud_manager.get_node("HUD")  # Get the actual HUD node
+	update_hud()  # Update the HUD initially with player data	
 
 # Called every frame
 func _process(delta: float) -> void:
@@ -67,6 +92,14 @@ func _process(delta: float) -> void:
 			position = target_pos  # Ensure the projectile stops exactly at the target
 			print("Projectile has reached the target!")
 			queue_free()  # Destroy the projectile once it reaches the target (optional)	
+
+	# If the unit is selected, update the HUD
+	if selected:
+		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
+		var hud_manager = get_parent().get_parent().get_node("HUDManager")
+		hud_manager.update_hud(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
+	else:
+		pass
 
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
@@ -484,3 +517,20 @@ func _on_projectile_hit_target(area: Area2D) -> void:
 # Call this function after every player action
 func on_player_action_completed():
 	emit_signal("player_action_completed")
+
+func update_hud() -> void:
+	if hud != null:
+		var health_bar = hud.get_node("HealthBar") as ProgressBar
+		var name_label = hud.get_node("NameLabel") as Label
+		var portrait = hud.get_node("Portrait") as TextureRect
+		
+		# Update the health bar
+		health_bar.value = current_health
+		health_bar.max_value = max_health
+		
+		# Update the name label
+		name_label.text = player_name
+		
+		# Update the portrait (if you have one)
+		portrait.texture = portrait_texture
+		

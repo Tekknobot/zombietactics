@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://smyypw2i5rbj"]
+
+[ext_resource type="PackedScene" uid="uid://rdlfqfdmhgit" path="res://assets/scenes/UI/HUD.tscn" id="1_iqwu7"]
+[ext_resource type="Script" path="res://scripts/HUD_Manager.gd" id="1_ymcj8"]
+
+[node name="HUDManager" type="CanvasLayer"]
+script = ExtResource("1_ymcj8")
+
+[node name="HUD" parent="." instance=ExtResource("1_iqwu7")]
+script = null

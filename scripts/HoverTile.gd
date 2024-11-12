@@ -10,6 +10,11 @@ var selected_player: Area2D = null
 var movement_range_tiles: Array[Vector2i] = []
 var attack_range_tiles: Array[Vector2i] = []
 
+@onready var hud_manager = $HUDManager  # Access the HUDManager instance in the scene
+@onready var player_unit1 = $PlayerUnit1  # Reference to PlayerUnit1
+@onready var player_unit2 = $PlayerUnit2  # Reference to PlayerUnit2
+@onready var player_unit3 = $PlayerUnit3  # Reference to PlayerUnit3
+
 # Initialization
 func _ready() -> void:
 	tilemap = get_node("/root/MapManager/TileMap")
@@ -81,6 +86,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos:
 			selected_player = player
+			selected_player.selected = true
 			show_movement_tiles(player)
 			return
 	
@@ -107,5 +113,7 @@ func clear_action_tiles() -> void:
 	if selected_player:
 		selected_player.clear_movement_tiles()
 		selected_player.clear_attack_range_tiles()
+		selected_player.selected = false
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()
+	

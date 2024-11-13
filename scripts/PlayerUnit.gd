@@ -83,20 +83,7 @@ func _ready() -> void:
 	update_hud()  # Update the HUD initially with player data	
 
 # Called every frame
-func _process(delta: float) -> void:	
-	# Check if any zombie in the "zombies" group is moving
-	var zombies = get_tree().get_nodes_in_group("zombies")
-	var zombies_moving = false
-	for zombie in zombies:
-		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
-			zombies_moving = true
-			print("Zombie is moving, skipping player input.")
-			break  # Exit early once we know a zombie is moving
-	
-	if zombies_moving:
-		# Prevent tile display or any other player action
-		return
-		
+func _process(delta: float) -> void:		
 	update_tile_position()
 	move_along_path(delta)
 	
@@ -178,6 +165,19 @@ func get_movement_tiles() -> Array[Vector2i]:
 
 # Display movement tiles within range
 func display_movement_tiles() -> void:
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+			
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
 
@@ -374,6 +374,19 @@ func _input(event: InputEvent) -> void:
 			
 # Display attack range tiles around the soldier using the attack_tile_scene
 func display_attack_range_tiles() -> void:
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+			
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # First, clear previous attack range tiles
 	

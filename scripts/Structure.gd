@@ -6,7 +6,7 @@ var coord: Vector2
 var layer: int
 
 @export var structure_type: String
-@export var explosion_radius: float = 0.0  # Radius to check for adjacent zombies or player units
+@export var explosion_radius: float = 1.0  # Radius to check for adjacent zombies or player units
 @export var explosion_scene: PackedScene  # Optional: Scene to instantiate for the explosion effect
 
 var is_demolished: bool = false
@@ -102,7 +102,7 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 				print("Zombie found adjacent to demolished structure, triggering explosion.")
 				_create_explosion_at_tile(adj_tile)  # Create explosion at the zombie's tile
 				_remove_unit_from_group(zombie, "zombies")
-				return  # Trigger the explosion once for the first adjacent zombie found
+				#return  # Trigger the explosion once for the first adjacent zombie found
 
 		# Check for player units in the adjacent tiles
 		for player in player_units:
@@ -112,7 +112,7 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 				_create_explosion_at_tile(adj_tile)  # Create explosion at the player's tile
 				_remove_unit_from_group(player, "player_units")
 				player.update_astar_grid()
-				return  # Trigger the explosion once for the first adjacent player unit found
+				#return  # Trigger the explosion once for the first adjacent player unit found
 
 # Get adjacent tiles based on the current tile position
 func get_adjacent_tiles(tile_pos: Vector2i) -> Array:

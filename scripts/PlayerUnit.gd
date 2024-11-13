@@ -69,7 +69,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
-@export var explosion_radius: float = 0.0  # Radius to check for units at the target position
+@export var explosion_radius: float = 1.0  # Radius to check for units at the target position
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

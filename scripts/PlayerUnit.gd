@@ -69,7 +69,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
-@export var explosion_radius: float = 1.0  # Radius to check for units at the target position
+@export var explosion_radius: float = 0.0  # Radius to check for units at the target position
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -175,7 +175,7 @@ func display_movement_tiles() -> void:
 	for zombie in zombies:
 		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
 			zombies_moving = true
-			print("Zombie is moving, skipping player input.")
+			#print("Zombie is moving, skipping player input.")
 			break  # Exit early once we know a zombie is moving
 	
 	if zombies_moving:
@@ -330,7 +330,7 @@ func _input(event: InputEvent) -> void:
 	for zombie in zombies:
 		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
 			zombies_moving = true
-			print("Zombie is moving, skipping player input.")
+			#print("Zombie is moving, skipping player input.")
 			break  # Exit early once we know a zombie is moving
 	
 	if zombies_moving:
@@ -384,7 +384,7 @@ func display_attack_range_tiles() -> void:
 	for zombie in zombies:
 		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
 			zombies_moving = true
-			print("Zombie is moving, skipping player input.")
+			#print("Zombie is moving, skipping player input.")
 			break  # Exit early once we know a zombie is moving
 	
 	if zombies_moving:

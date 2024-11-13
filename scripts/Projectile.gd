@@ -6,7 +6,7 @@ extends Node2D
 
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
-@export var explosion_radius: float = 1.0  # Radius to check for units at the target position
+@export var explosion_radius: float = 0.0  # Radius to check for units at the target position
 
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering

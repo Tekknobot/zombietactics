@@ -6,7 +6,7 @@ var coord: Vector2
 var layer: int
 
 @export var structure_type: String
-@export var explosion_radius: float = 1.0  # Radius to check for adjacent zombies or player units
+@export var explosion_radius: float = 0.0  # Radius to check for adjacent zombies or player units
 @export var explosion_scene: PackedScene  # Optional: Scene to instantiate for the explosion effect
 
 var is_demolished: bool = false

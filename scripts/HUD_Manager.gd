@@ -5,7 +5,7 @@ extends CanvasLayer
 @onready var player_name = $HUD/Name
 @onready var xp_bar = $HUD/XPBar
 @onready var level = $HUD/Level
-@onready var special = $HUD/Special  # Reference to the Special toggle
+@onready var missile = $HUD/Missile  # Reference to the Special toggle
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the GlobalManager in the scene
 
 func _ready():
@@ -15,8 +15,8 @@ func _ready():
 		print("Portrait node not found!")
 
 	# Connect the toggled signal for special button
-	if special:
-		special.connect("toggled", Callable(self, "_on_special_toggled"))
+	if missile:
+		missile.connect("toggled", Callable(self, "_on_special_toggled"))
 	
 # Method to handle the toggle state change
 func _on_special_toggled(button_pressed: bool) -> void:
@@ -33,12 +33,12 @@ func update_hud(character: PlayerUnit):
 	print("Updating HUD for: ", character)
 
 	# Reset the special toggle to "off" when updating the HUD
-	if special:
-		special.button_pressed = false  # This ensures the toggle is visually set to off
+	if missile:
+		missile.button_pressed = false  # This ensures the toggle is visually set to off
 		global_manager.special_toggle_active = false  # Reset the special flag in global_manager
 
 		# Optionally emit the toggled signal to indicate the toggle state reset
-		special.emit_signal("toggled", false)
+		missile.emit_signal("toggled", false)
 		print("Special toggle reset to off")
 
 	# Update the rest of the HUD elements

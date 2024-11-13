@@ -124,14 +124,42 @@ func animate_trajectory(line_inst: Line2D, points: Array):
 # Trigger explosion at the target position after the missile reaches it
 func _trigger_explosion(last_point: Vector2):
 	print("Explosion triggered at position:", last_point)
+	
 	# Instantiate the explosion effect at the target's position
 	var explosion_instance = explosion_scene.instantiate()
 	get_parent().add_child(explosion_instance)
 	explosion_instance.position = last_point
 	print("Explosion instance added to scene at:", last_point)
 
+	# Explosion radius (adjust this as needed)
+	var explosion_radius = 1.0
+
+	# Check for PlayerUnit within explosion radius
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if player.position.distance_to(last_point) <= explosion_radius:
+			player.get_child(0).play("death")
+			await get_tree().create_timer(1).timeout
+			player.visible = false  # Hide the player unit
+			player.remove_from_group("PlayerUnit")  # Remove from the group
+			print("PlayerUnit removed from explosion")
+
+	# Check for ZombieUnit within explosion radius
+	for zombie in get_tree().get_nodes_in_group("zombies"):
+		if zombie.position.distance_to(last_point) <= explosion_radius:
+			zombie.get_child(0).play("death")
+			await get_tree().create_timer(1).timeout
+			zombie.visible = false  # Hide the zombie unit
+			zombie.remove_from_group("ZombieUnit")  # Remove from the group
+			print("ZombieUnit removed from explosion")
+
+	# Check for Structures within explosion radius
+	for structure in get_tree().get_nodes_in_group("structures"):
+		if structure.position.distance_to(last_point) <= explosion_radius:
+			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
+			
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
 	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	
 	# Access the 'special' button within HUDManager
 	var special_button = hud_manager.get_node("HUD/Special")
-	global_manager.special_toggle_active = false
+	global_manager.special_toggle_active = false  # Deactivate the special toggle

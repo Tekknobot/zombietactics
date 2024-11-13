@@ -46,6 +46,13 @@ func update_hud(character: PlayerUnit):
 		portrait.texture = character.portrait_texture
 		print("Portrait texture updated")
 
+	# Update player name if the player_name label exists
+	if player_name:
+		player_name.text = character.player_name  # Set the player name text from the character
+		print("Player name updated to: ", player_name.text)
+	else:
+		print("Player name node is null!")
+
 	if character.max_health > 0:
 		health_bar.max_value = character.max_health
 		health_bar.value = character.current_health

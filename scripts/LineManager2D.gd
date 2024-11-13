@@ -1,5 +1,7 @@
 extends Node2D
 
+signal player_action_completed
+
 @export var Map: TileMap
 
 var line2D_scene = preload("res://assets/scenes/prefab/Line_2d.tscn")
@@ -61,7 +63,10 @@ func _input(event: InputEvent) -> void:
 				var map_target_tile_pos = Map.map_to_local(map_target_position)  # Convert to tile coordinates
 			
 				trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
-
+				
+				await get_tree().create_timer(3).timeout
+				on_player_action_completed()	
+				
 # Function to start the missile trajectory and visualize with Line2D
 func start_trajectory(start: Vector2, target: Vector2):
 	onTrajectory = true
@@ -88,11 +93,15 @@ func start_trajectory(start: Vector2, target: Vector2):
 
 	# Animate the missile trajectory by moving through the Bézier points
 	await animate_trajectory(line_inst, points)
-
+	
 	# Cleanup: Remove Line2D after animation
 	line_inst.queue_free()
 	onTrajectory = false
 	print("Trajectory animation completed and cleaned up.")
+
+# Call this function after every player action
+func on_player_action_completed():
+	emit_signal("player_action_completed")
 
 # Function to generate Bézier curve points
 func generate_bezier_curve(start: Vector2, control1: Vector2, control2: Vector2, end: Vector2, steps: int = 100) -> Array:
@@ -119,6 +128,7 @@ func animate_trajectory(line_inst: Line2D, points: Array):
 
 		# Simulate animation speed by waiting a short time before updating trajectory
 		await get_tree().create_timer(0.01).timeout
+	
 	print("Trajectory animation function completed.")
 
 # Trigger explosion at the target position after the missile reaches it
@@ -138,19 +148,19 @@ func _trigger_explosion(last_point: Vector2):
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.position.distance_to(last_point) <= explosion_radius:
 			player.get_child(0).play("death")
-			await get_tree().create_timer(1).timeout
+			await get_tree().create_timer(1.5).timeout
 			player.visible = false  # Hide the player unit
-			player.remove_from_group("PlayerUnit")  # Remove from the group
-			print("PlayerUnit removed from explosion")
+			player.remove_from_group("player_units")  # Remove from the group
+			print("Player Unit removed from explosion")
 
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:
 			zombie.get_child(0).play("death")
-			await get_tree().create_timer(1).timeout
+			await get_tree().create_timer(1.5).timeout
 			zombie.visible = false  # Hide the zombie unit
-			zombie.remove_from_group("ZombieUnit")  # Remove from the group
-			print("ZombieUnit removed from explosion")
+			zombie.remove_from_group("zombies")  # Remove from the group
+			print("Zombie Unit removed from explosion")
 
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):

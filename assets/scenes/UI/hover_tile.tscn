@@ -3,6 +3,6 @@
 [ext_resource type="Script" path="res://scripts/HoverTile.gd" id="1_btw2b"]
 [ext_resource type="Texture2D" uid="uid://b3fmige5evt8r" path="res://assets/iso_tiles/ui/tile_hover.png" id="1_l22dc"]
 
-[node name="HoverTile" type="Sprite2D"]
+[node name="HoverTile" type="Sprite2D" groups=["hovertile"]]
 texture = ExtResource("1_l22dc")
 script = ExtResource("1_btw2b")

@@ -56,6 +56,7 @@ func _create_explosion() -> void:
 
 	# Check for any zombie units in the target area and destroy them
 	_check_for_zombies_at_target()
+	_check_for_players_at_target()
 
 func _check_for_zombies_at_target() -> void:
 	# Find all nodes in the group "zombies"
@@ -69,3 +70,16 @@ func _check_for_zombies_at_target() -> void:
 			
 			# Play the death animation on the zombie (assuming it has an animation called "death")
 			zombie.get_child(0).play("death")
+
+func _check_for_players_at_target() -> void:
+	# Find all nodes in the group "zombies"
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if not player is Node2D:
+			continue  # Skip any non-Node2D members of the group
+		
+		# Check if the zombie is within the explosion radius
+		if player.position.distance_to(target_position) <= explosion_radius:
+			print("Player found at explosion position, destroying:", player.name)
+			
+			# Play the death animation on the zombie (assuming it has an animation called "death")
+			player.apply_damage(50)

@@ -252,7 +252,10 @@ func move_along_path(delta: float) -> void:
 			# Only instantiate the mine if we're not on the last tile
 			if path_index < current_path.size() - 1:
 				instantiate_mine_on_tile(target_pos)
-			
+			else:
+				player_to_move.current_xp += 25	
+				on_player_action_completed()
+				
 			path_index += 1  # Move to the next tile in the path
 			player_to_move.get_child(0).play("default")
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
@@ -265,8 +268,6 @@ func move_along_path(delta: float) -> void:
 			var landmine_button = hud_manager.get_node("HUD/Landmine")
 			global_manager.missile_toggle_active = false  # Deactivate the special toggle
 			hud_manager.update_hud(player_to_move)
-			
-			player_to_move.current_xp += 1	
 
 # Instantiate the mine on the current tile
 func instantiate_mine_on_tile(tile_pos: Vector2i) -> void:

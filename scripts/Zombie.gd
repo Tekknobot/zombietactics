@@ -37,12 +37,19 @@ func _ready() -> void:
 	
 	# Access the MissileManager and connect the signal if it exists
 	var missile_manager = map_manager.get_node("MissileManager")
-
 	if missile_manager and missile_manager.has_signal("player_action_completed"):
 		print("MissileManager signal found!")
 		missile_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
 	else:
 		print("MissileManager or signal 'player_action_completed' not found!")
+
+	# Access the MissileManager and connect the signal if it exists
+	var landmine_manager = map_manager.get_node("LandmineManager")
+	if landmine_manager and landmine_manager.has_signal("player_action_completed"):
+		print("LandmineManager signal found!")
+		landmine_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
+	else:
+		print("LandmineManager or signal 'player_action_completed' not found!")
 
 	# List of unit names
 	var units = ["Soldier", "Mercenary", "Dog"]

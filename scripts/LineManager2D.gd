@@ -23,7 +23,7 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
 	if not global_manager.special_toggle_active:
-		print("Special toggle is off, ignoring mouse clicks.")
+		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 			
 	# Handle mouse button events (right and left-click)

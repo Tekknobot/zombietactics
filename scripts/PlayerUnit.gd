@@ -541,7 +541,7 @@ func attack(target_tile: Vector2i) -> void:
 	hud_manager.update_hud(self)	
 	
 	# Wait for a delay before resetting the animation
-	await get_tree().create_timer(2).timeout
+	await get_tree().create_timer(1.5).timeout
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
@@ -602,7 +602,9 @@ func die() -> void:
 	print("Player has died")
 	get_child(0).play("death")
 	await get_tree().create_timer(1).timeout
-	queue_free()  # Remove player from the scene or handle accordingly		
+	self.remove_from_group("player_units")
+	self.visible = false
+	#queue_free()  # Remove player from the scene or handle accordingly		
 
 func level_up() -> void:
 	print("Player leveled up!")

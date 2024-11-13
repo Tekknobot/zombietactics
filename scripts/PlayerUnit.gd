@@ -71,6 +71,10 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var explosion_scene: PackedScene
 @export var explosion_radius: float = 1.0  # Radius to check for units at the target position
 
+# Set up a Timer node on the player node and connect its "timeout" signal to `_reset_color`
+@onready var timer: Timer = $Timer
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -85,7 +89,7 @@ func _ready() -> void:
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud = hud_manager.get_node("HUD")  # Get the actual HUD node
 	update_hud()  # Update the HUD initially with player data	
-
+	
 # Called every frame
 func _process(delta: float) -> void:		
 	update_tile_position()
@@ -675,3 +679,12 @@ func _create_explosion() -> void:
 	# Add explosion to the parent scene
 	get_parent().add_child(explosion)
 	print("Explosion created at position: ", explosion.position)
+
+# Flashes the sprite red and white a few times
+func flash_damage():
+	if sprite:
+		for i in range(8):  # Flash 3 times
+			sprite.modulate = Color(1, 0, 0)  # Set to red
+			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
+			sprite.modulate = Color(1, 1, 1)  # Set back to normal color
+			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds

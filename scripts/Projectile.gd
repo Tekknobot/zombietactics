@@ -8,6 +8,8 @@ extends Node2D
 @export var explosion_scene: PackedScene
 @export var explosion_radius: float = 1.0  # Radius to check for units at the target position
 
+var projectile_hit: bool = false
+
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering
 	z_index = int(position.y)
@@ -20,10 +22,13 @@ func _process(delta: float) -> void:
 	var distance_to_target = position.distance_to(target_position)
 	
 	# Check if the projectile has reached the target
-	if distance_to_target <= speed * delta:
+	if distance_to_target <= speed * delta and projectile_hit == false:
 		position = target_position  # Snap to target
 		print("Projectile reached target at: ", target_position)
+		self.visible = false
 		_create_explosion()  # Trigger the explosion effect
+		projectile_hit = true
+		await get_tree().create_timer(1).timeout 
 		queue_free()  # Destroy the projectile
 		return
 	
@@ -83,6 +88,7 @@ func _check_for_players_at_target() -> void:
 			print("Player found at explosion position, destroying:", player.name)
 			
 			# Play the death animation on the zombie (assuming it has an animation called "death")
+			attack_player(player)
 			player.apply_damage(50)
 
 func _check_for_structure_at_target() -> void:
@@ -140,3 +146,8 @@ func _check_for_structure_at_target() -> void:
 
 			else:
 				print("Structure does not have a valid 'structure_type' or 'get_structure_type' method.")
+
+# Function to handle the friendly attack logic
+func attack_player(player: Area2D) -> void:
+	if player.has_method("flash_damage"):
+		player.flash_damage()

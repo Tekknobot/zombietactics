@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://llelbv7y40d3"]
+
+[node name="Line2D" type="Line2D"]
+z_index = 4000
+position = Vector2(2, 0)
+width = 1.0

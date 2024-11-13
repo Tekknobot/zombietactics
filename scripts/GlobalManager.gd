@@ -1,6 +1,7 @@
 extends Node2D
 
-var special_toggle_active: bool = false  # The flag to track the state of the toggle
+var missile_toggle_active: bool = false  # The flag to track the state of the toggle
+var landmine_toggle_active: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

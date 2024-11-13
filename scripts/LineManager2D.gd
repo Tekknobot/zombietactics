@@ -24,7 +24,7 @@ func _ready() -> void:
 # Handling input events (mouse clicks)
 func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
-	if not global_manager.special_toggle_active:
+	if not global_manager.missile_toggle_active:
 		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 	
@@ -180,7 +180,7 @@ func _trigger_explosion(last_point: Vector2):
 	
 	# Access the 'special' button within HUDManager
 	var special_button = hud_manager.get_node("HUD/Special")
-	global_manager.special_toggle_active = false  # Deactivate the special toggle
+	global_manager.missile_toggle_active = false  # Deactivate the special toggle
 
 	# Add XP
 	# Get all nodes in the 'hovertile' group

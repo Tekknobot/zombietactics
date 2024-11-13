@@ -491,7 +491,7 @@ func clear_attack_range_tiles() -> void:
 
 func attack(target_tile: Vector2i) -> void:
 	# Only respond to clicks if the special toggle is active
-	if global_manager.special_toggle_active:
+	if global_manager.missile_toggle_active:
 		print("Special toggle is off, ignoring mouse clicks.")
 		return	
 	

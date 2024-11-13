@@ -1,12 +1,14 @@
 extends CanvasLayer
 
+@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the GlobalManager in the scene
+
 @onready var portrait = $HUD/Portrait
 @onready var health_bar = $HUD/HealthBar
 @onready var player_name = $HUD/Name
 @onready var xp_bar = $HUD/XPBar
 @onready var level = $HUD/Level
-@onready var missile = $HUD/Missile  # Reference to the Special toggle
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the GlobalManager in the scene
+@onready var missile = $HUD/Missile 
+@onready var landmine = $HUD/Landmine
 
 func _ready():
 	if portrait:
@@ -16,16 +18,28 @@ func _ready():
 
 	# Connect the toggled signal for special button
 	if missile:
-		missile.connect("toggled", Callable(self, "_on_special_toggled"))
-	
+		missile.connect("toggled", Callable(self, "_on_missile_toggled"))
+
+	if landmine:
+		landmine.connect("toggled", Callable(self, "_on_landmine_toggled"))
+		
 # Method to handle the toggle state change
-func _on_special_toggled(button_pressed: bool) -> void:
+func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
-		global_manager.special_toggle_active = true  # Set the flag to true
-		print("Special toggle activated!")
+		global_manager.missile_toggle_active = true  # Set the flag to true
+		print("Missile toggle activated!")
 	else:
-		global_manager.special_toggle_active = false  # Set the flag to false
-		print("Special toggle deactivated!")
+		global_manager.missile_toggle_active = false  # Set the flag to false
+		print("Missile toggle deactivated!")
+
+func _on_landmine_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		global_manager.landmine_toggle_active = true  # Set the flag to true
+		print("Landmine toggle activated!")
+	else:
+		global_manager.landmine_toggle_active = false  # Set the flag to false
+		print("Landmine toggle deactivated!")
+
 
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
@@ -35,7 +49,7 @@ func update_hud(character: PlayerUnit):
 	# Reset the special toggle to "off" when updating the HUD
 	if missile:
 		missile.button_pressed = false  # This ensures the toggle is visually set to off
-		global_manager.special_toggle_active = false  # Reset the special flag in global_manager
+		global_manager.missile_toggle_active = false  # Reset the special flag in global_manager
 
 		# Optionally emit the toggled signal to indicate the toggle state reset
 		missile.emit_signal("toggled", false)

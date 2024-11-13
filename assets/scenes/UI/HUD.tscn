@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://rdlfqfdmhgit"]
+[gd_scene load_steps=11 format=3 uid="uid://rdlfqfdmhgit"]
 
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
@@ -19,6 +19,12 @@ bg_color = Color(1, 1, 0, 1)
 bg_color = Color(0.6, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a3qd4"]
+bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v731d"]
+bg_color = Color(0.6, 0, 0.00392157, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_arpbt"]
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
 
 [node name="HUD" type="Control"]
@@ -99,3 +105,16 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
 theme_override_styles/normal = SubResource("StyleBoxFlat_a3qd4")
 toggle_mode = true
 text = "Missile"
+
+[node name="Landmine" type="Button" parent="."]
+layout_mode = 0
+offset_left = 168.0
+offset_top = -116.0
+offset_right = 252.0
+offset_bottom = -82.0
+theme_override_fonts/font = ExtResource("3_fyyii")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
+theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
+toggle_mode = true
+text = "Landmine"

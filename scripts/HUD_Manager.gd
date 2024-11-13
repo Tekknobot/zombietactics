@@ -46,14 +46,22 @@ func update_hud(character: PlayerUnit):
 	# Debugging: Check if the correct character is passed
 	print("Updating HUD for: ", character)
 
-	# Reset the special toggle to "off" when updating the HUD
+	# Reset the missile toggle to "off" when updating the HUD
 	if missile:
 		missile.button_pressed = false  # This ensures the toggle is visually set to off
 		global_manager.missile_toggle_active = false  # Reset the special flag in global_manager
 
 		# Optionally emit the toggled signal to indicate the toggle state reset
 		missile.emit_signal("toggled", false)
-		print("Special toggle reset to off")
+		print("Missile toggle reset to off")
+
+	if landmine:
+		landmine.button_pressed = false  # This ensures the toggle is visually set to off
+		global_manager.missile_toggle_active = false  # Reset the special flag in global_manager
+
+		# Optionally emit the toggled signal to indicate the toggle state reset
+		landmine.emit_signal("toggled", false)
+		print("Landmine toggle reset to off")
 
 	# Update the rest of the HUD elements
 	if character.portrait_texture and portrait:

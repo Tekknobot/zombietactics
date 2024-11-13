@@ -247,16 +247,31 @@ func move_along_path(delta: float) -> void:
 		var move_distance = min(distance_to_target, move_speed * delta)  # Move only as far as the remaining distance
 		player_to_move.position += direction * move_distance
 
-		# Instantiate a mine on each tile the player travels
+		# Check if we have reached the target tile
 		if distance_to_target <= move_distance:  # Threshold to determine if we reached the target
-			instantiate_mine_on_tile(target_pos)
+			# Only instantiate the mine if we're not on the last tile
+			if path_index < current_path.size() - 1:
+				instantiate_mine_on_tile(target_pos)
+			
 			path_index += 1  # Move to the next tile in the path
 			player_to_move.get_child(0).play("default")
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
 			update_astar_grid()
+			
+		 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
+			var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+			
+			# Access the 'special' button within HUDManager
+			var landmine_button = hud_manager.get_node("HUD/Landmine")
+			global_manager.missile_toggle_active = false  # Deactivate the special toggle
+			hud_manager.update_hud(player_to_move)
+			
+			player_to_move.current_xp += 1	
 
 # Instantiate the mine on the current tile
 func instantiate_mine_on_tile(tile_pos: Vector2i) -> void:
+	await get_tree().create_timer(0.2).timeout
+	
 	var mine = landmine_scene.instantiate() as Node2D
 	if mine == null:
 		print("Error: Failed to instantiate mine!")

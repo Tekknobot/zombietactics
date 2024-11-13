@@ -5,6 +5,7 @@ var tilemap: TileMap = null
 
 # Currently selected player
 var selected_player: Area2D = null
+var last_selected_player: Area2D = null
 
 # Movement and attack range tiles
 var movement_range_tiles: Array[Vector2i] = []
@@ -92,7 +93,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			show_movement_tiles(player)
 			return
 	
-	selected_player = null  # Deselect if no player is found at the clicked tile
+	#selected_player = null  # Deselect if no player is found at the clicked tile
 
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:
@@ -115,6 +116,7 @@ func clear_action_tiles() -> void:
 	if selected_player:
 		selected_player.clear_movement_tiles()
 		selected_player.clear_attack_range_tiles()
+		last_selected_player = selected_player
 		selected_player.selected = false
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()

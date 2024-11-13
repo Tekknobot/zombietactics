@@ -173,3 +173,19 @@ func _trigger_explosion(last_point: Vector2):
 	# Access the 'special' button within HUDManager
 	var special_button = hud_manager.get_node("HUD/Special")
 	global_manager.special_toggle_active = false  # Deactivate the special toggle
+
+	# Add XP
+	# Get all nodes in the 'hovertile' group
+	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
+
+	# Iterate through the list and find the HoverTile node
+	for hover_tile in hover_tiles:
+		if hover_tile.name == "HoverTile":
+			# Check if 'last_selected_player' exists and has 'current_xp' property
+			if hover_tile.selected_player:
+				hover_tile.selected_player.current_xp += 25
+				# Update the HUD to reflect new stats
+				hud_manager.update_hud(hover_tile.selected_player)	
+				print("Added 25 XP to", hover_tile.selected_player, "new XP:", hover_tile.selected_player.current_xp)		
+			else:
+				print("last_selected_player does not exist.")

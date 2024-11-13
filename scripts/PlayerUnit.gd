@@ -61,7 +61,7 @@ var hud: Control
 
 # Player's health properties
 var max_xp: int = 100
-var current_xp: int = 10
+var current_xp: int = 25
 var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
 
@@ -543,7 +543,7 @@ func attack(target_tile: Vector2i) -> void:
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
-	# Increase experience points by 10 for each attack
+	# Increase experience points by 25 for each attack
 	current_xp += 25
 	print("Current XP increased to:", current_xp)
 	

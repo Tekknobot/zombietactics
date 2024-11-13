@@ -6,7 +6,8 @@ var next_zombie_id: int = 1
 
 # Movement range for zombies, they can move only up to this range
 @export var movement_range = 3
-var zombies_moving = []  # List to track the zombies that are currently moving
+var is_moving = false  # Flag to track if zombies are moving
+
 var tile_size = 32  # Or whatever your tile size is in pixels
 @export var movement_tile_scene: PackedScene
 @export var tilemap: TileMap = null
@@ -24,6 +25,7 @@ var move_speed: float = 75.0
 const WATER_TILE_ID = 0
 
 var attacks: int = 0
+var attack_damage = 25
 
 func _ready() -> void:
 	update_tile_position()
@@ -133,6 +135,9 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		print("No zombies available.")
 		return
 
+	# Set is_moving to true when zombies start moving
+	is_moving = true
+
 	# Loop through zombies and move them one by one based on their ID
 	for zombie in zombies:
 		# Skip the zombie if it has been removed from the group
@@ -178,7 +183,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 			# Move the zombie toward the next path point
 			zombie.position += movement_vector * move_speed * delta_time
-
+			
 			# Check if the zombie has reached the target point
 			if zombie.position.distance_to(target_pos) <= target_reach_threshold:
 				# Zombie reached the current target point, so increment the path index
@@ -202,8 +207,11 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			
 		# Wait before processing the next zombie
 		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
-	
+
+	# After all zombies are done moving, set is_moving to false
+	is_moving = false
 	attacks = 0
+
 	
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
 
@@ -233,21 +241,18 @@ func check_for_attack() -> void:
 			var target_direction = target_world_pos.x - position.x
 
 			# Flip the sprite based on the target's relative position and current scale.x value
-			if target_direction > 0 and scale.x != -1:  # Target is to the right, but sprite is not facing right
+			if target_direction > 0 and scale.x != -1:
 				scale.x = -1  # Flip sprite to face right
-			elif target_direction < 0 and scale.x != 1:  # Target is to the left, but sprite is not facing left
+			elif target_direction < 0 and scale.x != 1:
 				scale.x = 1  # Flip sprite to face left
-			elif target_direction > 0 and scale.x == -1:  # Target is to the right, and sprite is already facing right
-				pass  # No need to flip, sprite is already facing right
-			elif target_direction < 0 and scale.x == 1:  # Target is to the left, and sprite is already facing left
-				pass  # No need to flip, sprite is already facing left
 
 			# Play attack animation on the zombie
 			self.get_child(0).play("attack")
 			print("Zombie just attacked.")
 			
-			# Call the attack player function
-			attack_player(player)
+			if self.visible:
+				# Call the attack player function
+				attack_player(player)
 			
 			# After the first attack, exit the loop
 			break
@@ -255,26 +260,6 @@ func check_for_attack() -> void:
 	# Reset the attack flag after a small delay to avoid multiple attacks in the same cycle/frame
 	await get_tree().create_timer(0.5).timeout  # Adjust the delay as needed
 	is_attacking = false
-
-
-# Function to check if the zombie is adjacent to a specific tile
-func is_adjacent_to_tile(zombie_tile: Vector2i, player: Area2D) -> bool:
-	# Get the tilemap
-	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	
-	# Get the player's tile position
-	var player_tile_pos = tilemap.local_to_map(player.global_position)
-	
-	# Get the surrounding tiles of the zombie's current position
-	var surrounding_cells = tilemap.get_surrounding_cells(zombie_tile)
-	
-	# Check if any of the surrounding cells match the player's tile position
-	for tile in surrounding_cells:
-		if tile == player_tile_pos:
-			return true  # Player is adjacent to the zombie
-	
-	# If no surrounding cell matches, return false
-	return false
 
 # Function to handle the attack logic
 func attack_player(player: Area2D) -> void:
@@ -294,7 +279,39 @@ func attack_player(player: Area2D) -> void:
 	# Print a debug message
 	print("Zombie attacks player at position:", player.global_position)
 	
+	# Inflict damage on the player
+	take_damage(player, attack_damage)  # Call the take_damage function with 10 damage
+	
 	attacks += 1
+
+# New Function to handle player taking damage
+func take_damage(player: Area2D, damage: int) -> void:
+	# Check if the player has a health property, otherwise assume max health
+	if not player.has_method("apply_damage"):
+		print("Player object does not have an 'apply_damage' method")
+		return
+	
+	player.apply_damage(damage)  # Call the player's apply_damage method
+	print("Zombie dealt", damage, "damage to player")
+
+# Function to check if the zombie is adjacent to a specific tile
+func is_adjacent_to_tile(zombie_tile: Vector2i, player: Area2D) -> bool:
+	# Get the tilemap
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	# Get the player's tile position
+	var player_tile_pos = tilemap.local_to_map(player.global_position)
+	
+	# Get the surrounding tiles of the zombie's current position
+	var surrounding_cells = tilemap.get_surrounding_cells(zombie_tile)
+	
+	# Check if any of the surrounding cells match the player's tile position
+	for tile in surrounding_cells:
+		if tile == player_tile_pos:
+			return true  # Player is adjacent to the zombie
+	
+	# If no surrounding cell matches, return false
+	return false
 
 func get_adjacent_walkable_tiles(center_tile: Vector2i) -> Array[Vector2i]:
 	

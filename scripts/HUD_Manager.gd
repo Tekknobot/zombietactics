@@ -4,6 +4,7 @@ extends CanvasLayer
 @onready var health_bar = $HUD/HealthBar  # Reference to the ProgressBar node
 @onready var player_name = $HUD/Name  # Reference to the Label node (for player's name)
 @onready var xp_bar = $HUD/XPBar  # Reference to the Label node (for player's name)
+@onready var level = $HUD/Level  
 
 func _ready():
 	if portrait:
@@ -49,3 +50,9 @@ func update_hud(character: PlayerUnit):
 	else:
 		print("Max health is 0 or invalid")
 	
+	# Update level display based on character's current level
+	if level:
+		level.text = "Level " + str(character.current_level)  # Update the level label with the character's current level
+		print("Level updated to: ", level.text)
+	else:
+		print("Level node is null!")

@@ -62,6 +62,10 @@ var hud: Control
 # Player's health properties
 var max_xp: int = 100
 var current_xp: int = 10
+var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
+var current_level: int = 1
+
+var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -79,7 +83,20 @@ func _ready() -> void:
 	update_hud()  # Update the HUD initially with player data	
 
 # Called every frame
-func _process(delta: float) -> void:
+func _process(delta: float) -> void:	
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+		
 	update_tile_position()
 	move_along_path(delta)
 	
@@ -303,6 +320,20 @@ func visualize_walkable_tiles() -> void:
 var attack_range_visible: bool = false  # Variable to track if attack range is visible
 
 func _input(event: InputEvent) -> void:
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+			
+	# Process player input only if zombies are not moving
 	if event is InputEventMouseButton:
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
@@ -436,7 +467,6 @@ func clear_attack_range_tiles() -> void:
 	attack_range_tiles.clear()
 
 func attack(target_tile: Vector2i) -> void:
-
 	# Check if the target is within the attack range
 	if not is_within_attack_range(target_tile):
 		print("Target is out of range")
@@ -469,15 +499,11 @@ func attack(target_tile: Vector2i) -> void:
 	var target_direction = target_world_pos.x - position.x
 
 	# Flip the sprite based on the target's relative position and current scale.x value
-	if target_direction > 0 and scale.x != -1:  # Target is to the right, but sprite is not facing right
+	if target_direction > 0 and scale.x != -1:
 		scale.x = -1  # Flip sprite to face right
-	elif target_direction < 0 and scale.x != 1:  # Target is to the left, but sprite is not facing left
+	elif target_direction < 0 and scale.x != 1:
 		scale.x = 1  # Flip sprite to face left
-	elif target_direction > 0 and scale.x == -1:  # Target is to the right, and sprite is already facing right
-		pass  # No need to flip, sprite is already facing right
-	elif target_direction < 0 and scale.x == 1:  # Target is to the left, and sprite is already facing left
-		pass  # No need to flip, sprite is already facing left
-
+	
 	# Set the initial position of the projectile (e.g., the soldier's position)
 	projectile.position = self.position
 	print("Projectile created at position: ", projectile.position)
@@ -489,11 +515,25 @@ func attack(target_tile: Vector2i) -> void:
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
+	# Increase experience points by 10 for each attack
+	current_xp += 25
+	print("Current XP increased to:", current_xp)
+	
+	# Optional: Check for level up, if applicable
+	if current_xp >= xp_for_next_level:
+		level_up()
+
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.update_hud(self)	
+	
+	# Wait for a delay before resetting the animation
 	await get_tree().create_timer(2).timeout
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
 	on_player_action_completed()
+
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:
@@ -534,3 +574,57 @@ func update_hud() -> void:
 		# Update the portrait (if you have one)
 		portrait.texture = portrait_texture
 		
+# Method to apply damage
+func apply_damage(damage: int) -> void:
+	current_health -= damage  # Reduce health by damage
+	current_health = clamp(current_health, 0, max_health)  # Ensure health stays within bounds
+	
+	if current_health <= 0:
+		die()  # Handle player death if health is 0
+	else:
+		print("Player health after attack:", current_health)
+
+# Optional death handling
+func die() -> void:
+	print("Player has died")
+	get_child(0).play("death")
+	await get_tree().create_timer(1).timeout
+	queue_free()  # Remove player from the scene or handle accordingly		
+
+func level_up() -> void:
+	print("Player leveled up!")
+	
+	# Reset or increase XP threshold
+	current_xp -= xp_for_next_level
+	xp_for_next_level += 50  # Increase threshold, if applicable
+	
+	# Add level-up bonuses
+	movement_range += 1
+	current_level += 1
+	
+	# Play level-up visual effect
+	play_level_up_effect()
+
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.update_hud(self)
+
+# Function to play level-up flickering effect (green to normal)
+func play_level_up_effect() -> void:
+	var original_color = modulate  # Store the original color of the unit
+	var flash_color = Color(0, 1, 0)  # Green color for the flash effect
+	
+	# Number of flashes and duration
+	var flash_count = 8  # How many times to alternate
+	var flash_duration = 0.1  # Duration for each flash (on or off)
+
+	# Loop to alternate colors
+	for i in range(flash_count):
+		# Alternate color between green and the original color
+		modulate = flash_color if i % 2 == 0 else original_color
+		
+		# Wait for the duration before switching again
+		await get_tree().create_timer(flash_duration).timeout
+
+	# Ensure color is reset to original after the effect
+	modulate = original_color

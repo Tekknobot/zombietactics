@@ -624,6 +624,10 @@ func level_up() -> void:
 	# Add level-up bonuses
 	movement_range += 1
 	current_level += 1
+	if current_health == 100:
+		return
+	else:
+		current_health += 25
 	
 	# Play level-up visual effect
 	play_level_up_effect()

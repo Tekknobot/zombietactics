@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://b6reg1gechlys"]
+[gd_scene load_steps=13 format=3 uid="uid://b6reg1gechlys"]
 
 [ext_resource type="Script" path="res://scripts/Structure.gd" id="1_oejrg"]
+[ext_resource type="PackedScene" uid="uid://bofv1wx4so130" path="res://assets/scenes/vfx/explosion.tscn" id="2_6ajjk"]
 [ext_resource type="Texture2D" uid="uid://6gt46uq18kaq" path="res://assets/structures/buildings.png" id="2_lg828"]
 [ext_resource type="Texture2D" uid="uid://buvtse4j41f5n" path="res://assets/structures/district/buildings_demolished1.png" id="3_6a2og"]
 [ext_resource type="Texture2D" uid="uid://ccailkq8jkjue" path="res://assets/structures/district/buildings_demolished2.png" id="4_yu2y5"]
@@ -62,9 +63,11 @@ animations = [{
 [node name="District_Area2D" type="Area2D" groups=["structure"]]
 script = ExtResource("1_oejrg")
 structure_type = "District"
+explosion_scene = ExtResource("2_6ajjk")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_k3m2e")
+animation = &"demolished"
 autoplay = "default"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

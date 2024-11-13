@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://dumfkfxnng3od"]
+[gd_scene load_steps=13 format=3 uid="uid://dumfkfxnng3od"]
 
 [ext_resource type="Script" path="res://scripts/Structure.gd" id="1_fgsm4"]
 [ext_resource type="Texture2D" uid="uid://ckxtu0sg4l76u" path="res://assets/structures/tower/default/buildings 1.png" id="2_3tl2q"]
+[ext_resource type="PackedScene" uid="uid://bofv1wx4so130" path="res://assets/scenes/vfx/explosion.tscn" id="2_t5i3e"]
 [ext_resource type="Texture2D" uid="uid://bh2v5n6ud2ksd" path="res://assets/structures/tower/buildings 1_demolished1.png" id="3_6vppo"]
 [ext_resource type="Texture2D" uid="uid://dmcnmf6lypgb0" path="res://assets/structures/tower/buildings 1_demolished2.png" id="4_ffj3v"]
 [ext_resource type="Texture2D" uid="uid://dv18l8uiy2ju8" path="res://assets/structures/tower/buildings 1_demolished3.png" id="5_op7vc"]
@@ -62,6 +63,7 @@ animations = [{
 [node name="Tower_Area2D" type="Area2D" groups=["structure"]]
 script = ExtResource("1_fgsm4")
 structure_type = "Tower"
+explosion_scene = ExtResource("2_t5i3e")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jyawu")

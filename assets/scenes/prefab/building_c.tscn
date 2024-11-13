@@ -1,7 +1,8 @@
-[gd_scene load_steps=19 format=3 uid="uid://bwjvlmhoak6vi"]
+[gd_scene load_steps=20 format=3 uid="uid://bwjvlmhoak6vi"]
 
 [ext_resource type="Script" path="res://scripts/Structure.gd" id="1_ismcq"]
 [ext_resource type="Texture2D" uid="uid://rif1tmffomp" path="res://assets/structures/building_c/buildings_c1.png" id="2_mwsmp"]
+[ext_resource type="PackedScene" uid="uid://bofv1wx4so130" path="res://assets/scenes/vfx/explosion.tscn" id="2_pl3xu"]
 [ext_resource type="Texture2D" uid="uid://bli1p4fryh2g8" path="res://assets/structures/building_c/buildings_c2.png" id="3_nmoll"]
 [ext_resource type="Texture2D" uid="uid://dtk3u587mvcry" path="res://assets/structures/building_c/buildings_c3.png" id="4_6wtw6"]
 [ext_resource type="Texture2D" uid="uid://bo3sxpx1yt8y5" path="res://assets/structures/building_c/buildings_c4.png" id="5_vqwiw"]
@@ -82,6 +83,7 @@ animations = [{
 [node name="Building_C_Area2D" type="Area2D" groups=["structure"]]
 script = ExtResource("1_ismcq")
 structure_type = "Building"
+explosion_scene = ExtResource("2_pl3xu")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_fh453")

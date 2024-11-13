@@ -11,6 +11,8 @@ var onTrajectory = false  # Indicates if missile is currently on a trajectory
 var right_click_position: Vector2
 var target_position: Vector2
 
+var missiles_launched : int = 0
+
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 var hud: Control
@@ -24,6 +26,9 @@ func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
 	if not global_manager.special_toggle_active:
 		#print("Special toggle is off, ignoring mouse clicks.")
+		return
+	
+	if missiles_launched >= 1:
 		return
 			
 	# Handle mouse button events (right and left-click)
@@ -62,6 +67,7 @@ func _input(event: InputEvent) -> void:
 				var map_target_position = Map.local_to_map(target_position)  # Convert target to TileMap local
 				var map_target_tile_pos = Map.map_to_local(map_target_position)  # Convert to tile coordinates
 			
+				missiles_launched += 1
 				trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 				
 				await get_tree().create_timer(3).timeout
@@ -97,6 +103,8 @@ func start_trajectory(start: Vector2, target: Vector2):
 	# Cleanup: Remove Line2D after animation
 	line_inst.queue_free()
 	onTrajectory = false
+	
+	missiles_launched = 0
 	print("Trajectory animation completed and cleaned up.")
 
 # Call this function after every player action

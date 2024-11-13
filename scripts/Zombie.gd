@@ -199,7 +199,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			update_astar_grid()
 			print("Zombie ID %d has no valid path to move." % zombie.zombie_id)
 		
-		if attacks == 1:
+		if attacks >= 1:
 			pass
 		else:
 			# Call the attack check once per zombie after its movement

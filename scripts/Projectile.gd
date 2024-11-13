@@ -57,6 +57,7 @@ func _create_explosion() -> void:
 	# Check for any zombie units in the target area and destroy them
 	_check_for_zombies_at_target()
 	_check_for_players_at_target()
+	_check_for_structure_at_target()
 
 func _check_for_zombies_at_target() -> void:
 	# Find all nodes in the group "zombies"
@@ -83,3 +84,29 @@ func _check_for_players_at_target() -> void:
 			
 			# Play the death animation on the zombie (assuming it has an animation called "death")
 			player.apply_damage(50)
+
+func _check_for_structure_at_target() -> void:
+	# Find all nodes in the group "structures"
+	for structure in get_tree().get_nodes_in_group("structures"):
+		if not structure is Node2D:
+			continue  # Skip any non-Node2D members of the group
+		
+		# Check if the structure is within the explosion radius
+		if structure.position.distance_to(target_position) <= explosion_radius:
+			print("Structure found at explosion position, handling:", structure.name)
+			
+			# Ensure the structure has a structure_type property before accessing it
+			if structure.has_method("get_structure_type"):
+				# Check the type of the structure (Building, etc.)
+				var structure_type = structure.get_structure_type()
+				if structure_type == "Building":
+					# Assuming the first child of the structure is the animation player
+					if structure.get_child_count() > 0 and structure.get_child(0) is AnimationPlayer:
+						# Play the "demolished" animation on the animation player
+						structure.get_child(0).play("demolished")
+					else:
+						print("Error: No animation player found or the first child is not an AnimationPlayer.")
+				else:
+					print("Structure is not a Building, skipping demolition.")
+			else:
+				print("Structure does not have a valid 'structure_type' or 'get_structure_type' method.")

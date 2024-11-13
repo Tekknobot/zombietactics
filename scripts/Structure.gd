@@ -5,6 +5,8 @@ var tile_pos: Vector2i
 var coord: Vector2
 var layer: int
 
+@export var structure_type: String
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Optionally, initialize any variables or states here
@@ -30,3 +32,8 @@ func update_tile_position() -> void:
 
 	# Optionally, set the z_index in the node to ensure proper rendering order
 	self.z_index = layer
+
+# Getter method for structure_type
+func get_structure_type() -> String:
+	# Return the structure type
+	return structure_type

@@ -67,6 +67,10 @@ var current_level: int = 1
 
 var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
+# Optional: Scene to instantiate for explosion effect
+@export var explosion_scene: PackedScene
+@export var explosion_radius: float = 1.0  # Radius to check for units at the target position
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -602,6 +606,10 @@ func die() -> void:
 	print("Player has died")
 	get_child(0).play("death")
 	await get_tree().create_timer(1).timeout
+	
+	if self.player_name == "Yoshidaboi":
+		_create_explosion()
+	
 	self.remove_from_group("player_units")
 	self.visible = false
 	#queue_free()  # Remove player from the scene or handle accordingly		
@@ -643,3 +651,23 @@ func play_level_up_effect() -> void:
 
 	# Ensure color is reset to original after the effect
 	modulate = original_color
+
+func _create_explosion() -> void:
+	# Check if explosion_scene is assigned
+	if explosion_scene == null:
+		print("Error: Explosion scene is not assigned!")
+		return
+
+	# Instantiate the explosion effect
+	var explosion = explosion_scene.instantiate() as Node2D
+	if explosion == null:
+		print("Error: Failed to instantiate explosion!")
+		return
+	
+	# Set the explosion's position to the projectile's impact location
+	explosion.position = position
+	explosion.z_index = int(position.y)  # Ensure explosion is layered correctly
+	
+	# Add explosion to the parent scene
+	get_parent().add_child(explosion)
+	print("Explosion created at position: ", explosion.position)

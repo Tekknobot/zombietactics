@@ -42,7 +42,16 @@ func _input(event: InputEvent) -> void:
 
 				# Set the target for the missile
 				target_position = right_click_position
-				trajectory_instance.start_trajectory(mouse_position, target_position)
+				
+				# Convert the global mouse position to the local position relative to the TileMap
+				var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
+				var map_mouse_tile_pos = Map.map_to_local(map_mouse_position)  # Convert to tile coordinates
+
+				# Convert the target position (assumed to be global) to local
+				var map_target_position = Map.local_to_map(target_position)  # Convert target to TileMap local
+				var map_target_tile_pos = Map.map_to_local(map_target_position)  # Convert to tile coordinates
+			
+				trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 
 # Function to start the missile trajectory and visualize with Line2D
 func start_trajectory(start: Vector2, target: Vector2):

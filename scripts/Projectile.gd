@@ -97,16 +97,46 @@ func _check_for_structure_at_target() -> void:
 			
 			# Ensure the structure has a structure_type property before accessing it
 			if structure.has_method("get_structure_type"):
-				# Check the type of the structure (Building, etc.)
+				# Check the type of the structure (Building, Tower, Stadium, District, etc.)
 				var structure_type = structure.get_structure_type()
-				if structure_type == "Building":
-					# Assuming the first child of the structure is the animation player
-					if structure.get_child_count() > 0 and structure.get_child(0) is AnimationPlayer:
-						# Play the "demolished" animation on the animation player
-						structure.get_child(0).play("demolished")
-					else:
-						print("Error: No animation player found or the first child is not an AnimationPlayer.")
-				else:
-					print("Structure is not a Building, skipping demolition.")
+				
+				# Handle the different structure types
+				match structure_type:
+					"Building":
+						# Assuming the first child of the structure is an AnimationPlayer or AnimatedSprite2D
+						if structure.get_child_count() > 0 and structure.get_child(0) is AnimatedSprite2D:
+							# Play the "demolished" animation on the animation player
+							structure.get_child(0).play("demolished")
+						else:
+							print("Error: No animation player found or the first child is not an AnimatedSprite2D.")
+					
+					"Tower":
+						# Handle Tower-specific logic (e.g., maybe a different animation or effect)
+						print("Tower found, applying damage or effect.")
+						# Example: Play tower's destruction animation or effect
+						if structure.get_child_count() > 0 and structure.get_child(0) is AnimatedSprite2D:
+							structure.get_child(0).play("demolished")
+						else:
+							print("Error: No animation player found for Tower.")
+					
+					"Stadium":
+						# Handle Stadium-specific logic (e.g., different animation or effect)
+						print("Stadium found, applying damage or effect.")
+						if structure.get_child_count() > 0 and structure.get_child(0) is AnimatedSprite2D:
+							structure.get_child(0).play("demolished")
+						else:
+							print("Error: No animation player found for Stadium.")
+					
+					"District":
+						# Handle District-specific logic (e.g., different animation or effect)
+						print("District found, applying damage or effect.")
+						if structure.get_child_count() > 0 and structure.get_child(0) is AnimatedSprite2D:
+							structure.get_child(0).play("demolished")
+						else:
+							print("Error: No animation player found for District.")
+					
+					_:
+						print("Unknown structure type:", structure_type)
+
 			else:
 				print("Structure does not have a valid 'structure_type' or 'get_structure_type' method.")

@@ -14,10 +14,10 @@ const DOWN_LEFT_ROAD = 7
 const DOWN_RIGHT_ROAD = 8
 
 # Preload PackedScenes for structures
-@onready var BUILDING_SCENE = preload("res://assets/scenes/prefab/building_c.scn")
-@onready var DISTRICT_SCENE = preload("res://assets/scenes/prefab/district.scn")
-@onready var STADIUM_SCENE = preload("res://assets/scenes/prefab/stadium.scn")
-@onready var TOWER_SCENE = preload("res://assets/scenes/prefab/tower.scn")
+@onready var BUILDING_SCENE = preload("res://assets/scenes/prefab/building_c.tscn")
+@onready var DISTRICT_SCENE = preload("res://assets/scenes/prefab/district.tscn")
+@onready var STADIUM_SCENE = preload("res://assets/scenes/prefab/stadium.tscn")
+@onready var TOWER_SCENE = preload("res://assets/scenes/prefab/tower.tscn")
 
 # Preload the hover tile scene
 @onready var hover_tile = preload("res://assets/scenes/UI/hover_tile.tscn").instantiate()

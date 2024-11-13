@@ -9,6 +9,8 @@ var layer: int
 @export var explosion_radius: float = 1.0  # Radius to check for adjacent zombies or player units
 @export var explosion_scene: PackedScene  # Optional: Scene to instantiate for the explosion effect
 
+var is_demolished: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Optionally, initialize any variables or states here
@@ -31,33 +33,33 @@ func _process(delta: float) -> void:
 # Function to handle the demolished "Building" type
 func _check_for_demolished_building_and_trigger_explosion():
 	var animated_sprite = get_child(0) as AnimatedSprite2D
-	if animated_sprite and animated_sprite.animation == "demolished" and self.visible:
+	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
-		#self.visible = false  # Hide the structure
+		is_demolished = true
 		print("Building demolished, but not removed.")
 
 # Function to handle the demolished "Tower" type
 func _check_for_demolished_tower_and_trigger_explosion():
 	var animated_sprite = get_child(0) as AnimatedSprite2D
-	if animated_sprite and animated_sprite.animation == "demolished" and self.visible:
+	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
-		#self.visible = false  # Hide the structure
+		is_demolished = true
 		print("Tower demolished, but not removed.")
 
 # Function to handle the demolished "District" type
 func _check_for_demolished_district_and_trigger_explosion():
 	var animated_sprite = get_child(0) as AnimatedSprite2D
-	if animated_sprite and animated_sprite.animation == "demolished" and self.visible:
+	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
-		#self.visible = false  # Hide the structure
+		is_demolished = true
 		print("District demolished, but not removed.")
 
 # Function to handle the demolished "Stadium" type
 func _check_for_demolished_stadium_and_trigger_explosion():
 	var animated_sprite = get_child(0) as AnimatedSprite2D
-	if animated_sprite and animated_sprite.animation == "demolished" and self.visible:
+	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
-		#self.visible = false  # Hide the structure
+		is_demolished = true
 		print("Stadium demolished, but not removed.")
 
 # Function to update the tile position based on the current Area2D position
@@ -109,6 +111,7 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 				print("Player unit found adjacent to demolished structure, triggering explosion.")
 				_create_explosion_at_tile(adj_tile)  # Create explosion at the player's tile
 				_remove_unit_from_group(player, "player_units")
+				player.update_astar_grid()
 				return  # Trigger the explosion once for the first adjacent player unit found
 
 # Get adjacent tiles based on the current tile position

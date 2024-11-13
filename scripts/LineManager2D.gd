@@ -45,7 +45,7 @@ func _input(event: InputEvent) -> void:
 				
 				# Convert the global mouse position to the local position relative to the TileMap
 				var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
-				var map_mouse_tile_pos = Map.map_to_local(map_mouse_position)  # Convert to tile coordinates
+				var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
 
 				# Convert the target position (assumed to be global) to local
 				var map_target_position = Map.local_to_map(target_position)  # Convert target to TileMap local

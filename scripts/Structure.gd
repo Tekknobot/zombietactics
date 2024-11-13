@@ -122,10 +122,10 @@ func get_adjacent_tiles(tile_pos: Vector2i) -> Array:
 	adjacent_tiles.append(Vector2i(tile_pos.x + 1, tile_pos.y))  # Right
 	adjacent_tiles.append(Vector2i(tile_pos.x, tile_pos.y - 1))  # Up
 	adjacent_tiles.append(Vector2i(tile_pos.x, tile_pos.y + 1))  # Down
-	adjacent_tiles.append(Vector2i(tile_pos.x - 1, tile_pos.y - 1))  # Top-left
-	adjacent_tiles.append(Vector2i(tile_pos.x + 1, tile_pos.y - 1))  # Top-right
-	adjacent_tiles.append(Vector2i(tile_pos.x - 1, tile_pos.y + 1))  # Bottom-left
-	adjacent_tiles.append(Vector2i(tile_pos.x + 1, tile_pos.y + 1))  # Bottom-right
+	#adjacent_tiles.append(Vector2i(tile_pos.x - 1, tile_pos.y - 1))  # Top-left
+	#adjacent_tiles.append(Vector2i(tile_pos.x + 1, tile_pos.y - 1))  # Top-right
+	#adjacent_tiles.append(Vector2i(tile_pos.x - 1, tile_pos.y + 1))  # Bottom-left
+	#adjacent_tiles.append(Vector2i(tile_pos.x + 1, tile_pos.y + 1))  # Bottom-right
 	
 	return adjacent_tiles
 

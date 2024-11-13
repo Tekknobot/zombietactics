@@ -75,6 +75,8 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @onready var timer: Timer = $Timer
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
 
+@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -488,6 +490,11 @@ func clear_attack_range_tiles() -> void:
 	attack_range_tiles.clear()
 
 func attack(target_tile: Vector2i) -> void:
+	# Only respond to clicks if the special toggle is active
+	if global_manager.special_toggle_active:
+		print("Special toggle is off, ignoring mouse clicks.")
+		return	
+	
 	# Check if the target is within the attack range
 	if not is_within_attack_range(target_tile):
 		print("Target is out of range")

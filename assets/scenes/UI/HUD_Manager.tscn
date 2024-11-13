@@ -7,4 +7,3 @@
 script = ExtResource("1_ymcj8")
 
 [node name="HUD" parent="." instance=ExtResource("1_iqwu7")]
-script = null

@@ -15,6 +15,8 @@ var attack_range_tiles: Array[Vector2i] = []
 @onready var player_unit2 = $PlayerUnit2  # Reference to PlayerUnit2
 @onready var player_unit3 = $PlayerUnit3  # Reference to PlayerUnit3
 
+@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
+
 # Initialization
 func _ready() -> void:
 	tilemap = get_node("/root/MapManager/TileMap")
@@ -38,7 +40,7 @@ func _process(delta: float) -> void:
 		handle_left_click(tile_pos)
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
 		handle_right_click()
-
+		
 # Checks if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:
 	var map_rect: Rect2i = tilemap.get_used_rect()

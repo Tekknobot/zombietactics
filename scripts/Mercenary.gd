@@ -283,7 +283,7 @@ func _input(event: InputEvent) -> void:
 				print("Attack range is now visible.")  # Debug log
 
 		# Left-click to trigger the attack
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressednot and global_manager.special_toggle_active:
 			# Debounce to prevent multiple triggerings
 			var current_time = Time.get_ticks_msec()  # Get the current time in seconds
 			if current_time - last_attack_time < 0.01:  # 0.2 seconds debounce

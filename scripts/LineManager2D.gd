@@ -9,12 +9,21 @@ var onTrajectory = false  # Indicates if missile is currently on a trajectory
 var right_click_position: Vector2
 var target_position: Vector2
 
+@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
+
+var hud: Control
+
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
 	
 # Handling input events (mouse clicks)
 func _input(event: InputEvent) -> void:
+	# Only respond to clicks if the special toggle is active
+	if not global_manager.special_toggle_active:
+		print("Special toggle is off, ignoring mouse clicks.")
+		return
+			
 	# Handle mouse button events (right and left-click)
 	if event is InputEventMouseButton:
 		# Right-click to set the target position
@@ -120,3 +129,9 @@ func _trigger_explosion(last_point: Vector2):
 	get_parent().add_child(explosion_instance)
 	explosion_instance.position = last_point
 	print("Explosion instance added to scene at:", last_point)
+
+	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
+	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	# Access the 'special' button within HUDManager
+	var special_button = hud_manager.get_node("HUD/Special")
+	global_manager.special_toggle_active = false

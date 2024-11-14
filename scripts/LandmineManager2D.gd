@@ -22,9 +22,10 @@ var path_index: int = 0  # Index for the current step in the path
 var move_speed: float = 75.0  # Movement speed for the soldier
 
 # Constants
-const WATER_TILE_ID = 0  # Replace with the actual tile ID for water
+var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
+@onready var map_manager = get_node("/root/MapManager")
 
 var right_click_position: Vector2
 var target_position: Vector2
@@ -36,11 +37,23 @@ func _ready() -> void:
 	if tilemap == null:
 		print("Error: Tilemap is not set.")
 		return
-	
+		
 	setup_astar()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+		
 	move_along_path(delta)
 
 func _input(event: InputEvent) -> void:
@@ -116,8 +129,22 @@ func is_tile_movable(tile_pos: Vector2i) -> bool:
 
 # Check if a tile is a water tile
 func is_water_tile(tile_id: int) -> bool:
-	# Replace with the actual condition to check if the tile is water
-	return tile_id == 0  # Replace WATER_TILE_ID with the actual water tile ID
+	var WATER_TILE_ID: int
+
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+
+	# Return whether the tile_id matches the WATER_TILE_ID
+	return tile_id == WATER_TILE_ID
 
 # Check if there is a structure on the tile
 func is_structure(tile_pos: Vector2i) -> bool:

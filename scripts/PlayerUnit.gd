@@ -30,6 +30,7 @@ var astar: AStarGrid2D = AStarGrid2D.new()
 
 # Tilemap reference
 @export var tilemap: TileMap = null
+@onready var map_manager = get_parent().get_node("/root/MapManager")
 
 # Pathfinding variables
 var current_path: Array[Vector2i] = []  # Stores the path tiles
@@ -37,7 +38,7 @@ var path_index: int = 0  # Index for the current step in the path
 var move_speed: float = 75.0  # Movement speed for the soldier
 
 # Constants
-const WATER_TILE_ID = 0  # Replace with the actual tile ID for water
+var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
 @export var selected: bool = false
 
@@ -82,7 +83,19 @@ func _ready() -> void:
 	if tilemap == null:
 		print("Error: Tilemap is not set.")
 		return
-	
+
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+		
 	update_tile_position()
 	setup_astar()
 	visualize_walkable_tiles()
@@ -223,9 +236,22 @@ func is_tile_movable(tile_pos: Vector2i) -> bool:
 
 # Check if a tile is a water tile
 func is_water_tile(tile_id: int) -> bool:
-	# Replace with the actual condition to check if the tile is water
-	# For example, if water has a specific tile ID, you can check it here
-	return tile_id == 0  # Replace WATER_TILE_ID with the actual water tile ID
+	var WATER_TILE_ID: int
+
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+
+	# Return whether the tile_id matches the WATER_TILE_ID
+	return tile_id == WATER_TILE_ID
 
 # Check if there is a structure on the tile
 func is_structure(tile_pos: Vector2i) -> bool:

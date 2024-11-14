@@ -10,7 +10,7 @@ var layer: int
 func _process(delta: float) -> void:
 	update_tile_position()
 	check_for_units_on_tile()
-		
+	
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

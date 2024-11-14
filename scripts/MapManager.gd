@@ -1,12 +1,12 @@
 extends Node2D
 
-# Constants for tile IDs
-const WATER = 0
-const SANDSTONE = 1
-const DIRT = 2
-const GRASS = 3
-const SNOW = 4
-const ICE = 5
+# Tile IDs (variables instead of constants)
+var WATER: int
+var SANDSTONE: int
+var DIRT: int
+var GRASS: int
+var SNOW: int
+var ICE: int
 
 # Constants for road tile IDs
 const INTERSECTION = 6
@@ -57,10 +57,59 @@ var stadium_count: int = 0
 var tower_count: int = 0
 var building_count: int = 0
 
+var map_1: bool = false
+var map_2: bool = false
+var map_3: bool = false
+var map_4: bool = false
+
 # Called when the node enters the scene tree for the first time
 func _ready():
 	add_child(hover_tile)  # Add hover tile to the scene
 	hover_tile.visible = false  # Initially hide the hover tile
+
+	# Randomly choose a set of values for the tiles
+	match randi() % 4:
+		0:
+			# Set values from the first set (0-5)
+			WATER = 0
+			SANDSTONE = 1
+			DIRT = 2
+			GRASS = 3
+			SNOW = 4
+			ICE = 5
+			
+			map_1 = true
+		1:
+			# Set values from the second set (9-14)
+			WATER = 9
+			SANDSTONE = 10
+			DIRT = 11
+			GRASS = 12
+			SNOW = 13
+			ICE = 14
+			
+			map_2 = true
+		2:
+			# Set values from the third set (15-20)
+			WATER = 15
+			SANDSTONE = 16
+			DIRT = 17
+			GRASS = 18
+			SNOW = 19
+			ICE = 20
+			
+			map_3 = true
+		3:
+			# Set values from the third set (15-20)
+			WATER = 21
+			SANDSTONE = 22
+			DIRT = 23
+			GRASS = 24
+			SNOW = 25
+			ICE = 26	
+			
+			map_4 = true
+				
 	generate_map()
 
 func _process(delta):

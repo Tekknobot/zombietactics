@@ -8,9 +8,10 @@ extends Node2D
 @export var highlight_tile: PackedScene  # Highlight tile packed scene for hover effect
 
 @onready var tilemap = get_parent().get_node("TileMap")  # Reference to the TileMap
+@onready var map_manager = get_node("/root/MapManager")
 
 # Tile IDs for non-spawnable tiles
-const WATER = 0  # Replace with the actual tile ID for water
+var WATER # Replace with the actual tile ID for water
 
 # Track the number of player units spawned
 var player_units_spawned = 0
@@ -24,10 +25,22 @@ func _ready():
 	await get_tree().process_frame  # Waits for one frame
 	await get_tree().process_frame  # Additional frames if needed
 
+	if map_manager.map_1:
+		WATER = 0
+	elif map_manager.map_2:
+		WATER = 9
+	elif map_manager.map_3:
+		WATER = 15
+	elif map_manager.map_4:
+		WATER = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER = 0  # Fallback value if no map is selected
+			
 	# Now check if the TileMap has usable tiles before proceeding
 	if tilemap.get_used_rect().size.x == 0 or tilemap.get_used_rect().size.y == 0:
 		print("Error: TileMap still has no usable tiles after waiting.")
-	else:
+	else:		
 		spawn_player_units()  # Proceed to spawn units if the map has tiles
 
 # Function to spawn player units on one half of the map

@@ -83,6 +83,10 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 
 # Selects a unit at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_node("HUDManager")
+	hud_manager.visible = true
+	
 	clear_action_tiles()  # Clear any previous selection tiles
 
 	var players = get_tree().get_nodes_in_group("player_units")

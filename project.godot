@@ -10,10 +10,11 @@ config_version=5
 
 [application]
 
-config/name="ZombieApocalypse"
+config/name="Enter The Zombie"
 run/main_scene="res://assets/scenes/map_manager.scn"
 config/features=PackedStringArray("4.3", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://assets/icon/icon-256.png"
+config/windows_native_icon="res://assets/icon/icon.ico"
 
 [autoload]
 

@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://rdlfqfdmhgit"]
+[gd_scene load_steps=12 format=3 uid="uid://rdlfqfdmhgit"]
 
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
+[ext_resource type="FontFile" uid="uid://csnhk3q4gx0" path="res://assets/fonts/magofonts/mago1.ttf" id="3_oopvd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_65y7a"]
 bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
@@ -118,3 +119,14 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
 theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
 toggle_mode = true
 text = "Landmine"
+
+[node name="Info" type="RichTextLabel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 172.0
+offset_top = -77.0
+offset_right = 304.0
+offset_bottom = -46.0
+theme_override_fonts/normal_font = ExtResource("3_oopvd")
+theme_override_font_sizes/normal_font_size = 16
+text = "Perform special on any open or occupide tile."

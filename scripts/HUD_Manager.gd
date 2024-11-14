@@ -19,9 +19,11 @@ func _ready():
 	# Connect the toggled signal for special button
 	if missile:
 		missile.connect("toggled", Callable(self, "_on_missile_toggled"))
+		print("Missile connected")
 
 	if landmine:
 		landmine.connect("toggled", Callable(self, "_on_landmine_toggled"))
+		print("Landmine connected")
 		
 # Method to handle the toggle state change
 func _on_missile_toggled(button_pressed: bool) -> void:

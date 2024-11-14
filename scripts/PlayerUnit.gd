@@ -667,7 +667,7 @@ func play_level_up_effect() -> void:
 	var flash_color = Color(0, 1, 0)  # Green color for the flash effect
 	
 	# Number of flashes and duration
-	var flash_count = 8  # How many times to alternate
+	var flash_count = 12  # How many times to alternate
 	var flash_duration = 0.1  # Duration for each flash (on or off)
 
 	# Loop to alternate colors

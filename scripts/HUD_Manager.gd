@@ -30,6 +30,9 @@ func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		global_manager.missile_toggle_active = true  # Set the flag to true
 		print("Missile toggle activated!")
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()			
 	else:
 		global_manager.missile_toggle_active = false  # Set the flag to false
 		print("Missile toggle deactivated!")
@@ -37,7 +40,10 @@ func _on_missile_toggled(button_pressed: bool) -> void:
 func _on_landmine_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		global_manager.landmine_toggle_active = true  # Set the flag to true
-		print("Landmine toggle activated!")
+		print("Landmine toggle activated!")	
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
 	else:
 		global_manager.landmine_toggle_active = false  # Set the flag to false
 		print("Landmine toggle deactivated!")

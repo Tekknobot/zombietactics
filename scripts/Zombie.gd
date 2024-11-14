@@ -12,6 +12,8 @@ var tile_size = 32  # Or whatever your tile size is in pixels
 @export var movement_tile_scene: PackedScene
 @export var tilemap: TileMap = null
 
+@onready var map_manager = get_parent().get_node("/root/MapManager")
+
 var movement_tiles: Array[Node2D] = []
 var tile_pos: Vector2i
 var coord: Vector2
@@ -22,12 +24,24 @@ var current_path: PackedVector2Array
 var path_index: int = 0
 var move_speed: float = 75.0
 
-const WATER_TILE_ID = 0
+var WATER_TILE_ID = 0
 
 var attacks: int = 0
 var attack_damage = 25
 
 func _ready() -> void:
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+			
 	update_tile_position()
 	update_astar_grid()
 

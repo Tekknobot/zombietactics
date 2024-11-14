@@ -308,6 +308,11 @@ func take_damage(player: Area2D, damage: int) -> void:
 		return
 	
 	player.apply_damage(damage)  # Call the player's apply_damage method
+
+	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.update_hud(player)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
+	
 	print("Zombie dealt", damage, "damage to player")
 
 # Function to check if the zombie is adjacent to a specific tile

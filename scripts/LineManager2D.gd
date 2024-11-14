@@ -17,6 +17,13 @@ var missiles_launched : int = 0
 
 var hud: Control
 
+var player_to_act
+
+# Soldier's current tile position
+var tile_pos: Vector2i
+var coord: Vector2
+var layer: int
+
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
@@ -42,7 +49,28 @@ func _input(event: InputEvent) -> void:
 
 		# Left-click to launch missile trajectory (only if right-click has been used to set target)
 		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory:
-			if event.pressed and right_click_position != Vector2.ZERO:
+			if event.pressed:
+				# Get all nodes in the 'hovertile' group
+				var hover_tiles = get_tree().get_nodes_in_group("hovertile")
+
+				# Iterate through the list and find the HoverTile node
+				for hover_tile in hover_tiles:
+					if hover_tile.name == "HoverTile":
+						# Check if 'selected_player' exists on the hover_tile
+						if hover_tile.selected_player:
+							# Access the selected player's position and assign it to 'tile_pos'
+							var selected_player = hover_tile.selected_player
+							var selected_player_position = selected_player.position  # Assuming position is a Vector2
+							
+							player_to_act = selected_player
+							
+							# Convert the world position of the player to the tile's position
+							var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+							tile_pos = tilemap.local_to_map(selected_player_position)  # Convert to map coordinates (tile position)
+							
+							print("Selected player's tile position:", tile_pos)  # Optional: Debug log to confirm the position
+				
+				
 				print("Left-click detected, initiating trajectory.")
 				# Get mouse position for trajectory path and adjust for map conversion
 				var mouse_position = get_global_mouse_position()
@@ -55,17 +83,13 @@ func _input(event: InputEvent) -> void:
 				self.get_parent().add_child(trajectory_instance)
 				trajectory_instance.add_to_group("trajectories")
 				print("Trajectory instance created and added to the scene.")
-
-				# Set the target for the missile
-				target_position = right_click_position
 				
 				# Convert the global mouse position to the local position relative to the TileMap
 				var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
 				var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
 
 				# Convert the target position (assumed to be global) to local
-				var map_target_position = Map.local_to_map(target_position)  # Convert target to TileMap local
-				var map_target_tile_pos = Map.map_to_local(map_target_position)  # Convert to tile coordinates
+				var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
 			
 				missiles_launched += 1
 				trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)

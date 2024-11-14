@@ -57,7 +57,7 @@ func update_hud(character: PlayerUnit):
 
 	if landmine:
 		landmine.button_pressed = false  # This ensures the toggle is visually set to off
-		global_manager.missile_toggle_active = false  # Reset the special flag in global_manager
+		global_manager.landmine_toggle_active = false  # Reset the special flag in global_manager
 
 		# Optionally emit the toggled signal to indicate the toggle state reset
 		landmine.emit_signal("toggled", false)

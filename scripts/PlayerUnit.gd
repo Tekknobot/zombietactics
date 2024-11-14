@@ -491,10 +491,15 @@ func clear_attack_range_tiles() -> void:
 
 func attack(target_tile: Vector2i) -> void:
 	# Only respond to clicks if the special toggle is active
-	if global_manager.missile_toggle_active:
-		print("Special toggle is off, ignoring mouse clicks.")
+	if not global_manager.missile_toggle_active:
+		print("Missile toggle is off, ignoring mouse clicks.")
 		return	
-	
+		
+	# Only respond to clicks if the special toggle is active
+	if not global_manager.landmine_toggle_active:
+		print("Landmine toggle is off, ignoring mouse clicks.")
+		return	
+			
 	# Check if the target is within the attack range
 	if not is_within_attack_range(target_tile):
 		print("Target is out of range")
@@ -561,7 +566,6 @@ func attack(target_tile: Vector2i) -> void:
 	get_child(0).play("default")
 	clear_attack_range_tiles()
 	on_player_action_completed()
-
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:

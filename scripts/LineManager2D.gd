@@ -91,12 +91,26 @@ func _input(event: InputEvent) -> void:
 				# Convert the target position (assumed to be global) to local
 				var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
 			
+				await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 				missiles_launched += 1
-				trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
+
+				#on_player_action_completed()
 				
-				await get_tree().create_timer(3).timeout
-				on_player_action_completed()	
-				
+				# Trigger zombie action: find and chase player
+				trigger_zombie_actions()
+
+# Function to trigger the zombies' actions: find and chase player
+func trigger_zombie_actions():
+	# Get all zombies in the "zombie" group
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	
+	# Iterate over each zombie in the group
+	for zombie in zombies:
+		if zombie.has_method("find_and_chase_player_and_move"):
+			# Call the method with the delta time to trigger the action
+			zombie.find_and_chase_player_and_move(get_process_delta_time())
+			print("Zombie is chasing and moving towards the player.")
+								
 # Function to start the missile trajectory and visualize with Line2D
 func start_trajectory(start: Vector2, target: Vector2):
 	onTrajectory = true
@@ -126,9 +140,11 @@ func start_trajectory(start: Vector2, target: Vector2):
 	
 	# Cleanup: Remove Line2D after animation
 	line_inst.queue_free()
+
+	missiles_launched = 0
+	
 	onTrajectory = false
 	
-	missiles_launched = 0
 	print("Trajectory animation completed and cleaned up.")
 
 # Call this function after every player action

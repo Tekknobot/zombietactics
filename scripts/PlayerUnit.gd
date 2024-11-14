@@ -489,17 +489,16 @@ func clear_attack_range_tiles() -> void:
 		tile.queue_free()
 	attack_range_tiles.clear()
 
-func attack(target_tile: Vector2i) -> void:
-	# Only respond to clicks if the special toggle is active
-	if not global_manager.missile_toggle_active:
-		print("Missile toggle is off, ignoring mouse clicks.")
+func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_attack: bool = false) -> void:
+	# If this is a missile or landmine attack, check the respective toggle
+	if is_missile_attack and not global_manager.missile_toggle_active:
+		print("Missile toggle is off, ignoring missile attack.")
 		return	
-		
-	# Only respond to clicks if the special toggle is active
-	if not global_manager.landmine_toggle_active:
-		print("Landmine toggle is off, ignoring mouse clicks.")
+
+	if is_landmine_attack and not global_manager.landmine_toggle_active:
+		print("Landmine toggle is off, ignoring landmine attack.")
 		return	
-			
+
 	# Check if the target is within the attack range
 	if not is_within_attack_range(target_tile):
 		print("Target is out of range")
@@ -516,6 +515,18 @@ func attack(target_tile: Vector2i) -> void:
 		print("Error: Failed to instantiate projectile!")
 		return
 
+	# Check if missile or landmine toggle is active, free the projectile immediately
+	if global_manager.missile_toggle_active:
+		print("Missile toggle active, freeing projectile immediately.")
+		projectile.queue_free()
+		return
+
+	# Check if missile or landmine toggle is active, free the projectile immediately
+	if global_manager.landmine_toggle_active:
+		print("Landmine toggle active, freeing projectile immediately.")
+		projectile.queue_free()
+		return
+
 	# Get the TileMap to get world position of the target
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	if tilemap == null:
@@ -526,6 +537,7 @@ func attack(target_tile: Vector2i) -> void:
 	var target_world_pos = tilemap.map_to_local(target_tile)
 	print("Target world position: ", target_world_pos)
 	
+	# Play the attack animation
 	get_child(0).play("attack")
 	
 	# Determine the direction to the target

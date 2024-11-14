@@ -102,3 +102,11 @@ func update_hud(character: PlayerUnit):
 		print("Level updated to: ", level.text)
 	else:
 		print("Level node is null!")
+
+func show_special_buttons():
+	missile.visible = true
+	landmine.visible = true
+
+func hide_special_buttons():
+	missile.visible = false
+	landmine.visible = false

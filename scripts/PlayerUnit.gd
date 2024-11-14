@@ -175,6 +175,10 @@ func get_movement_tiles() -> Array[Vector2i]:
 
 # Display movement tiles within range
 func display_movement_tiles() -> void:
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.hide_special_buttons()	
+		
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false
@@ -384,6 +388,10 @@ func _input(event: InputEvent) -> void:
 			
 # Display attack range tiles around the soldier using the attack_tile_scene
 func display_attack_range_tiles() -> void:
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.show_special_buttons()	
+	
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false

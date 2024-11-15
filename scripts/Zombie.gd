@@ -66,7 +66,7 @@ func _ready() -> void:
 		print("LandmineManager or signal 'player_action_completed' not found!")
 
 	# List of unit names
-	var units = ["Soldier", "Mercenary", "Dog"]
+	var units = ["Soldier", "Mercenary", "Dog", "M1"]
 
 	# Iterate over the unit names and connect the signal
 	for unit_name in units:

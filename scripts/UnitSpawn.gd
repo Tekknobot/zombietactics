@@ -5,6 +5,8 @@ extends Node2D
 @export var unit_merc: PackedScene  # Set the unit scene in the Inspector
 @export var unit_dog: PackedScene  # Set the unit scene in the Inspector
 @export var unit_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
+@export var M1: PackedScene  # Set the unit scene for the zombie in the Inspector
+
 @export var highlight_tile: PackedScene  # Highlight tile packed scene for hover effect
 
 @onready var tilemap = get_parent().get_node("TileMap")  # Reference to the TileMap
@@ -46,7 +48,7 @@ func _ready():
 # Function to spawn player units on one half of the map
 func spawn_player_units():
 	# List of unit scenes for easier access
-	var units = [unit_soldier, unit_merc, unit_dog]
+	var units = [unit_soldier, unit_merc, unit_dog, M1]
 	
 	# Spawn each unit at a random, valid position on one half of the map
 	for unit_type in units:

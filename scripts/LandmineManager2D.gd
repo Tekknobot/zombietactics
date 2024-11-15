@@ -248,13 +248,20 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 # Function to move the soldier along the path
 func move_along_path(delta: float) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	
+		
 	if current_path.is_empty():
 		return  # No path, so don't move
 
 	if path_index < current_path.size():
 		player_to_move.get_child(0).play("move")
-		
+
+		# Check if the player is still valid
+		if !player_to_move.visible or not is_instance_valid(player_to_move):
+			print("Player no longer exists. Stopping path traversal and mine placement.")
+			current_path.clear()
+			on_player_action_completed()
+			return  # Stop movement if the player is destroyed or invalid
+					
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
 		
 		# Convert the target position to world position (center of the tile)

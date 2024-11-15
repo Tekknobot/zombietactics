@@ -100,11 +100,6 @@ func _ready() -> void:
 	setup_astar()
 	visualize_walkable_tiles()
 	
-	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
-	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud = hud_manager.get_node("HUD")  # Get the actual HUD node
-	update_hud()  # Update the HUD initially with player data	
-	
 # Called every frame
 func _process(delta: float) -> void:		
 	update_tile_position()
@@ -644,22 +639,6 @@ func _on_projectile_hit_target(area: Area2D) -> void:
 # Call this function after every player action
 func on_player_action_completed():
 	emit_signal("player_action_completed")
-
-func update_hud() -> void:
-	if hud != null:
-		var health_bar = hud.get_node("HealthBar") as ProgressBar
-		var name_label = hud.get_node("NameLabel") as Label
-		var portrait = hud.get_node("Portrait") as TextureRect
-		
-		# Update the health bar
-		health_bar.value = current_health
-		health_bar.max_value = max_health
-		
-		# Update the name label
-		name_label.text = player_name
-		
-		# Update the portrait (if you have one)
-		portrait.texture = portrait_texture
 		
 # Method to apply damage
 func apply_damage(damage: int) -> void:

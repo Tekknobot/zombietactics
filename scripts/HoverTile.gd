@@ -106,6 +106,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
+			zombie.selected = true
+			selected_player = null
 			show_movement_tiles_zombie(zombie)
 			return
 
@@ -144,4 +146,5 @@ func clear_action_tiles() -> void:
 func clear_action_tiles_zombie() -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
+		zombie.selected = false
 		zombie.clear_movement_tiles()

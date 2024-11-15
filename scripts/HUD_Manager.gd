@@ -103,6 +103,44 @@ func update_hud(character: PlayerUnit):
 	else:
 		print("Level node is null!")
 
+# Access and update HUD elements based on the selected player unit
+func update_hud_zombie(character: ZombieUnit):
+	# Debugging: Check if the correct character is passed
+	print("Updating HUD for: ", character)
+
+	# Update the rest of the HUD elements
+	if character.portrait_texture and portrait:
+		portrait.texture = character.portrait_texture
+		print("Portrait texture updated")
+
+	# Update player name if the player_name label exists
+	if player_name:
+		player_name.text = character.zombie_name  # Set the player name text from the character
+		print("Player name updated to: ", player_name.text)
+	else:
+		print("Player name node is null!")
+
+	if character.max_health > 0:
+		health_bar.max_value = character.max_health
+		health_bar.value = character.current_health
+		print("Health Bar Updated: Max: ", health_bar.max_value, " Current: ", health_bar.value)
+	else:
+		print("Max health is 0 or invalid")
+	
+	if character.max_xp > 0:
+		xp_bar.max_value = character.max_xp
+		xp_bar.value = character.current_xp
+		print("XP Bar Updated: Max: ", xp_bar.max_value, " Current: ", xp_bar.value)
+	else:
+		print("Max XP is 0 or invalid")
+	
+	if level:
+		level.text = "Level " + str(character.current_level)
+		print("Level updated to: ", level.text)
+	else:
+		print("Level node is null!")
+
+
 func show_special_buttons():
 	missile.visible = true
 	landmine.visible = true

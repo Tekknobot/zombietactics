@@ -1,5 +1,8 @@
 extends Area2D
 
+# Declare the class
+class_name ZombieUnit
+
 # Define the zombie_id property here
 @export var zombie_id: int  # Default to -1, will be set later
 var next_zombie_id: int = 1
@@ -28,6 +31,23 @@ var WATER_TILE_ID = 0
 
 var attacks: int = 0
 var attack_damage = 25
+
+var hud: Control
+
+@export var selected: bool = false
+@export var portrait_texture: Texture
+
+# Player's name (optional)
+@export var zombie_name: String
+# Player's health properties
+var max_health: int = 100
+var current_health: int = 25
+
+# Player's health properties
+var max_xp: int = 100
+var current_xp: int = 25
+var xp_for_next_level: int = 0  # Example threshold for level-up, if relevant
+var current_level: int = 1
 
 func _ready() -> void:
 	if map_manager.map_1:
@@ -89,7 +109,15 @@ func _process(delta: float) -> void:
 				self.remove_from_group("zombies")				
 				self.visible = false
 				#queue_free()  # Destroy the zombie once the death animation ends
-			
+
+	# If the unit is selected, update the HUD
+	if selected:
+		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
+		var hud_manager = get_parent().get_parent().get_node("HUDManager")
+		hud_manager.update_hud_zombie(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
+	else:
+		pass
+					
 	update_tile_position()
 	move_along_path(delta)
 

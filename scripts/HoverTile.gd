@@ -88,7 +88,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	hud_manager.visible = true
 	
 	clear_action_tiles()  # Clear any previous selection tiles
-
+	clear_action_tiles_zombie()
+	
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos:
@@ -98,11 +99,25 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			return
 	
 	#selected_player = null  # Deselect if no player is found at the clicked tile
+	
+	clear_action_tiles() 
+	clear_action_tiles_zombie()  # Clear any previous selection tiles
+
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	for zombie in zombies:
+		if tilemap.local_to_map(zombie.global_position) == tile_pos:
+			show_movement_tiles_zombie(zombie)
+			return
 
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:
 	movement_range_tiles = player.get_movement_tiles()
 	player.display_movement_tiles()
+
+# Displays movement tiles for the selected player
+func show_movement_tiles_zombie(zombie: Area2D) -> void:
+	movement_range_tiles = zombie.get_movement_tiles()
+	zombie.display_movement_tiles()
 
 # Toggles between attack and movement mode for the currently selected player
 func toggle_attack_mode() -> void:
@@ -124,4 +139,9 @@ func clear_action_tiles() -> void:
 		selected_player.selected = false
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()
-	
+
+# Clears all action tiles (movement and attack) when the selection changes
+func clear_action_tiles_zombie() -> void:
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	for zombie in zombies:
+		zombie.clear_movement_tiles()

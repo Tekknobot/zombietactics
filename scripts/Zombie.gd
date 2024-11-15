@@ -371,7 +371,7 @@ func move_along_path(delta: float) -> void:
 		return  # No path, so don't move
 
 	# Ensure we don't move past the allowed movement range (3 tiles)
-	if path_index >= min(current_path.size(), movement_range):
+	if path_index >= min(current_path.size(), movement_range + 1):
 		return  # Stop moving once we've reached the maximum movement range
 
 
@@ -438,3 +438,53 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 		if tile_pos == unit_tile_pos:
 			return true
 	return false
+
+# Get all tiles within movement range based on Manhattan distance
+func get_movement_tiles() -> Array[Vector2i]:
+	var tiles_in_range: Array[Vector2i] = []
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for x in range(-movement_range, movement_range + 1):
+		for y in range(-movement_range, movement_range + 1):
+			if abs(x) + abs(y) <= movement_range:
+				var target_tile_pos: Vector2i = tile_pos + Vector2i(x, y)
+				if tilemap.get_used_rect().has_point(target_tile_pos):
+					tiles_in_range.append(target_tile_pos)
+
+	return tiles_in_range
+
+# Display movement tiles within range
+func display_movement_tiles() -> void:
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			#print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.hide_special_buttons()	
+		
+			
+	clear_movement_tiles()  # Clear existing movement tiles
+	
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for tile in get_movement_tiles():
+		if is_tile_movable(tile):
+			var world_pos: Vector2 = tilemap.map_to_local(tile)
+			var movement_tile_instance: Node2D = movement_tile_scene.instantiate() as Node2D
+			movement_tile_instance.position = world_pos
+			tilemap.add_child(movement_tile_instance)
+			movement_tiles.append(movement_tile_instance)
+
+# Clear displayed movement tiles
+func clear_movement_tiles() -> void:
+	for tile in movement_tiles:
+		tile.queue_free()
+	movement_tiles.clear()

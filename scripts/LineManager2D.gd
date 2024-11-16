@@ -28,7 +28,6 @@ var layer: int
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
 	
-# Handling input events (mouse clicks)
 func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
 	if not global_manager.missile_toggle_active:
@@ -78,27 +77,39 @@ func _input(event: InputEvent) -> void:
 				var mouse_local = Map.local_to_map(mouse_position)
 				print("Mouse position adjusted to:", mouse_position, "converted to map coordinates:", mouse_local)
 
-				# Create a new trajectory instance
-				var trajectory_instance = self.duplicate()
-				self.get_parent().add_child(trajectory_instance)
-				trajectory_instance.add_to_group("trajectories")
-				print("Trajectory instance created and added to the scene.")
+				# Ensure the mouse position is within map boundaries
+				var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+				var map_size = tilemap.get_used_rect()  # Get the map's used rectangle
+				var map_width = map_size.size.x
+				var map_height = map_size.size.y
 				
-				# Convert the global mouse position to the local position relative to the TileMap
-				var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
-				var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
+				# Check if the mouse position is within map bounds
+				if mouse_local.x >= 0 and mouse_local.x < map_width and mouse_local.y >= 0 and mouse_local.y < map_height:
+					# The mouse position is within the map boundaries
+					# Create a new trajectory instance
+					var trajectory_instance = self.duplicate()
+					self.get_parent().add_child(trajectory_instance)
+					trajectory_instance.add_to_group("trajectories")
+					print("Trajectory instance created and added to the scene.")
+					
+					# Convert the global mouse position to the local position relative to the TileMap
+					var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
+					var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
 
-				# Convert the target position (assumed to be global) to local
-				var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
-			
-				await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
-				missiles_launched += 1
+					# Convert the target position (assumed to be global) to local
+					var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
+					
+					# Start the trajectory
+					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
+					missiles_launched += 1
 
-				#on_player_action_completed()
-				
-				# Trigger zombie action: find and chase player
-				trigger_zombie_actions()
-
+					# Trigger zombie action: find and chase player
+					trigger_zombie_actions()
+				else:
+					# If the mouse position is out of bounds, print a message or handle it as needed
+					print("Mouse position out of map bounds:", mouse_local)
+					return
+					
 # Function to trigger the zombies' actions: find and chase player
 func trigger_zombie_actions():
 	# Get all zombies in the "zombie" group

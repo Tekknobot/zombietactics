@@ -107,6 +107,7 @@ func trigger_zombie_actions():
 	# Iterate over each zombie in the group
 	for zombie in zombies:
 		if zombie.has_method("find_and_chase_player_and_move"):
+			zombie.clear_movement_tiles()
 			# Call the method with the delta time to trigger the action
 			zombie.find_and_chase_player_and_move(get_process_delta_time())
 			print("Zombie is chasing and moving towards the player.")

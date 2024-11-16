@@ -22,7 +22,7 @@ GlobalManager="*res://scripts/GlobalManager.gd"
 
 [display]
 
-window/size/viewport_height=748
+window/size/viewport_height=728
 window/size/mode=4
 window/stretch/mode="viewport"
 

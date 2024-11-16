@@ -1,9 +1,37 @@
-[gd_scene load_steps=3 format=3 uid="uid://smyypw2i5rbj"]
+[gd_scene load_steps=5 format=3 uid="uid://smyypw2i5rbj"]
 
 [ext_resource type="PackedScene" uid="uid://rdlfqfdmhgit" path="res://assets/scenes/UI/HUD.tscn" id="1_iqwu7"]
 [ext_resource type="Script" path="res://scripts/HUD_Manager.gd" id="1_ymcj8"]
+[ext_resource type="Script" path="res://scripts/Navigation.gd" id="3_jawwu"]
+[ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_lf15b"]
 
 [node name="HUDManager" type="CanvasLayer"]
 script = ExtResource("1_ymcj8")
 
 [node name="HUD" parent="." instance=ExtResource("1_iqwu7")]
+
+[node name="Navigation" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("3_jawwu")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Navigation"]
+layout_mode = 0
+offset_left = -94.0
+offset_top = -26.0
+offset_right = 16.0
+offset_bottom = 14.0
+
+[node name="Button" type="Button" parent="Navigation/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_lf15b")
+theme_override_font_sizes/font_size = 32
+text = "TITLESCREEN"

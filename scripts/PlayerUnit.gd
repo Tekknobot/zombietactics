@@ -73,7 +73,6 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var explosion_radius: float = 1.0  # Radius to check for units at the target position
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
-
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 # Called when the node enters the scene tree for the first time.

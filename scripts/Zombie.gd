@@ -55,6 +55,8 @@ var current_level: int = 1
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
 
+var player_unit_is_selected = false
+
 func _ready() -> void:
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
@@ -116,8 +118,20 @@ func _process(delta: float) -> void:
 				self.visible = false
 				#queue_free()  # Destroy the zombie once the death animation ends
 
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		if player.selected:
+			player_unit_is_selected = true
+			# Get all zombie units in the game
+			var zombies = get_tree().get_nodes_in_group("zombies")
+			for zombie in zombies:
+				zombie.selected = false			
+		else:
+			player_unit_is_selected = false
+
 	# If the unit is selected, update the HUD
-	if selected and is_moving == false:
+	if selected and is_moving == false and player_unit_is_selected == false:
 		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud_zombie(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager

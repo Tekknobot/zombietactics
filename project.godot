@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Enter The Zombie"
-run/main_scene="res://assets/scenes/map_manager.scn"
+run/main_scene="res://assets/scenes/TitleScreen.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://assets/icon/icon-256.png"
 config/windows_native_icon="res://assets/icon/icon.ico"
@@ -22,8 +22,8 @@ GlobalManager="*res://scripts/GlobalManager.gd"
 
 [display]
 
-window/size/viewport_height=696
-window/size/mode=2
+window/size/viewport_height=748
+window/size/mode=4
 window/stretch/mode="viewport"
 
 [editor]

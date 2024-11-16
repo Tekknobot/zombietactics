@@ -335,15 +335,12 @@ func attack_player(player: Area2D) -> void:
 	var sprite = player.get_node("AnimatedSprite2D")  # Get the AnimatedSprite2D or visual representation of the player
 	
 	if sprite:
-		# Modulate the color to a bright red (indicating the attack)
-		sprite.modulate = Color(1, 0, 0)  # Red color to indicate damage or attack
-		
-		# Start a timer to reset the modulate back to the original color after 0.1 second
-		await get_tree().create_timer(0.2).timeout  # Wait 0.1 seconds for a quick flash
-		
-		# Reset the modulate to the original color (full color, no effect)
-		sprite.modulate = Color(1, 1, 1)  # Reset back to the original color (white/full color)
-	
+		for i in range(4):  # Flash 3 times
+			sprite.modulate = Color(1, 0, 0)  # Set to red
+			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
+			sprite.modulate = Color(1, 1, 1)  # Set back to normal color
+			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
+
 	# Print a debug message
 	print("Zombie attacks player at position:", player.global_position)
 	

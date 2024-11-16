@@ -66,3 +66,21 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_wapy1")
 theme_override_font_sizes/font_size = 32
 text = "CREDITS"
+
+[node name="Credit" type="RichTextLabel" parent="."]
+offset_left = 70.0
+offset_top = 684.0
+offset_right = 549.0
+offset_bottom = 724.0
+theme_override_fonts/normal_font = ExtResource("4_wapy1")
+theme_override_font_sizes/normal_font_size = 32
+text = "Copyright 2024 Zillatronics, Developed By Pizzzamoney"
+
+[node name="Version" type="RichTextLabel" parent="."]
+offset_left = 1030.0
+offset_top = 684.0
+offset_right = 1130.0
+offset_bottom = 724.0
+theme_override_fonts/normal_font = ExtResource("4_wapy1")
+theme_override_font_sizes/normal_font_size = 32
+text = "Version 1.0"

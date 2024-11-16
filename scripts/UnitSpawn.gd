@@ -22,11 +22,22 @@ var can_spawn = true  # Flag to control if further spawning is allowed
 # Track unique zombie IDs
 var zombie_id_counter = 0  # Counter to assign unique IDs to zombies
 
+# List of 16 zombie names
+var zombie_names = [
+	"Walker", "Crawler", "Stalker", "Biter",
+	"Lurker", "Rotter", "Shambler", "Moaner",
+	"Sniffer", "Stumbler", "Gnawer", "Howler",
+	"Groaner", "Clawer", "Grunter", "Chomper"
+]
+
 func _ready():
 	# Wait for a few frames to ensure the TileMap has generated fully
 	await get_tree().process_frame  # Waits for one frame
 	await get_tree().process_frame  # Additional frames if needed
 
+	# Shuffle the zombie names to randomize the order
+	zombie_names.shuffle()
+	
 	if map_manager.map_1:
 		WATER = 0
 	elif map_manager.map_2:
@@ -81,6 +92,9 @@ func spawn_zombies():
 	var zombie_count = 16
 	var spawn_attempts = 0
 	
+	# Shuffle zombie names to ensure uniqueness
+	zombie_names.shuffle()
+	
 	# Loop until we spawn the desired number of zombies
 	while spawn_attempts < zombie_count:
 		var spawn_position = get_random_spawn_position(false)  # Pass false to restrict to zombie side
@@ -95,13 +109,15 @@ func spawn_zombies():
 			zombie_instance.set("zombie_id", zombie_id_counter)  # Set a custom property for the unique ID
 			zombie_id_counter += 1  # Increment the zombie ID for the next one
 			
+			# Assign a unique name to the zombie
+			if zombie_names.size() > 0:
+				zombie_instance.zombie_name = zombie_names.pop_back()  # Remove the last name from the list
+			
 			# Add to scene tree and zombie units group
 			add_child(zombie_instance)
 			zombie_instance.add_to_group("zombies")
 			spawn_attempts += 1
-			print("Zombie spawned at:", spawn_position, "with ID:", zombie_instance.zombie_id)
-			
-			zombie_instance.zombie_id = zombie_id_counter
+			print("Zombie spawned at:", spawn_position, "with ID:", zombie_instance.zombie_id, "and name:", zombie_instance.zombie_name)
 	
 	# Disable further spawning once all zombies are spawned
 	can_spawn = false

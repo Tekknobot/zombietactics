@@ -72,8 +72,6 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var explosion_scene: PackedScene
 @export var explosion_radius: float = 1.0  # Radius to check for units at the target position
 
-# Set up a Timer node on the player node and connect its "timeout" signal to `_reset_color`
-@onready var timer: Timer = $Timer
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
 
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
@@ -656,7 +654,7 @@ func die() -> void:
 	get_child(0).play("death")
 	await get_tree().create_timer(1).timeout
 	
-	if self.player_name == "Yoshidaboi":
+	if self.player_name == "Yoshida. Boi":
 		_create_explosion()
 	
 	self.remove_from_group("player_units")

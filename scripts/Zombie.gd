@@ -41,13 +41,19 @@ var hud: Control
 @export var zombie_name: String
 # Player's health properties
 var max_health: int = 100
-var current_health: int = 25
+var current_health: int = 50
 
 # Player's health properties
 var max_xp: int = 100
 var current_xp: int = 25
-var xp_for_next_level: int = 0  # Example threshold for level-up, if relevant
+var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
+
+# Optional: Scene to instantiate for explosion effect
+@export var explosion_scene: PackedScene
+@export var explosion_radius: float = 1.0  # Radius to check for units at the target position
+
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
 
 func _ready() -> void:
 	if map_manager.map_1:
@@ -203,6 +209,10 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			print("Zombie ID %d removed, skipping..." % zombie.zombie_id)
 			continue  # Skip this zombie and move to the next one
 
+		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
+		var hud_manager = get_parent().get_parent().get_node("HUDManager")
+		hud_manager.update_hud_zombie(zombie)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
+		
 		# Find the closest player for this zombie
 		var closest_player: Area2D = null
 		var min_distance = INF
@@ -339,7 +349,12 @@ func attack_player(player: Area2D) -> void:
 	
 	# Inflict damage on the player
 	take_damage(player, attack_damage)  # Call the take_damage function with 10 damage
+	current_xp += 25
 	
+	# Optional: Check for level up, if applicable
+	if current_xp >= xp_for_next_level:
+		level_up()
+			
 	attacks += 1
 
 # New Function to handle player taking damage
@@ -516,3 +531,94 @@ func clear_movement_tiles() -> void:
 	for tile in movement_tiles:
 		tile.queue_free()
 	movement_tiles.clear()
+
+# Method to apply damage
+func apply_damage(damage: int) -> void:
+	current_health -= damage  # Reduce health by damage
+	current_health = clamp(current_health, 0, max_health)  # Ensure health stays within bounds
+	
+	if current_health <= 0:
+		die()  # Handle player death if health is 0
+	else:
+		print("Player health after attack:", current_health)
+
+# Optional death handling
+func die() -> void:
+	print("Zombie has died")
+	get_child(0).play("death")
+	await get_tree().create_timer(1).timeout
+	
+	self.remove_from_group("zombies")
+	self.visible = false
+	#queue_free()  # Remove player from the scene or handle accordingly		
+
+func level_up() -> void:
+	print("Zombie leveled up!")
+	
+	# Reset or increase XP threshold
+	current_xp -= xp_for_next_level
+	xp_for_next_level += 50  # Increase threshold, if applicable
+	
+	# Add level-up bonuses
+	movement_range += 1
+	current_level += 1
+	if current_health == 100:
+		return
+	else:
+		current_health += 25
+	
+	# Play level-up visual effect
+	play_level_up_effect()
+
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.update_hud_zombie(self)
+
+# Function to play level-up flickering effect (green to normal)
+func play_level_up_effect() -> void:
+	var original_color = modulate  # Store the original color of the unit
+	var flash_color = Color(0, 1, 0)  # Green color for the flash effect
+	
+	# Number of flashes and duration
+	var flash_count = 12  # How many times to alternate
+	var flash_duration = 0.1  # Duration for each flash (on or off)
+
+	# Loop to alternate colors
+	for i in range(flash_count):
+		# Alternate color between green and the original color
+		modulate = flash_color if i % 2 == 0 else original_color
+		
+		# Wait for the duration before switching again
+		await get_tree().create_timer(flash_duration).timeout
+
+	# Ensure color is reset to original after the effect
+	modulate = original_color
+
+func _create_explosion() -> void:
+	# Check if explosion_scene is assigned
+	if explosion_scene == null:
+		print("Error: Explosion scene is not assigned!")
+		return
+
+	# Instantiate the explosion effect
+	var explosion = explosion_scene.instantiate() as Node2D
+	if explosion == null:
+		print("Error: Failed to instantiate explosion!")
+		return
+	
+	# Set the explosion's position to the projectile's impact location
+	explosion.position = position
+	explosion.z_index = int(position.y)  # Ensure explosion is layered correctly
+	
+	# Add explosion to the parent scene
+	get_parent().add_child(explosion)
+	print("Explosion created at position: ", explosion.position)
+
+# Flashes the sprite red and white a few times
+func flash_damage():
+	if sprite:
+		for i in range(8):  # Flash 3 times
+			sprite.modulate = Color(1, 0, 0)  # Set to red
+			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
+			sprite.modulate = Color(1, 1, 1)  # Set back to normal color
+			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds

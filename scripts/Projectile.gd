@@ -75,7 +75,8 @@ func _check_for_zombies_at_target() -> void:
 			print("Zombie found at explosion position, destroying:", zombie.name)
 			
 			# Play the death animation on the zombie (assuming it has an animation called "death")
-			zombie.get_child(0).play("death")
+			attack_zombie(zombie)
+			zombie.apply_damage(25)
 
 func _check_for_players_at_target() -> void:
 	# Find all nodes in the group "zombies"
@@ -87,7 +88,6 @@ func _check_for_players_at_target() -> void:
 		if player.position.distance_to(target_position) <= explosion_radius:
 			print("Player found at explosion position, destroying:", player.name)
 			
-			# Play the death animation on the zombie (assuming it has an animation called "death")
 			attack_player(player)
 			player.apply_damage(50)
 
@@ -151,3 +151,8 @@ func _check_for_structure_at_target() -> void:
 func attack_player(player: Area2D) -> void:
 	if player.has_method("flash_damage"):
 		player.flash_damage()
+
+# Function to handle the friendly attack logic
+func attack_zombie(zombie: Area2D) -> void:
+	if zombie.has_method("flash_damage"):
+		zombie.flash_damage()

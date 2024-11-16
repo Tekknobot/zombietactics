@@ -117,7 +117,7 @@ func _process(delta: float) -> void:
 				#queue_free()  # Destroy the zombie once the death animation ends
 
 	# If the unit is selected, update the HUD
-	if selected:
+	if selected and is_moving == false:
 		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud_zombie(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager

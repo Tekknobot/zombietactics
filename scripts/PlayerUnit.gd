@@ -113,6 +113,19 @@ func _process(delta: float) -> void:
 			print("Projectile has reached the target!")
 			queue_free()  # Destroy the projectile once it reaches the target (optional)	
 
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			#print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+
 	# If the unit is selected, update the HUD
 	if selected:
 		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)

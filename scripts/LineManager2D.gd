@@ -206,7 +206,7 @@ func _trigger_explosion(last_point: Vector2):
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:
 			zombie.get_child(0).play("death")
-			await get_tree().create_timer(1.5).timeout
+			await get_tree().create_timer(0).timeout
 			zombie.visible = false  # Hide the zombie unit
 			zombie.remove_from_group("zombies")  # Remove from the group
 			print("Zombie Unit removed from explosion")

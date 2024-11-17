@@ -25,13 +25,13 @@ script = ExtResource("3_jawwu")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Navigation"]
 layout_mode = 0
-offset_left = -94.0
+offset_left = -53.0
 offset_top = -26.0
-offset_right = 16.0
+offset_right = 13.0
 offset_bottom = 14.0
 
 [node name="Button" type="Button" parent="Navigation/HBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_lf15b")
 theme_override_font_sizes/font_size = 32
-text = "TITLESCREEN"
+text = "RETURN"

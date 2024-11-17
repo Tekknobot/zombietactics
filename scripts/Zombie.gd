@@ -58,6 +58,11 @@ var current_level: int = 1
 
 var player_unit_is_selected = false
 
+@onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
+@export var zombie_audio: AudioStream
+@export var hurt_audio: AudioStream
+@export var levelup_audio: AudioStream
+
 func _ready() -> void:
 	# Possible values for health and XP
 	var possible_values = [25, 50, 75]
@@ -235,6 +240,10 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			print("Zombie ID %d removed, skipping..." % zombie.zombie_id)
 			continue  # Skip this zombie and move to the next one
 
+		# Play sfx
+		audio_player.stream = zombie_audio
+		audio_player.play()
+
 		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud_zombie(zombie)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
@@ -387,12 +396,16 @@ func take_damage(player: Area2D, damage: int) -> void:
 		print("Player object does not have an 'apply_damage' method")
 		return
 	
+	# Play sfx
+	player.audio_player.stream = hurt_audio
+	player.audio_player.play()	
+		
 	player.apply_damage(damage)  # Call the player's apply_damage method
 
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.update_hud(player)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-	
+		
 	print("Zombie dealt", damage, "damage to player")
 
 # Function to check if the zombie is adjacent to a specific tile
@@ -577,7 +590,7 @@ func die() -> void:
 
 func level_up() -> void:
 	print("Zombie leveled up!")
-	
+		
 	# Reset or increase XP threshold
 	current_xp -= xp_for_next_level
 	xp_for_next_level += 50  # Increase threshold, if applicable
@@ -586,7 +599,7 @@ func level_up() -> void:
 	movement_range += 1
 	current_level += 1
 	if current_health == 100:
-		return
+		current_health = 100
 	else:
 		current_health += 25
 	
@@ -606,6 +619,12 @@ func play_level_up_effect() -> void:
 	var flash_count = 12  # How many times to alternate
 	var flash_duration = 0.1  # Duration for each flash (on or off)
 
+	# Play level-up sound effect
+	if audio_player.playing:
+		audio_player.stop()  # Stop the currently playing audio, if any
+	audio_player.stream = levelup_audio
+	audio_player.play()
+	
 	# Loop to alternate colors
 	for i in range(flash_count):
 		# Alternate color between green and the original color

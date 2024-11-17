@@ -75,6 +75,11 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
+@onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
+@export var hurt_audio: AudioStream
+@export var death_audio: AudioStream
+@export var levelup_audio: AudioStream
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -664,6 +669,12 @@ func apply_damage(damage: int) -> void:
 func die() -> void:
 	print("Player has died")
 	get_child(0).play("death")
+	
+	if self.player_name == "Dutch. Major" or self.player_name == "Bournetu. Kill" :
+		# Play sfx
+		audio_player.stream = death_audio
+		audio_player.play()
+			
 	await get_tree().create_timer(1).timeout
 	
 	if self.player_name == "Yoshida. Boi":
@@ -671,9 +682,14 @@ func die() -> void:
 	
 	self.remove_from_group("player_units")
 	self.visible = false
+		
 	#queue_free()  # Remove player from the scene or handle accordingly		
 
 func level_up() -> void:
+	# Play sfx
+	audio_player.stream = levelup_audio
+	audio_player.play()	
+		
 	print("Player leveled up!")
 	
 	# Reset or increase XP threshold

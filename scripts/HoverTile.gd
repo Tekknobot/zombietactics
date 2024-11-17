@@ -18,6 +18,10 @@ var attack_range_tiles: Array[Vector2i] = []
 
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
+@onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
+@export var select_audio: AudioStream
+@export var arm_attack_audio: AudioStream
+
 # Initialization
 func _ready() -> void:
 	tilemap = get_node("/root/MapManager/TileMap")
@@ -83,6 +87,10 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 
 # Selects a unit at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:
+	# Play sfx
+	audio_player.stream = select_audio
+	audio_player.play()
+	
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_node("HUDManager")
 	hud_manager.visible = true
@@ -123,6 +131,10 @@ func show_movement_tiles_zombie(zombie: Area2D) -> void:
 
 # Toggles between attack and movement mode for the currently selected player
 func toggle_attack_mode() -> void:
+	# Play sfx
+	audio_player.stream = arm_attack_audio
+	audio_player.play()
+		
 	clear_action_tiles()
 	if attack_range_tiles.is_empty():
 		# Switch to attack mode

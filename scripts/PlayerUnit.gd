@@ -80,7 +80,13 @@ func _ready() -> void:
 	if tilemap == null:
 		print("Error: Tilemap is not set.")
 		return
-
+	
+	update_tile_position()
+	setup_astar()
+	visualize_walkable_tiles()
+	
+# Called every frame
+func _process(delta: float) -> void:		
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
 	elif map_manager.map_2:
@@ -93,12 +99,6 @@ func _ready() -> void:
 		print("Error: No map selected, defaulting WATER to 0.")
 		WATER_TILE_ID = 0  # Fallback value if no map is selected
 		
-	update_tile_position()
-	setup_astar()
-	visualize_walkable_tiles()
-	
-# Called every frame
-func _process(delta: float) -> void:		
 	update_tile_position()
 	move_along_path(delta)
 	

@@ -59,6 +59,8 @@ var current_level: int = 1
 var player_unit_is_selected = false
 
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
+@onready var level_audio_player = $LevelUpAudio  # Adjust the path as needed
+
 @export var zombie_audio: AudioStream
 @export var hurt_audio: AudioStream
 @export var levelup_audio: AudioStream
@@ -589,6 +591,9 @@ func die() -> void:
 	#queue_free()  # Remove player from the scene or handle accordingly		
 
 func level_up() -> void:
+	level_audio_player.stream = levelup_audio
+	level_audio_player.play()
+		
 	print("Zombie leveled up!")
 		
 	# Reset or increase XP threshold
@@ -618,12 +623,6 @@ func play_level_up_effect() -> void:
 	# Number of flashes and duration
 	var flash_count = 12  # How many times to alternate
 	var flash_duration = 0.1  # Duration for each flash (on or off)
-
-	# Play level-up sound effect
-	if audio_player.playing:
-		audio_player.stop()  # Stop the currently playing audio, if any
-	audio_player.stream = levelup_audio
-	audio_player.play()
 	
 	# Loop to alternate colors
 	for i in range(flash_count):

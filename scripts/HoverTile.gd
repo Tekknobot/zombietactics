@@ -87,10 +87,6 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 
 # Selects a unit at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:
-	# Play sfx
-	audio_player.stream = select_audio
-	audio_player.play()
-	
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_node("HUDManager")
 	hud_manager.visible = true
@@ -101,6 +97,10 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos:
+			# Play sfx
+			audio_player.stream = select_audio
+			audio_player.play()			
+			
 			selected_player = player
 			selected_player.selected = true
 			show_movement_tiles(player)
@@ -114,6 +114,10 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
+			# Play sfx
+			audio_player.stream = select_audio
+			audio_player.play()			
+			
 			zombie.selected = true
 			selected_player = null
 			show_movement_tiles_zombie(zombie)

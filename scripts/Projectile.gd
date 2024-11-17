@@ -98,8 +98,13 @@ func _check_for_players_at_target() -> void:
 
 			# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 			var hud_manager = get_parent().get_parent().get_node("HUDManager")
-			hud_manager.update_hud_zombie(player)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-						
+			hud_manager.update_hud(player)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
+			
+			if player.player_name == "Yoshida. Boi":
+				return
+			
+			player.audio_player.stream = player.hurt_audio
+			player.audio_player.play()		
 
 func _check_for_structure_at_target() -> void:
 	# Find all nodes in the group "structures"

@@ -36,6 +36,7 @@ func _check_for_demolished_building_and_trigger_explosion():
 	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
 		is_demolished = true
+		modulate = Color (1, 1, 1)
 		print("Building demolished, but not removed.")
 
 # Function to handle the demolished "Tower" type
@@ -44,6 +45,7 @@ func _check_for_demolished_tower_and_trigger_explosion():
 	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
 		is_demolished = true
+		modulate = Color (1, 1, 1)
 		print("Tower demolished, but not removed.")
 
 # Function to handle the demolished "District" type
@@ -52,6 +54,7 @@ func _check_for_demolished_district_and_trigger_explosion():
 	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
 		is_demolished = true
+		modulate = Color (1, 1, 1)
 		print("District demolished, but not removed.")
 
 # Function to handle the demolished "Stadium" type
@@ -60,6 +63,7 @@ func _check_for_demolished_stadium_and_trigger_explosion():
 	if animated_sprite and animated_sprite.animation == "demolished" and self.visible and is_demolished == false:
 		_check_for_adjacent_units_and_trigger_explosion()
 		is_demolished = true
+		modulate = Color (1, 1, 1)
 		print("Stadium demolished, but not removed.")
 
 # Function to update the tile position based on the current Area2D position

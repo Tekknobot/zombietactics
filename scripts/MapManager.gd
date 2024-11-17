@@ -336,6 +336,15 @@ func spawn_structure(scene: PackedScene, x: int, y: int):
 	# Add the structure to the scene tree and assign it to a group for easy management
 	add_child(structure_instance)
 	structure_instance.add_to_group("structures")  # Add structure to "structures" group
+
+	# Apply random color modulation to make it visually distinct
+	var random_modulation = Color(
+		0.8 + rng.randf_range(-0.2, 0.2),  # Red
+		0.8 + rng.randf_range(-0.2, 0.2),  # Green
+		0.8 + rng.randf_range(-0.2, 0.2),  # Blue
+		1  # Fully opaque
+	)
+	structure_instance.modulate = random_modulation
 	
 	# Store the structure's coordinates
 	structure_coordinates.append(Vector2i(x, y))

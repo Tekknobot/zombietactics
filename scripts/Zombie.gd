@@ -39,6 +39,7 @@ var hud: Control
 
 # Player's name (optional)
 @export var zombie_name: String
+
 # Player's health properties
 var max_health: int = 100
 var current_health: int = 50
@@ -58,6 +59,17 @@ var current_level: int = 1
 var player_unit_is_selected = false
 
 func _ready() -> void:
+	# Possible values for health and XP
+	var possible_values = [25, 50, 75]
+	
+	# Randomize current_health
+	current_health = possible_values[randi() % possible_values.size()]
+	print("Current Health set to:", current_health)
+
+	# Randomize current_xp
+	current_xp = possible_values[randi() % possible_values.size()]
+	print("Current XP set to:", current_xp)
+		
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
 	elif map_manager.map_2:

@@ -684,7 +684,7 @@ func level_up() -> void:
 	movement_range += 1
 	current_level += 1
 	if current_health == 100:
-		return
+		current_health == 100
 	else:
 		current_health += 25
 	

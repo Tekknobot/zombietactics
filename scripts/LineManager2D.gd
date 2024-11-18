@@ -104,7 +104,7 @@ func _input(event: InputEvent) -> void:
 					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 
 					# Trigger zombie action: find and chase player
-					trigger_zombie_actions()
+					#trigger_zombie_actions()
 				else:
 					# If the mouse position is out of bounds, print a message or handle it as needed
 					print("Mouse position out of map bounds:", mouse_local)

@@ -259,7 +259,7 @@ func move_along_path(delta: float) -> void:
 		if !player_to_move.visible or not is_instance_valid(player_to_move):
 			print("Player no longer exists. Stopping path traversal and mine placement.")
 			current_path.clear()
-			on_player_action_completed()
+			#on_player_action_completed()
 			return  # Stop movement if the player is destroyed or invalid
 					
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
@@ -288,7 +288,7 @@ func move_along_path(delta: float) -> void:
 				instantiate_mine_on_tile(target_pos)
 			else:
 				player_to_move.current_xp += 25	
-				on_player_action_completed()
+				#on_player_action_completed()
 				
 			path_index += 1  # Move to the next tile in the path
 			player_to_move.get_child(0).play("default")

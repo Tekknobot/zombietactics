@@ -634,7 +634,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
-	on_player_action_completed()
+	#on_player_action_completed()
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:

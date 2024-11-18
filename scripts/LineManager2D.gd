@@ -18,11 +18,15 @@ var missiles_launched : int = 0
 var hud: Control
 
 var player_to_act
+var player_temp = null
 
 # Soldier's current tile position
 var tile_pos: Vector2i
 var coord: Vector2
 var layer: int
+
+@onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+var missiles_canceled = false
 
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
@@ -62,8 +66,6 @@ func _input(event: InputEvent) -> void:
 							var selected_player_position = selected_player.position  # Assuming position is a Vector2
 							
 							player_to_act = selected_player
-							if player_to_act.has_attacked:
-								return
 							
 							# Convert the world position of the player to the tile's position
 							var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -71,8 +73,13 @@ func _input(event: InputEvent) -> void:
 							
 							print("Selected player's tile position:", tile_pos)  # Optional: Debug log to confirm the position
 				
-				
 				print("Left-click detected, initiating trajectory.")
+				
+				# Ensure the selected player has not already attacked
+				if player_to_act.has_attacked:
+					print("Player has already attacked. Trajectory will not be started.")										
+					return  # Exit the function without starting the trajectory
+				
 				# Get mouse position for trajectory path and adjust for map conversion
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8  # Adjust for map-specific offsets if needed
@@ -103,29 +110,27 @@ func _input(event: InputEvent) -> void:
 					
 					missiles_launched += 1
 					# Start the trajectory
-					player_to_act.has_attacked = true
 					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
-
+					player_to_act.has_attacked = true
+					
 					# Trigger zombie action: find and chase player
-					#trigger_zombie_actions()
+					clear_zombie_tiles()
+					player_to_act.check_end_turn_conditions()
+					
 				else:
 					# If the mouse position is out of bounds, print a message or handle it as needed
 					print("Mouse position out of map bounds:", mouse_local)
 					return
 					
 # Function to trigger the zombies' actions: find and chase player
-func trigger_zombie_actions():
+func clear_zombie_tiles():
 	# Get all zombies in the "zombie" group
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	
 	# Iterate over each zombie in the group
 	for zombie in zombies:
-		if zombie.has_method("find_and_chase_player_and_move"):
-			zombie.clear_movement_tiles()
-			# Call the method with the delta time to trigger the action
-			zombie.find_and_chase_player_and_move(get_process_delta_time())
-			print("Zombie is chasing and moving towards the player.")
-								
+		zombie.clear_movement_tiles()
+						
 # Function to start the missile trajectory and visualize with Line2D
 func start_trajectory(start: Vector2, target: Vector2):
 	onTrajectory = true

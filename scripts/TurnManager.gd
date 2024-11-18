@@ -48,7 +48,6 @@ func end_current_unit_turn() -> void:
 	# If all turns are used, fire `on_player_action_completed`
 	if all_turns_used:
 		on_player_action_completed()
-		
 
 # Add a player unit
 func add_player_unit(unit: Node) -> void:

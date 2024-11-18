@@ -781,6 +781,9 @@ func check_end_turn_conditions() -> void:
 	if has_moved and has_attacked:
 		print(self.name, "has completed its turn.")
 		has_used_turn = true
-		turn_manager.end_current_unit_turn()  # Notify the turn manager to move to the next unit
+		end_turn()
 		
+func end_turn():
+	turn_manager.end_current_unit_turn()  # Notify the turn manager to move to the next unit
+			
 		

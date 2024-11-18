@@ -32,6 +32,8 @@ var target_position: Vector2
 
 var player_to_move
 
+@onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -261,6 +263,7 @@ func move_along_path(delta: float) -> void:
 			current_path.clear()
 			#on_player_action_completed()
 			player_to_move.has_attacked = true
+			player_to_move.check_end_turn_conditions()
 			return  # Stop movement if the player is destroyed or invalid
 					
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
@@ -291,6 +294,7 @@ func move_along_path(delta: float) -> void:
 				player_to_move.current_xp += 25	
 				#on_player_action_completed()
 				player_to_move.has_attacked = true
+				player_to_move.check_end_turn_conditions()
 				
 			path_index += 1  # Move to the next tile in the path
 			player_to_move.get_child(0).play("default")

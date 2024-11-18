@@ -562,30 +562,26 @@ func level_up() -> void:
 	audio_player.play()
 	print("Level up triggered!")
 	
-	# Reset XP threshold
-	current_xp -= xp_for_next_level
-	xp_for_next_level += 25  # Increment XP threshold
-	
 	# Add level-up bonuses
 	movement_range += 1
 	current_level += 1
 	max_health += 25
 	current_health = max_health  # Fully heal player
 	attack_damage += 25
-	
-	# Update HUD values
+
+	# Reset XP threshold
+	current_xp -= xp_for_next_level
+	xp_for_next_level += 25  # Increment XP threshold
+		
+	# Update HUD with new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.health_bar.max_value += 25
-	hud_manager.xp_bar.max_value += 25
+	hud_manager.update_hud_zombie(self)  # Consolidate all updates into one method
 	
 	# Play visual effect
 	play_level_up_effect()
-	
-	# Update HUD with new stats
-	hud_manager.update_hud_zombie(self)
-
+		
 	print("Level up completed!")
-
+	
 # Function to play level-up flickering effect (green to normal)
 func play_level_up_effect() -> void:
 	var original_color = modulate  # Store the original color of the unit

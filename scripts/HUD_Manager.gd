@@ -125,7 +125,17 @@ func update_hud(character: PlayerUnit):
 		print("ATK updated to: ", atk.text)
 	else:
 		print("ATK node is null!")
+		
+	if health_bar:
+		health_bar.max_value = character.max_health
+		health_bar.value = character.current_health
+		print("Updated health bar: Max=", health_bar.max_value, ", Current=", health_bar.value)
 
+	if xp_bar:
+		xp_bar.max_value = character.xp_for_next_level
+		xp_bar.value = character.current_xp
+		print("Updated XP bar: Max=", xp_bar.max_value, ", Current=", xp_bar.value)
+			
 # Access and update HUD elements based on the selected player unit
 func update_hud_zombie(character: ZombieUnit):
 	# Debugging: Check if the correct character is passed
@@ -180,7 +190,17 @@ func update_hud_zombie(character: ZombieUnit):
 		print("ATK updated to: ", atk.text)
 	else:
 		print("ATK node is null!")
-		
+
+	if health_bar:
+		health_bar.max_value = character.max_health
+		health_bar.value = character.current_health
+		print("Updated health bar: Max=", health_bar.max_value, ", Current=", health_bar.value)
+
+	if xp_bar:
+		xp_bar.max_value = character.xp_for_next_level
+		xp_bar.value = character.current_xp
+		print("Updated XP bar: Max=", xp_bar.max_value, ", Current=", xp_bar.value)		
+
 func show_special_buttons():
 	missile.visible = true
 	landmine.visible = true

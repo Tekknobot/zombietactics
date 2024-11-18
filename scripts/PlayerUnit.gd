@@ -62,7 +62,7 @@ var hud: Control
 
 # Player's health properties
 var max_xp: int = 100
-var current_xp: int = 25
+var current_xp: int = 75
 var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
 
@@ -138,13 +138,6 @@ func _process(delta: float) -> void:
 		# Prevent tile display or any other player action
 		return
 
-	# If the unit is selected, update the HUD
-	if selected:
-		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
-		var hud_manager = get_parent().get_parent().get_node("HUDManager")
-		hud_manager.update_hud(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-	else:
-		pass
 
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
@@ -625,26 +618,28 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
-	# Increase experience points by 25 for each attack
-	current_xp += 25
-	print("Current XP increased to:", current_xp)
-	
-	# Optional: Check for level up, if applicable
-	if current_xp >= xp_for_next_level:
-		level_up()
 
-	# Update the HUD to reflect new stats
-	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.update_hud(self)	
-	
 	# Wait for a delay before resetting the animation
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(1.7).timeout
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
 	#on_player_action_completed()
 	has_attacked = true
 	has_moved = true
+
+	# Increase experience points by 25 for each attack
+	current_xp += 25
+	print("Current XP increased to:", current_xp)
+
+	# Optional: Check for level up, if applicable
+	if current_xp >= xp_for_next_level:
+		level_up()
+			
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.update_hud(self)	
+		
 	check_end_turn_conditions()
 
 # Function to check if the target is within the attack range
@@ -706,29 +701,22 @@ func level_up() -> void:
 	audio_player.play()
 	print("Level up triggered!")
 	
-	# Reset XP threshold
-	current_xp -= xp_for_next_level
-	xp_for_next_level += 25  # Increment XP threshold
-	
 	# Add level-up bonuses
 	movement_range += 1
 	current_level += 1
 	max_health += 25
 	current_health = max_health  # Fully heal player
 	attack_damage += 25
-	
-	# Update HUD values
-	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.health_bar.max_value += 25
-	hud_manager.xp_bar.max_value += 25
-	
+
+	# Reset XP threshold
+	current_xp -= xp_for_next_level
+	xp_for_next_level += 25  # Increment XP threshold
+		
 	# Play visual effect
 	play_level_up_effect()
-	
-	# Update HUD with new stats
-	hud_manager.update_hud(self)
-
+		
 	print("Level up completed!")
+
 
 # Function to play level-up flickering effect (green to normal)
 func play_level_up_effect() -> void:
@@ -749,6 +737,10 @@ func play_level_up_effect() -> void:
 
 	# Ensure color is reset to original after the effect
 	modulate = original_color
+	
+	# Darken the unit to visually indicate its turn is over
+	self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
+		
 
 func _create_explosion() -> void:
 	# Check if explosion_scene is assigned

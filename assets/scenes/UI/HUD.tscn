@@ -3,16 +3,16 @@
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_65y7a"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nx3cq"]
 bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6fi2p"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r5qri"]
 bg_color = Color(0, 1, 0, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mnlj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np2bf"]
 bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u1erf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o3ylw"]
 bg_color = Color(1, 1, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_upmy2"]
@@ -54,8 +54,8 @@ offset_left = 14.0
 offset_top = -154.0
 offset_right = 22.0
 offset_bottom = -26.0
-theme_override_styles/background = SubResource("StyleBoxFlat_65y7a")
-theme_override_styles/fill = SubResource("StyleBoxFlat_6fi2p")
+theme_override_styles/background = SubResource("StyleBoxFlat_nx3cq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_r5qri")
 step = 1.0
 value = 100.0
 fill_mode = 3
@@ -68,8 +68,8 @@ offset_left = 154.0
 offset_top = -154.0
 offset_right = 162.0
 offset_bottom = -26.0
-theme_override_styles/background = SubResource("StyleBoxFlat_7mnlj")
-theme_override_styles/fill = SubResource("StyleBoxFlat_u1erf")
+theme_override_styles/background = SubResource("StyleBoxFlat_np2bf")
+theme_override_styles/fill = SubResource("StyleBoxFlat_o3ylw")
 step = 1.0
 value = 25.0
 fill_mode = 3

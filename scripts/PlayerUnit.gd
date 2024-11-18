@@ -618,10 +618,6 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
-
-	# Wait for a delay before resetting the animation
-	await get_tree().create_timer(1.7).timeout
-	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
 	#on_player_action_completed()
@@ -784,6 +780,7 @@ func check_end_turn_conditions() -> void:
 		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
 		
 		# Proceed to end the turn
+		await get_tree().create_timer(1.7).timeout
 		end_turn()
 
 func end_turn() -> void:

@@ -308,7 +308,7 @@ func move_along_path(delta: float) -> void:
 			# Access the 'special' button within HUDManager
 			var landmine_button = hud_manager.get_node("HUD/Landmine")
 			global_manager.missile_toggle_active = false  # Deactivate the special toggle
-			hud_manager.update_hud(player_to_move)
+			#hud_manager.update_hud(player_to_move)
 
 # Instantiate the mine on the current tile
 func instantiate_mine_on_tile(tile_pos: Vector2i) -> void:

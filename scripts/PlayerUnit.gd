@@ -781,7 +781,13 @@ func check_end_turn_conditions() -> void:
 	if has_moved and has_attacked:
 		print(self.name, "has completed its turn.")
 		has_used_turn = true
+
+		# Darken the unit to visually indicate that its turn is over
+		if self is Node2D:
+			self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness to make it darker
+
 		end_turn()
+
 		
 func end_turn():
 	turn_manager.end_current_unit_turn()  # Notify the turn manager to move to the next unit

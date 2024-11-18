@@ -294,6 +294,7 @@ func move_along_path(delta: float) -> void:
 				player_to_move.current_xp += 25	
 				#on_player_action_completed()
 				player_to_move.has_attacked = true
+				player_to_move.has_moved = true
 				player_to_move.check_end_turn_conditions()
 				
 			path_index += 1  # Move to the next tile in the path

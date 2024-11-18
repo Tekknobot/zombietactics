@@ -66,7 +66,7 @@ var player_unit_is_selected = false
 @export var levelup_audio: AudioStream
 @export var dog_hurt_audio: AudioStream
 
-@onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+@onready var turn_manager = get_parent().get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 
 
 func _ready() -> void:
@@ -96,34 +96,6 @@ func _ready() -> void:
 	update_tile_position()
 	update_astar_grid()
 
-	# Get the MapManager node first, then access its child UnitSpawn and its children units
-	var map_manager = get_node("/root/MapManager")    
-	var unitspawn = map_manager.get_node("UnitSpawn")
-	
-	# Access the MissileManager and connect the signal if it exists
-	var missile_manager = map_manager.get_node("MissileManager")
-	if missile_manager and missile_manager.has_signal("player_action_completed"):
-		print("MissileManager signal found!")
-		missile_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
-	else:
-		print("MissileManager or signal 'player_action_completed' not found!")
-
-	# Access the MissileManager and connect the signal if it exists
-	var landmine_manager = map_manager.get_node("LandmineManager")
-	if landmine_manager and landmine_manager.has_signal("player_action_completed"):
-		print("LandmineManager signal found!")
-		landmine_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
-	else:
-		print("LandmineManager or signal 'player_action_completed' not found!")
-
-	# List of unit names
-	var units = ["Soldier", "Mercenary", "Dog"]
-
-	# Iterate over the unit names and connect the signal
-	for unit_name in units:
-		var unit = unitspawn.get_node(unit_name)
-		unit.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
-
 	turn_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
 
 
@@ -143,26 +115,6 @@ func _process(delta: float) -> void:
 				self.remove_from_group("zombies")				
 				self.visible = false
 				#queue_free()  # Destroy the zombie once the death animation ends
-
-	# Get all player units in the game
-	var players = get_tree().get_nodes_in_group("player_units")
-	for player in players:
-		if player.selected:
-			player_unit_is_selected = true
-			# Get all zombie units in the game
-			var zombies = get_tree().get_nodes_in_group("zombies")
-			for zombie in zombies:
-				zombie.selected = false			
-		else:
-			player_unit_is_selected = false
-
-	# If the unit is selected, update the HUD
-	if selected and is_moving == false and player_unit_is_selected == false:
-		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
-		var hud_manager = get_parent().get_parent().get_node("HUDManager")
-		hud_manager.update_hud_zombie(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-	else:
-		pass
 					
 	update_tile_position()
 	move_along_path(delta)

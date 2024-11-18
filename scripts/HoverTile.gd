@@ -106,6 +106,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			selected_player = player
 			selected_player.selected = true
 			show_movement_tiles(player)
+			hud_manager.update_hud(player)
 			return
 	
 	#selected_player = null  # Deselect if no player is found at the clicked tile
@@ -121,8 +122,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			audio_player.play()			
 			
 			zombie.selected = true
-			selected_player = null
 			show_movement_tiles_zombie(zombie)
+			hud_manager.update_hud_zombie(zombie)
 			return
 
 # Displays movement tiles for the selected player

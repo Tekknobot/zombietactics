@@ -638,12 +638,13 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	hud_manager.update_hud(self)	
 	
 	# Wait for a delay before resetting the animation
-	await get_tree().create_timer(1.7).timeout
+	await get_tree().create_timer(1).timeout
 	
 	get_child(0).play("default")
 	clear_attack_range_tiles()
 	#on_player_action_completed()
 	has_attacked = true
+	has_moved = true
 	check_end_turn_conditions()
 
 # Function to check if the target is within the attack range

@@ -7,6 +7,8 @@ var tilemap: TileMap = null
 var selected_player: Area2D = null
 var last_selected_player: Area2D = null
 
+var selected_structure: Area2D = null
+
 # Movement and attack range tiles
 var movement_range_tiles: Array[Vector2i] = []
 var attack_range_tiles: Array[Vector2i] = []
@@ -87,19 +89,20 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 		selected_player.move_player_to_target(tile_pos)
 		clear_action_tiles()  # Clear movement and attack tiles after moving
 
-# Selects a unit at the given tile position
+# Selects a unit or structure at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_node("HUDManager")
 	hud_manager.visible = true
 	
 	clear_action_tiles()  # Clear any previous selection tiles
-	clear_action_tiles_zombie()
+	clear_action_tiles_zombie()  # Clear any previous zombie selection tiles
 	
+	# Check if a player unit is at the tile
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos:
-			# Play sfx
+			# Play selection sound effect
 			audio_player.stream = select_audio
 			audio_player.play()			
 			
@@ -109,15 +112,11 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			hud_manager.update_hud(player)
 			return
 	
-	selected_player = null  # Deselect if no player is found at the clicked tile
-	
-	clear_action_tiles() 
-	clear_action_tiles_zombie()  # Clear any previous selection tiles
-
+	# Check if a zombie is at the tile
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
-			# Play sfx
+			# Play selection sound effect
 			audio_player.stream = select_audio
 			audio_player.play()			
 			
@@ -125,6 +124,22 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			show_movement_tiles_zombie(zombie)
 			hud_manager.update_hud_zombie(zombie)
 			return
+	
+	# Check if a structure is at the tile (from the 'structures' group)
+	var structures = get_tree().get_nodes_in_group("structures")
+	for structure in structures:
+		if tilemap.local_to_map(structure.global_position) == tile_pos:
+			# Play selection sound effect
+			audio_player.stream = select_audio
+			audio_player.play()
+			
+			selected_structure = structure		
+			# If the structure is selected, perform any necessary action (like highlighting it)
+			structure.selected = true
+			return
+	
+	# Deselect if no unit or structure is found at the clicked tile
+	selected_player = null
 
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:

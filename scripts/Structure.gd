@@ -10,6 +10,7 @@ var layer: int
 @export var explosion_scene: PackedScene  # Optional: Scene to instantiate for the explosion effect
 
 var is_demolished: bool = false
+var selected = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

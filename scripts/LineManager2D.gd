@@ -112,6 +112,7 @@ func _input(event: InputEvent) -> void:
 					# Start the trajectory
 					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 					player_to_act.has_attacked = true
+					player_to_act.has_moved = true
 					
 					# Trigger zombie action: find and chase player
 					clear_zombie_tiles()
@@ -222,6 +223,7 @@ func _trigger_explosion(last_point: Vector2):
 			await get_tree().create_timer(0).timeout
 			player.visible = false  # Hide the player unit
 			player.remove_from_group("player_units")  # Remove from the group
+			add_xp()
 			print("Player Unit removed from explosion")
 
 	# Check for ZombieUnit within explosion radius
@@ -231,13 +233,17 @@ func _trigger_explosion(last_point: Vector2):
 			await get_tree().create_timer(0).timeout
 			zombie.visible = false  # Hide the zombie unit
 			zombie.remove_from_group("zombies")  # Remove from the group
+			add_xp()
 			print("Zombie Unit removed from explosion")
 
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
-			
+			add_xp()
+
+func add_xp():
+	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
 	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	
@@ -245,7 +251,6 @@ func _trigger_explosion(last_point: Vector2):
 	var missile_button = hud_manager.get_node("HUD/Special")
 	global_manager.missile_toggle_active = false  # Deactivate the special toggle
 
-	# Add XP
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
 
@@ -253,7 +258,7 @@ func _trigger_explosion(last_point: Vector2):
 	for hover_tile in hover_tiles:
 		if hover_tile.name == "HoverTile":
 			# Check if 'last_selected_player' exists and has 'current_xp' property
-			if hover_tile.selected_player:
+			if hover_tile.selected_player or hover_tile.selected_structure:
 				hover_tile.selected_player.current_xp += 25
 				# Update the HUD to reflect new stats
 				hud_manager.update_hud(hover_tile.selected_player)	

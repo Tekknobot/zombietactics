@@ -1,74 +1,99 @@
 extends Node2D
 
-var player_units: Array = []  # Array to hold all player units
-var zombie_units: Array = []  # Array to hold all zombie units
-var current_unit_index: int = 0  # Index of the current unit
-var all_units: Array = []  # Combined list of all units (to determine turn order)
+var player_units: Array = []  # Array for player units
+var zombie_units: Array = []  # Array for zombie units
+var current_unit: Node = null  # The unit currently taking its turn
+var current_group: String = "player_units"  # Which group's turn it is ("player_units" or "zombie_units")
+var current_unit_index: int = 0  # Index of the current unit in the current group
 
 func _ready() -> void:
-	# Get all player units and zombie units
+	# Initialize player and zombie units
 	player_units = get_tree().get_nodes_in_group("player_units")
 	zombie_units = get_tree().get_nodes_in_group("zombies")
-	
-	# Combine both groups into a single turn order list
-	all_units = player_units + zombie_units
 
-	# Sort the units by initiative (if applicable) or keep as default
-	# Uncomment the following line if units have an `initiative` property
-	# all_units.sort_custom(self, "_sort_by_initiative")
-
-	current_unit_index = 0  # Start with the first unit
-	start_current_unit_turn()  # Start the first unit's turn
-
-# Sort units by initiative (optional)
-func _sort_by_initiative(a, b) -> int:
-	# Compare the initiative of two units; higher initiative goes first
-	return b.initiative - a.initiative  # Descending order
+	if player_units.size() > 0:
+		current_group = "player_units"
+		current_unit_index = 0
+		start_current_unit_turn()  # Start the first unit's turn
+	else:
+		print("No player units available to start.")
 
 # Start the current unit's turn
 func start_current_unit_turn() -> void:
-	if all_units.size() == 0:
-		print("No units available.")
-		return
-	
-	var current_unit = all_units[current_unit_index]
-	if current_unit.has_method("start_turn"):
+	if current_group == "player_units":
+		if player_units.size() == 0:
+			print("No player units left.")
+			switch_to_next_group()
+			return
+
+		current_unit = player_units[current_unit_index]
+	elif current_group == "zombie_units":
+		if zombie_units.size() == 0:
+			print("No zombie units left.")
+			switch_to_next_group()
+			return
+
+		current_unit = zombie_units[current_unit_index]
+
+	if current_unit and current_unit.has_method("start_turn"):
 		current_unit.start_turn()  # Call start_turn on the current unit
 	else:
-		print("Unit", current_unit.name, "does not have a 'start_turn' method!")
+		print("Current unit does not have a 'start_turn' method!")
 
 # End the current unit's turn and move to the next one
 func end_current_unit_turn() -> void:
-	var current_unit = all_units[current_unit_index]
-	if current_unit.has_method("end_turn"):
+	if current_unit and current_unit.has_method("end_turn"):
 		current_unit.end_turn()  # Call end_turn on the current unit
 	else:
-		print("Unit", current_unit.name, "does not have an 'end_turn' method!")
+		print("Current unit does not have an 'end_turn' method!")
 
-	# Move to the next unit
-	current_unit_index = (current_unit_index + 1) % all_units.size()
-	start_current_unit_turn()  # Start the next unit's turn
+	# Move to the next unit in the group
+	if current_group == "player_units":
+		current_unit_index += 1
+		if current_unit_index >= player_units.size():
+			switch_to_next_group()  # Switch to zombie units
+	elif current_group == "zombie_units":
+		current_unit_index += 1
+		if current_unit_index >= zombie_units.size():
+			switch_to_next_group()  # Switch to player units
 
-# Add a new player unit to the turn manager
+	# Start the next turn
+	start_current_unit_turn()
+
+# Switch to the other group
+func switch_to_next_group() -> void:
+	if current_group == "player_units":
+		current_group = "zombie_units"
+		current_unit_index = 0  # Reset to the first zombie
+	else:
+		current_group = "player_units"
+		current_unit_index = 0  # Reset to the first player
+
+# Add a player unit
 func add_player_unit(unit: Node) -> void:
 	if not player_units.has(unit):
 		player_units.append(unit)
-		all_units = player_units + zombie_units  # Recombine unit list
 
-# Add a new zombie unit to the turn manager
+# Add a zombie unit
 func add_zombie_unit(unit: Node) -> void:
 	if not zombie_units.has(unit):
 		zombie_units.append(unit)
-		all_units = player_units + zombie_units  # Recombine unit list
 
-# Remove a unit (e.g., if destroyed)
+# Remove a unit from its respective group
 func remove_unit(unit: Node) -> void:
 	if player_units.has(unit):
 		player_units.erase(unit)
+		if current_group == "player_units" and player_units.size() == 0:
+			switch_to_next_group()
 	elif zombie_units.has(unit):
 		zombie_units.erase(unit)
-	
-	# Recombine unit list and adjust the current index
-	all_units = player_units + zombie_units
-	if current_unit_index >= all_units.size():
-		current_unit_index = 0  # Reset index if it exceeds list size
+		if current_group == "zombie_units" and zombie_units.size() == 0:
+			switch_to_next_group()
+
+	# If the removed unit is the current unit, adjust the index
+	if unit == current_unit:
+		end_current_unit_turn()
+
+# Get the currently active unit
+func get_current_unit() -> Node:
+	return current_unit

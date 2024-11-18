@@ -76,14 +76,16 @@ func handle_right_click() -> void:
 
 # Attacks the target at the specified tile
 func attack_selected_player(tile_pos: Vector2i) -> void:
-	selected_player.attack(tile_pos)
-	clear_action_tiles()  # Clear tiles after the attack
-	await get_tree().create_timer(1).timeout  # Optional delay for action feedback
+	if selected_player.has_attacked == false:
+		selected_player.attack(tile_pos)
+		clear_action_tiles()  # Clear tiles after the attack
+		await get_tree().create_timer(1).timeout  # Optional delay for action feedback
 
 # Moves the selected player to the specified tile
 func move_selected_player(tile_pos: Vector2i) -> void:
-	selected_player.move_player_to_target(tile_pos)
-	clear_action_tiles()  # Clear movement and attack tiles after moving
+	if selected_player.has_moved == false:
+		selected_player.move_player_to_target(tile_pos)
+		clear_action_tiles()  # Clear movement and attack tiles after moving
 
 # Selects a unit at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:

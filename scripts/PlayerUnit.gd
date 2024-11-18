@@ -82,6 +82,12 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var levelup_audio: AudioStream
 @export var hurt_audio: AudioStream
 
+@onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+
+var has_moved: bool = false  # Tracks if the unit has moved this turn
+var has_attacked: bool = false  # Tracks if the unit has attacked this turn
+var has_used_turn: bool = false  # Tracks if it's currently this unit's turn
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -348,6 +354,8 @@ func move_along_path(delta: float) -> void:
 			get_child(0).play("default")
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
 			update_astar_grid()
+			has_moved = true
+			check_end_turn_conditions()
 	
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:
@@ -635,6 +643,8 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	get_child(0).play("default")
 	clear_attack_range_tiles()
 	#on_player_action_completed()
+	has_attacked = true
+	check_end_turn_conditions()
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:
@@ -765,3 +775,12 @@ func flash_damage():
 
 func get_attack_damage() -> int:
 	return attack_damage  # Replace with your variable holding attack damage
+
+# Check if the unit's turn should automatically end
+func check_end_turn_conditions() -> void:
+	if has_moved and has_attacked:
+		print(self.name, "has completed its turn.")
+		turn_manager.end_current_unit_turn()  # Notify the turn manager to move to the next unit
+		
+func end_turn():		
+	has_used_turn = true

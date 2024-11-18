@@ -66,6 +66,9 @@ var player_unit_is_selected = false
 @export var levelup_audio: AudioStream
 @export var dog_hurt_audio: AudioStream
 
+@onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+
+
 func _ready() -> void:
 	# Possible values for health and XP
 	var possible_values = [25, 50, 75]
@@ -120,6 +123,9 @@ func _ready() -> void:
 	for unit_name in units:
 		var unit = unitspawn.get_node(unit_name)
 		unit.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
+
+	turn_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
+
 
 # Called every frame
 func _process(delta: float) -> void:
@@ -317,6 +323,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false
 	attacks = 0
+	
+	reset_player_units()
 
 	
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
@@ -671,3 +679,11 @@ func flash_damage():
 
 func get_attack_damage() -> int:
 	return attack_damage  # Replace with your variable holding attack damage
+
+func reset_player_units():
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:	
+		player.has_moved = false
+		player.has_attacked = false
+		player.has_used_turn = false

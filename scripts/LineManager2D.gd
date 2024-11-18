@@ -62,6 +62,8 @@ func _input(event: InputEvent) -> void:
 							var selected_player_position = selected_player.position  # Assuming position is a Vector2
 							
 							player_to_act = selected_player
+							if player_to_act.has_attacked:
+								return
 							
 							# Convert the world position of the player to the tile's position
 							var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -101,6 +103,7 @@ func _input(event: InputEvent) -> void:
 					
 					missiles_launched += 1
 					# Start the trajectory
+					player_to_act.has_attacked = true
 					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 
 					# Trigger zombie action: find and chase player

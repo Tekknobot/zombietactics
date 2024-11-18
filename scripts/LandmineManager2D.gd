@@ -241,7 +241,7 @@ func set_tile_walkable(tile_pos: Vector2i, walkable: bool) -> void:
 func move_player_to_target(target_tile: Vector2i) -> void:
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
-
+	
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
 
@@ -252,7 +252,7 @@ func move_along_path(delta: float) -> void:
 	if current_path.is_empty():
 		return  # No path, so don't move
 
-	if path_index < current_path.size():
+	if path_index < current_path.size() and player_to_move.has_attacked == false:
 		player_to_move.get_child(0).play("move")
 
 		# Check if the player is still valid
@@ -260,6 +260,7 @@ func move_along_path(delta: float) -> void:
 			print("Player no longer exists. Stopping path traversal and mine placement.")
 			current_path.clear()
 			#on_player_action_completed()
+			player_to_move.has_attacked = true
 			return  # Stop movement if the player is destroyed or invalid
 					
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
@@ -280,7 +281,7 @@ func move_along_path(delta: float) -> void:
 		var distance_to_target = player_to_move.position.distance_to(target_world_pos)
 		var move_distance = min(distance_to_target, move_speed * delta)  # Move only as far as the remaining distance
 		player_to_move.position += direction * move_distance
-
+		
 		# Check if we have reached the target tile
 		if distance_to_target <= move_distance:  # Threshold to determine if we reached the target
 			# Only instantiate the mine if we're not on the last tile
@@ -289,9 +290,11 @@ func move_along_path(delta: float) -> void:
 			else:
 				player_to_move.current_xp += 25	
 				#on_player_action_completed()
+				player_to_move.has_attacked = true
 				
 			path_index += 1  # Move to the next tile in the path
 			player_to_move.get_child(0).play("default")
+			
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
 			update_astar_grid()
 			

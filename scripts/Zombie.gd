@@ -64,6 +64,7 @@ var player_unit_is_selected = false
 @export var zombie_audio: AudioStream
 @export var hurt_audio: AudioStream
 @export var levelup_audio: AudioStream
+@export var dog_hurt_audio: AudioStream
 
 func _ready() -> void:
 	# Possible values for health and XP
@@ -398,9 +399,14 @@ func take_damage(player: Area2D, damage: int) -> void:
 		print("Player object does not have an 'apply_damage' method")
 		return
 	
-	# Play sfx
-	player.audio_player.stream = hurt_audio
-	player.audio_player.play()	
+	if player.player_name == "Yoshida. Boi":
+		# Play sfx
+		player.audio_player.stream = dog_hurt_audio
+		player.audio_player.play()	
+	else:
+		# Play sfx
+		player.audio_player.stream = hurt_audio
+		player.audio_player.play()	
 		
 	player.apply_damage(damage)  # Call the player's apply_damage method
 

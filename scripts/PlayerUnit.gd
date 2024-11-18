@@ -76,7 +76,6 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
-@export var hurt_audio: AudioStream
 @export var death_audio: AudioStream
 @export var levelup_audio: AudioStream
 

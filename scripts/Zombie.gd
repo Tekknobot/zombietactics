@@ -59,7 +59,7 @@ var current_level: int = 1
 var player_unit_is_selected = false
 
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
-@onready var level_audio_player = $LevelUpAudio  # Adjust the path as needed
+@onready var second_audio_player = $SecondAudioPlayer  # Adjust the path as needed
 
 @export var zombie_audio: AudioStream
 @export var hurt_audio: AudioStream
@@ -597,8 +597,8 @@ func die() -> void:
 	#queue_free()  # Remove player from the scene or handle accordingly		
 
 func level_up() -> void:
-	level_audio_player.stream = levelup_audio
-	level_audio_player.play()
+	second_audio_player.stream = levelup_audio
+	second_audio_player.play()
 		
 	print("Zombie leveled up!")
 		

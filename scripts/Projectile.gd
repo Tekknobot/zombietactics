@@ -81,7 +81,9 @@ func _check_for_zombies_at_target() -> void:
 			# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 			var hud_manager = get_parent().get_parent().get_node("HUDManager")
 			hud_manager.update_hud_zombie(zombie)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-			
+
+			zombie.second_audio_player.stream = zombie.hurt_audio
+			zombie.second_audio_player.play()				
 
 func _check_for_players_at_target() -> void:
 	# Find all nodes in the group "zombies"

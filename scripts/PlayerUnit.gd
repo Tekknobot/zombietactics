@@ -62,7 +62,7 @@ var hud: Control
 
 # Player's health properties
 var max_xp: int = 100
-var current_xp: int = 75
+var current_xp: int = 25
 var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
 

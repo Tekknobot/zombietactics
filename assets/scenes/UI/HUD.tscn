@@ -1,8 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://rdlfqfdmhgit"]
+[gd_scene load_steps=11 format=3 uid="uid://rdlfqfdmhgit"]
 
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
-[ext_resource type="FontFile" uid="uid://csnhk3q4gx0" path="res://assets/fonts/magofonts/mago1.ttf" id="3_oopvd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_65y7a"]
 bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
@@ -96,13 +95,44 @@ theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
 text = "Level 1"
 
+[node name="HP" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 172.0
+offset_top = -69.0
+offset_right = 301.0
+offset_bottom = -43.0
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+text = "HP: 100 of 100"
+
+[node name="XP" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 172.0
+offset_top = -48.0
+offset_right = 301.0
+offset_bottom = -22.0
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+text = "XP: 25 of 100"
+
+[node name="ATK" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 172.0
+offset_top = -89.0
+offset_right = 301.0
+offset_bottom = -63.0
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+text = "ATK: 25"
+
 [node name="Missile" type="Button" parent="."]
 visible = false
 layout_mode = 0
-offset_left = 168.0
-offset_top = -154.0
-offset_right = 234.0
-offset_bottom = -120.0
+offset_left = 24.0
+offset_top = -262.0
+offset_right = 90.0
+offset_bottom = -228.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
@@ -113,24 +143,13 @@ text = "Missile"
 [node name="Landmine" type="Button" parent="."]
 visible = false
 layout_mode = 0
-offset_left = 168.0
-offset_top = -116.0
-offset_right = 252.0
-offset_bottom = -82.0
+offset_left = 24.0
+offset_top = -224.0
+offset_right = 108.0
+offset_bottom = -190.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
 theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
 toggle_mode = true
 text = "Landmine"
-
-[node name="Info" type="RichTextLabel" parent="."]
-visible = false
-layout_mode = 0
-offset_left = 172.0
-offset_top = -77.0
-offset_right = 304.0
-offset_bottom = -46.0
-theme_override_fonts/normal_font = ExtResource("3_oopvd")
-theme_override_font_sizes/normal_font_size = 16
-text = "Perform special on any open or occupide tile."

@@ -66,6 +66,8 @@ var current_xp: int = 25
 var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
 
+var attack_damage: int = 25
+
 var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
 # Optional: Scene to instantiate for explosion effect
@@ -78,6 +80,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
 @export var death_audio: AudioStream
 @export var levelup_audio: AudioStream
+@export var hurt_audio: AudioStream
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -565,6 +568,8 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 
 	# Instantiate the projectile
 	var projectile = projectile_scene.instantiate() as Node2D
+	projectile.attacker = self
+	
 	if projectile == null:
 		print("Error: Failed to instantiate projectile!")
 		return
@@ -698,10 +703,9 @@ func level_up() -> void:
 	# Add level-up bonuses
 	movement_range += 1
 	current_level += 1
-	if current_health == 100:
-		current_health == 100
-	else:
-		current_health += 25
+	current_health += 25
+	max_health += 25
+	attack_damage += 25
 	
 	# Play level-up visual effect
 	play_level_up_effect()
@@ -758,3 +762,6 @@ func flash_damage():
 			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
 			sprite.modulate = Color(1, 1, 1)  # Set back to normal color
 			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
+
+func get_attack_damage() -> int:
+	return attack_damage  # Replace with your variable holding attack damage

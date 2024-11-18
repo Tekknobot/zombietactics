@@ -10,6 +10,11 @@ extends CanvasLayer
 @onready var missile = $HUD/Missile 
 @onready var landmine = $HUD/Landmine
 
+@onready var hp = $HUD/HP
+@onready var xp = $HUD/XP
+@onready var atk = $HUD/ATK
+
+
 func _ready():
 	if portrait:
 		print("Portrait node found!")
@@ -103,6 +108,24 @@ func update_hud(character: PlayerUnit):
 	else:
 		print("Level node is null!")
 
+	if hp:
+		hp.text = "HP: " + str(character.current_health) + " of " + str(character.max_health)
+		print("HP updated to: ", hp.text)
+	else:
+		print("HP node is null!")
+
+	if xp:
+		xp.text = "XP: " + str(character.current_xp) + " of " + str(character.xp_for_next_level)
+		print("XP updated to: ", xp.text)
+	else:
+		print("XP node is null!")
+
+	if atk:
+		atk.text = "ATK: " + str(character.attack_damage)
+		print("ATK updated to: ", atk.text)
+	else:
+		print("ATK node is null!")
+
 # Access and update HUD elements based on the selected player unit
 func update_hud_zombie(character: ZombieUnit):
 	# Debugging: Check if the correct character is passed
@@ -140,7 +163,24 @@ func update_hud_zombie(character: ZombieUnit):
 	else:
 		print("Level node is null!")
 
+	if hp:
+		hp.text = "HP: " + str(character.current_health) + " of " + str(character.max_health)
+		print("HP updated to: ", hp.text)
+	else:
+		print("HP node is null!")
 
+	if xp:
+		xp.text = "XP: " + str(character.current_xp) + " of " + str(character.xp_for_next_level)
+		print("XP updated to: ", xp.text)
+	else:
+		print("XP node is null!")
+
+	if atk:
+		atk.text = "ATK: " + str(character.attack_damage)
+		print("ATK updated to: ", atk.text)
+	else:
+		print("ATK node is null!")
+		
 func show_special_buttons():
 	missile.visible = true
 	landmine.visible = true

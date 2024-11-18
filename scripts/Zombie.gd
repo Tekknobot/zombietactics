@@ -30,7 +30,7 @@ var move_speed: float = 75.0
 var WATER_TILE_ID = 0
 
 var attacks: int = 0
-var attack_damage = 25
+var attack_damage: int = 25
 
 var hud: Control
 
@@ -609,10 +609,9 @@ func level_up() -> void:
 	# Add level-up bonuses
 	movement_range += 1
 	current_level += 1
-	if current_health == 100:
-		current_health = 100
-	else:
-		current_health += 25
+	current_health += 25
+	max_health += 25
+	attack_damage += 25
 	
 	# Play level-up visual effect
 	play_level_up_effect()
@@ -669,3 +668,6 @@ func flash_damage():
 			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
 			sprite.modulate = Color(1, 1, 1)  # Set back to normal color
 			await get_tree().create_timer(0.1).timeout  # Wait 0.1 seconds
+
+func get_attack_damage() -> int:
+	return attack_damage  # Replace with your variable holding attack damage

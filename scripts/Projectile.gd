@@ -10,6 +10,9 @@ extends Node2D
 
 var projectile_hit: bool = false
 
+# Assuming `attacker` is set when the projectile is spawned
+var attacker: Area2D = null  # Reference to the unit that fired the projectile
+
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering
 	z_index = int(position.y)
@@ -65,6 +68,11 @@ func _create_explosion() -> void:
 	_check_for_structure_at_target()
 
 func _check_for_zombies_at_target() -> void:
+	# Ensure `attacker` is valid
+	if attacker == null:
+		print("Projectile has no attacker reference.")
+		return
+			
 	# Find all nodes in the group "zombies"
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if not zombie is Node2D:
@@ -73,10 +81,17 @@ func _check_for_zombies_at_target() -> void:
 		# Check if the zombie is within the explosion radius
 		if zombie.position.distance_to(target_position) <= explosion_radius:
 			print("Zombie found at explosion position, destroying:", zombie.name)
-			
+				
 			# Play the death animation on the zombie (assuming it has an animation called "death")
 			attack_zombie(zombie)
-			zombie.apply_damage(25)
+
+			# Use the attacker's attack damage
+			var damage = 25  # Default value in case attacker doesn't have damage info
+			if attacker.has_method("get_attack_damage"):
+				damage = attacker.get_attack_damage()
+			
+			# Apply damage to the zombie
+			zombie.apply_damage(damage)
 
 			# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 			var hud_manager = get_parent().get_parent().get_node("HUDManager")
@@ -86,7 +101,7 @@ func _check_for_zombies_at_target() -> void:
 			zombie.second_audio_player.play()				
 
 func _check_for_players_at_target() -> void:
-	# Find all nodes in the group "zombies"
+	# Find all nodes in the group "player_units"
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if not player is Node2D:
 			continue  # Skip any non-Node2D members of the group

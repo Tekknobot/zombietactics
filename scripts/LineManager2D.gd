@@ -99,9 +99,9 @@ func _input(event: InputEvent) -> void:
 					# Convert the target position (assumed to be global) to local
 					var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
 					
+					missiles_launched += 1
 					# Start the trajectory
 					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
-					missiles_launched += 1
 
 					# Trigger zombie action: find and chase player
 					trigger_zombie_actions()

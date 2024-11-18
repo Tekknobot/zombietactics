@@ -109,7 +109,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			hud_manager.update_hud(player)
 			return
 	
-	#selected_player = null  # Deselect if no player is found at the clicked tile
+	selected_player = null  # Deselect if no player is found at the clicked tile
 	
 	clear_action_tiles() 
 	clear_action_tiles_zombie()  # Clear any previous selection tiles

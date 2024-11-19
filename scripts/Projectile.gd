@@ -1,5 +1,10 @@
 extends Node2D
 
+# Declare member variables
+var tile_pos: Vector2i
+var coord: Vector2
+var layer: int
+
 # Target position and speed properties
 @export var target_position: Vector2
 @export var speed: float = 200.0
@@ -19,15 +24,18 @@ func _ready() -> void:
 	z_index = int(position.y)
 
 func _process(delta: float) -> void:
-	# Adjust z_index to ensure layering as it moves
-	z_index = int(position.y)
-
 	# If the projectile is TNT, rotate its AnimatedSprite2D child
 	if name == "TNT":
 		var animated_sprite = $AnimatedSprite2D  # Reference to the AnimatedSprite2D child
 		if animated_sprite:
 			animated_sprite.rotation += rotation_speed * delta  # Increment rotation relative to its center
-	
+
+	# If the projectile is TNT, rotate its AnimatedSprite2D child
+	if name == "Projectile":
+		var animated_sprite = $AnimatedSprite2D  # Reference to the AnimatedSprite2D child
+		if animated_sprite:
+			animated_sprite.rotation += (rotation_speed + 25) * delta  # Increment rotation relative to its center
+		
 	# Calculate the distance to the target
 	var distance_to_target = position.distance_to(target_position)
 	
@@ -48,8 +56,27 @@ func _process(delta: float) -> void:
 	# Move the projectile towards the target
 	position += movement
 	print("Projectile position: ", position)
+	
+	# Adjust z_index to ensure layering as it moves
+	update_tile_position()
 
+# Function to update the tile position based on the current Area2D position
+func update_tile_position() -> void:
+	# Get the TileMap node
+	var tile_map = get_tree().get_root().get_node("MapManager/TileMap")  # Adjust path based on your scene structure
+	
+	# Convert the current position to tile coordinates
+	tile_pos = tile_map.local_to_map(position)
 
+	# Store the tile coordinates
+	coord = tile_pos
+	
+	# Update z_index for layering based on tile position
+	layer = (tile_pos.x + tile_pos.y) + 1
+
+	# Optionally, set the z_index in the node to ensure proper rendering order
+	self.z_index = layer
+	
 func _create_explosion() -> void:
 	# Check if explosion_scene is assigned
 	if explosion_scene == null:

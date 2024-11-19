@@ -28,7 +28,7 @@ explosion_scene = ExtResource("2_g1ylo")
 position = Vector2(0, -17)
 sprite_frames = SubResource("SpriteFrames_rngvo")
 autoplay = "default"
-frame_progress = 0.492953
+frame_progress = 0.281636
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 

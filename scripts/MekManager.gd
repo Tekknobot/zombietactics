@@ -40,23 +40,34 @@ func _process(delta: float) -> void:
 		print("Error: No map selected, defaulting WATER to 0.")
 		WATER_TILE_ID = 0  # Fallback value if no map is selected
 
-# Function to instantiate a random exported scene onto a clicked movable tile
 func _input(event: InputEvent) -> void:
 	if not global_manager.mek_toggle_active:
 		return
-			
+	
+	# Get the TileMap node
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
+	# Convert the global mouse position to local position relative to the TileMap
+	var global_mouse_pos = get_global_mouse_position()
+	global_mouse_pos.y += 8
+	var local_mouse_pos = tilemap.to_local(global_mouse_pos)
+
+	# Convert the local mouse position to the corresponding tile position
+	var tile_pos = tilemap.local_to_map(local_mouse_pos)
+
+	# Check if the tile is within the valid bounds
+	if not is_within_bounds(tile_pos):
+		# If the tile is out of bounds, return early
+		return
+	
+	# Proceed only if left mouse button is pressed
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		var global_mouse_pos = get_global_mouse_position()
-		global_mouse_pos.y += 8		
-		
-		var tile_pos = tilemap.local_to_map(global_mouse_pos)
-		
+		# Check if the tile is movable
 		if is_tile_movable(tile_pos):
 			# Play sfx
 			audio_player.stream = mek_call_audio
 			audio_player.play()				
-			
+				
 			# Pick a random exported scene
 			var random_scene = get_random_scene()
 			if random_scene:
@@ -97,6 +108,14 @@ func _input(event: InputEvent) -> void:
 				print("No scene available to spawn.")
 		else:
 			print("Tile is not movable:", tile_pos)
+
+# Checks if the tile position is within the tilemap bounds
+func is_within_bounds(tile_pos: Vector2i) -> bool:
+	var map_rect: Rect2i = tilemap.get_used_rect()
+	return tile_pos.x >= map_rect.position.x and tile_pos.y >= map_rect.position.y \
+		and tile_pos.x < map_rect.position.x + map_rect.size.x \
+		and tile_pos.y < map_rect.position.y + map_rect.size.y
+
 
 # Function to animate fade-in and fade-out
 func animate_fade_in_out(instance: Node2D) -> void:

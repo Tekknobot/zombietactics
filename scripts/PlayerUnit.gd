@@ -809,8 +809,6 @@ func mek_melee(selected_unit: Area2D) -> void:
 		mek_tile_pos + Vector2i(0, -1)   # Up
 	]
 	
-	await get_tree().create_timer(1).timeout
-	
 	# Iterate over each adjacent tile to check for zombies
 	for tile_pos in adjacent_tiles:
 		var zombies = get_tree().get_nodes_in_group("zombies")
@@ -835,7 +833,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 					scale.x = 1
 
 				# Perform attack animation and damage
-				await get_tree().create_timer(1).timeout
+				await get_tree().create_timer(1.5).timeout
 				get_child(0).play("attack")
 
 				# Play sfx

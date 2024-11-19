@@ -700,7 +700,7 @@ func level_up() -> void:
 	movement_range += 1
 	current_level += 1
 	max_health += 25
-	current_health = max_health  # Fully heal player
+	current_health += 25  # Fully heal player
 	attack_damage += 25
 
 	# Reset XP threshold

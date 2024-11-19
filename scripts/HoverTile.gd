@@ -91,11 +91,7 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 		clear_action_tiles()  # Clear movement and attack tiles after moving
 
 # Selects a unit or structure at the given tile position
-func select_unit_at_tile(tile_pos: Vector2i) -> void:
-	# Update the HUD to reflect new stats
-	var hud_manager = get_parent().get_node("HUDManager")
-	hud_manager.visible = true
-	
+func select_unit_at_tile(tile_pos: Vector2i) -> void:	
 	clear_action_tiles()  # Clear any previous selection tiles
 	clear_action_tiles_zombie()  # Clear any previous zombie selection tiles
 	
@@ -103,6 +99,10 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos:
+			# Update the HUD to reflect new stats
+			var hud_manager = get_parent().get_node("HUDManager")
+			hud_manager.visible = true		
+				
 			# Play selection sound effect
 			audio_player.stream = select_audio
 			audio_player.play()
@@ -121,6 +121,10 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
+			# Update the HUD to reflect new stats
+			var hud_manager = get_parent().get_node("HUDManager")
+			hud_manager.visible = true	
+						
 			# Play selection sound effect
 			audio_player.stream = select_audio
 			audio_player.play()			

@@ -452,7 +452,7 @@ func display_attack_range_tiles() -> void:
 
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.show_special_buttons()	
+	hud_manager.show_special_buttons(self)	
 	
 			
 	clear_movement_tiles()  # Clear existing movement tiles

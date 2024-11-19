@@ -1,0 +1,37 @@
+[gd_scene load_steps=7 format=3 uid="uid://kmr2jkfvmmei"]
+
+[ext_resource type="Script" path="res://scripts/Projectile.gd" id="1_61q0x"]
+[ext_resource type="PackedScene" uid="uid://bofv1wx4so130" path="res://assets/scenes/vfx/explosion.tscn" id="2_g1ylo"]
+[ext_resource type="Texture2D" uid="uid://c5100qvyadyjq" path="res://assets/projectiles/default/tnt/tnt1.png" id="3_t3abb"]
+[ext_resource type="Texture2D" uid="uid://cn6gewl7drect" path="res://assets/projectiles/default/tnt/tnt2.png" id="4_b2cg5"]
+[ext_resource type="AudioStream" uid="uid://cue0f2dfa4w6t" path="res://audio/SFX/rusty_machine_gun_fire_single.wav" id="11_s7exd"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rngvo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_t3abb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_b2cg5")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]
+
+[node name="TNT" type="Node2D"]
+script = ExtResource("1_61q0x")
+explosion_scene = ExtResource("2_g1ylo")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -17)
+sprite_frames = SubResource("SpriteFrames_rngvo")
+autoplay = "default"
+frame_progress = 0.492953
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("11_s7exd")
+autoplay = true

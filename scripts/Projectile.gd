@@ -3,6 +3,7 @@ extends Node2D
 # Target position and speed properties
 @export var target_position: Vector2
 @export var speed: float = 200.0
+@export var rotation_speed: float = 5.0
 
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
@@ -21,6 +22,12 @@ func _process(delta: float) -> void:
 	# Adjust z_index to ensure layering as it moves
 	z_index = int(position.y)
 
+	# If the projectile is TNT, rotate its AnimatedSprite2D child
+	if name == "TNT":
+		var animated_sprite = $AnimatedSprite2D  # Reference to the AnimatedSprite2D child
+		if animated_sprite:
+			animated_sprite.rotation += rotation_speed * delta  # Increment rotation relative to its center
+	
 	# Calculate the distance to the target
 	var distance_to_target = position.distance_to(target_position)
 	
@@ -31,7 +38,7 @@ func _process(delta: float) -> void:
 		self.visible = false
 		_create_explosion()  # Trigger the explosion effect
 		projectile_hit = true
-		await get_tree().create_timer(1).timeout 
+		await get_tree().create_timer(1).timeout
 		queue_free()  # Destroy the projectile
 		return
 	
@@ -41,6 +48,7 @@ func _process(delta: float) -> void:
 	# Move the projectile towards the target
 	position += movement
 	print("Projectile position: ", position)
+
 
 func _create_explosion() -> void:
 	# Check if explosion_scene is assigned

@@ -201,9 +201,10 @@ func update_hud_zombie(character: ZombieUnit):
 		xp_bar.value = character.current_xp
 		print("Updated XP bar: Max=", xp_bar.max_value, ", Current=", xp_bar.value)		
 
-func show_special_buttons():
-	missile.visible = true
-	landmine.visible = true
+func show_special_buttons(character: PlayerUnit):
+	if character.player_name == "Yoshida. Boi":
+		missile.visible = true
+		landmine.visible = true
 
 func hide_special_buttons():
 	missile.visible = false

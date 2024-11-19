@@ -775,14 +775,13 @@ func check_end_turn_conditions() -> void:
 		print(self.name, "has completed its turn.")
 		has_used_turn = true
 
+		# Proceed to end the turn
+		await get_tree().create_timer(1.7).timeout	
+		
 		# Darken the unit to visually indicate its turn is over
 		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
-		
-		# Proceed to end the turn
-		await get_tree().create_timer(1.7).timeout
-		
+					
 		get_child(0).play("default")
-	
 		end_turn()
 
 func end_turn() -> void:

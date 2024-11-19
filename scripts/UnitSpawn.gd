@@ -81,6 +81,13 @@ func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i):
 	var unit_instance = unit_type.instantiate()
 	unit_instance.position = tilemap.map_to_local(tile_pos)
 	unit_instance.z_index = int(unit_instance.position.y)
+
+	# Randomly determine the direction (left or right)
+	var random_direction = randi() % 2 == 0  # True for right, False for left
+	unit_instance.scale = Vector2(
+		abs(unit_instance.scale.x) if random_direction else -abs(unit_instance.scale.x),
+		unit_instance.scale.y
+	)
 	
 	# Add to scene tree and player units group
 	add_child(unit_instance)
@@ -112,6 +119,13 @@ func spawn_zombies():
 			# Assign a unique name to the zombie
 			if zombie_names.size() > 0:
 				zombie_instance.zombie_name = zombie_names.pop_back()  # Remove the last name from the list
+
+			# Randomly determine the direction (left or right)
+			var random_direction = randi() % 2 == 0  # True for right, False for left
+			zombie_instance.scale = Vector2(
+				abs(zombie_instance.scale.x) if random_direction else -abs(zombie_instance.scale.x),
+				zombie_instance.scale.y
+			)
 			
 			# Add to scene tree and zombie units group
 			add_child(zombie_instance)

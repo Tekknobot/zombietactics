@@ -81,6 +81,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var death_audio: AudioStream
 @export var levelup_audio: AudioStream
 @export var hurt_audio: AudioStream
+@export var mek_attack_audio = preload("res://audio/SFX/mek_attack.wav")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 
@@ -808,6 +809,8 @@ func mek_melee(selected_unit: Area2D) -> void:
 		mek_tile_pos + Vector2i(0, -1)   # Up
 	]
 	
+	await get_tree().create_timer(1).timeout
+	
 	# Iterate over each adjacent tile to check for zombies
 	for tile_pos in adjacent_tiles:
 		var zombies = get_tree().get_nodes_in_group("zombies")
@@ -834,6 +837,11 @@ func mek_melee(selected_unit: Area2D) -> void:
 				# Perform attack animation and damage
 				await get_tree().create_timer(1).timeout
 				get_child(0).play("attack")
+
+				# Play sfx
+				audio_player.stream = mek_attack_audio
+				audio_player.play()	
+							
 				zombie.flash_damage()
 				zombie.apply_damage(attack_damage)
 

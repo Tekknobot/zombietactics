@@ -13,6 +13,10 @@ extends Node2D
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  
 @onready var hovertile = get_node("/root/MapManager/HoverTile") 
 
+@onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
+@export var mek_call_audio = preload("res://audio/SFX/call_mek.wav")
+
+
 # Constants
 var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
@@ -49,6 +53,10 @@ func _input(event: InputEvent) -> void:
 		var tile_pos = tilemap.local_to_map(global_mouse_pos)
 		
 		if is_tile_movable(tile_pos):
+			# Play sfx
+			audio_player.stream = mek_call_audio
+			audio_player.play()				
+			
 			# Pick a random exported scene
 			var random_scene = get_random_scene()
 			if random_scene:
@@ -98,6 +106,10 @@ func animate_fade_in_out(instance: Node2D) -> void:
 	tween.tween_property(instance, "modulate:a", 1, 2)  # Fade to fully opaque over 0.5 seconds
 	tween.set_trans(tween.TRANS_LINEAR).set_ease(tween.EASE_IN_OUT)
 	
+	# Play sfx
+	audio_player.stream = mek_call_audio
+	audio_player.play()	
+			
 	# Fade-out animation after a delay
 	tween.tween_interval(1.0)  # Wait 1 second after fade-in completes
 	tween.tween_property(instance, "modulate:a", 0, 2)  # Fade to fully transparent over 0.5 seconds

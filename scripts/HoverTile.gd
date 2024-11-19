@@ -75,6 +75,7 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 func handle_right_click() -> void:
 	if selected_player:
 		toggle_attack_mode()
+		last_selected_player = selected_player
 
 # Attacks the target at the specified tile
 func attack_selected_player(tile_pos: Vector2i) -> void:
@@ -104,7 +105,11 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 		if tilemap.local_to_map(player.global_position) == tile_pos:
 			# Play selection sound effect
 			audio_player.stream = select_audio
-			audio_player.play()			
+			audio_player.play()
+			
+			# Update the last selected player only when a new player is selected
+			if selected_player and selected_player != player:
+				last_selected_player = selected_player
 			
 			selected_player = player
 			selected_player.selected = true
@@ -138,7 +143,9 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			structure.selected = true
 			return
 	
-	# Deselect if no unit or structure is found at the clicked tile
+	# If no unit or structure is found at the clicked tile, deselect the current player
+	if selected_player:
+		last_selected_player = selected_player  # Save the current player as last selected
 	selected_player = null
 
 # Displays movement tiles for the selected player
@@ -171,7 +178,6 @@ func clear_action_tiles() -> void:
 	if selected_player:
 		selected_player.clear_movement_tiles()
 		selected_player.clear_attack_range_tiles()
-		last_selected_player = selected_player
 		selected_player.selected = false
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()

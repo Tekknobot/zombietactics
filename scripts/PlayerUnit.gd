@@ -401,6 +401,7 @@ func _input(event: InputEvent) -> void:
 				print("Right-click detected: Showing attack range.")  # Debug log
 				display_attack_range_tiles()
 				attack_range_visible = true  # Set the attack range visible flag to true
+				selected = true
 				print("Attack range is now visible.")  # Debug log
 
 		# Left-click to trigger the attack
@@ -712,7 +713,6 @@ func level_up() -> void:
 		
 	print("Level up completed!")
 
-
 # Function to play level-up flickering effect (green to normal)
 func play_level_up_effect() -> void:
 	var original_color = modulate  # Store the original color of the unit
@@ -789,3 +789,64 @@ func end_turn() -> void:
 		turn_manager.end_current_unit_turn()  # Notify the turn manager to move to the next unit
 	else:
 		print("Turn manager is not set! Unable to proceed to the next unit.")
+
+func mek_melee(selected_unit: Area2D) -> void:
+	# Get the tilemap to convert positions
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	if not tilemap:
+		print("TileMap not found!")
+		return
+
+	# Get the player's current tile position
+	var mek_tile_pos = tilemap.local_to_map(self.position)
+	
+	# Define adjacent tiles (4 directions: up, down, left, right)
+	var adjacent_tiles = [
+		mek_tile_pos + Vector2i(1, 0),   # Right
+		mek_tile_pos + Vector2i(-1, 0),  # Left
+		mek_tile_pos + Vector2i(0, 1),   # Down
+		mek_tile_pos + Vector2i(0, -1)   # Up
+	]
+	
+	# Iterate over each adjacent tile to check for zombies
+	for tile_pos in adjacent_tiles:
+		var zombies = get_tree().get_nodes_in_group("zombies")
+		for zombie in zombies:
+			var zombie_tile_pos = tilemap.local_to_map(zombie.position)
+			if tile_pos == zombie_tile_pos:
+				print("Zombie found adjacent at tile:", tile_pos)
+				
+				# Get the world position of the zombie (target)
+				var zombie_world_pos = tilemap.map_to_local(zombie_tile_pos)
+				print("Zombie world position: ", zombie_world_pos)
+				
+				# Determine the direction to the target
+				var direction_to_target = zombie_world_pos.x - position.x
+				
+				# Flip the sprite based on the target's relative position (left or right)
+				if direction_to_target > 0 and scale.x != -1:
+					# Zombie is to the right, flip the mek to face right
+					scale.x = -1
+				elif direction_to_target < 0 and scale.x != 1:
+					# Zombie is to the left, flip the mek to face left
+					scale.x = 1
+
+				# Perform attack animation and damage
+				await get_tree().create_timer(1).timeout
+				get_child(0).play("attack")
+				zombie.flash_damage()
+				zombie.apply_damage(attack_damage)
+
+				# Update the HUD to reflect new stats
+				var hud_manager = get_parent().get_parent().get_node("HUDManager")
+				hud_manager.update_hud_zombie(zombie)
+				hud_manager.hide_special_buttons()
+
+				# Update selected unit's state
+				selected_unit.has_attacked = true
+				selected_unit.has_moved = true
+				selected_unit.check_end_turn_conditions()
+				return  # Exit once a zombie is found
+
+	# No adjacent zombies found
+	print("No zombies adjacent.")

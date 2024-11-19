@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var player_name = $HUD/Name
 @onready var xp_bar = $HUD/XPBar
 @onready var level = $HUD/Level
+
 @onready var missile = $HUD/Missile 
 @onready var landmine = $HUD/Landmine
 
@@ -14,6 +15,7 @@ extends CanvasLayer
 @onready var xp = $HUD/XP
 @onready var atk = $HUD/ATK
 
+@onready var mek = $HUD/Mek
 
 func _ready():
 	if portrait:
@@ -29,7 +31,11 @@ func _ready():
 	if landmine:
 		landmine.connect("toggled", Callable(self, "_on_landmine_toggled"))
 		print("Landmine connected")
-		
+
+	if mek:
+		mek.connect("toggled", Callable(self, "_on_mek_toggled"))
+		print("Mek connected")
+				
 # Method to handle the toggle state change
 func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -52,6 +58,17 @@ func _on_landmine_toggled(button_pressed: bool) -> void:
 	else:
 		global_manager.landmine_toggle_active = false  # Set the flag to false
 		print("Landmine toggle deactivated!")
+
+func _on_mek_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		global_manager.mek_toggle_active = true  # Set the flag to true
+		print("Mek toggle activated!")	
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		global_manager.mek_toggle_active = false  # Set the flag to false
+		print("Mek toggle deactivated!")
 
 
 # Access and update HUD elements based on the selected player unit
@@ -206,6 +223,10 @@ func show_special_buttons(character: PlayerUnit):
 		missile.visible = true
 		landmine.visible = true
 
+	if character.player_name == "Dutch. Major" or character.player_name == "Bournetu. Kill":
+		mek.visible = true
+
 func hide_special_buttons():
 	missile.visible = false
 	landmine.visible = false
+	mek.visible = false

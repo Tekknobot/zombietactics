@@ -248,7 +248,7 @@ func add_xp():
 	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	
 	# Access the 'special' button within HUDManager
-	var missile_button = hud_manager.get_node("HUD/Special")
+	var missile_button = hud_manager.get_node("HUD/Missile")
 	global_manager.missile_toggle_active = false  # Deactivate the special toggle
 
 	# Get all nodes in the 'hovertile' group

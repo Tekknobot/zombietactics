@@ -618,7 +618,6 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
-	get_child(0).play("default")
 	clear_attack_range_tiles()
 	#on_player_action_completed()
 	has_attacked = true
@@ -781,6 +780,9 @@ func check_end_turn_conditions() -> void:
 		
 		# Proceed to end the turn
 		await get_tree().create_timer(1.7).timeout
+		
+		get_child(0).play("default")
+	
 		end_turn()
 
 func end_turn() -> void:

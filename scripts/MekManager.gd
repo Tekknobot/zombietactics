@@ -95,12 +95,12 @@ func animate_fade_in_out(instance: Node2D) -> void:
 	var tween = create_tween()
 	
 	# Fade-in animation
-	tween.tween_property(instance, "modulate:a", 1, 0.5)  # Fade to fully opaque over 0.5 seconds
+	tween.tween_property(instance, "modulate:a", 1, 2)  # Fade to fully opaque over 0.5 seconds
 	tween.set_trans(tween.TRANS_LINEAR).set_ease(tween.EASE_IN_OUT)
 	
 	# Fade-out animation after a delay
 	tween.tween_interval(1.0)  # Wait 1 second after fade-in completes
-	tween.tween_property(instance, "modulate:a", 0, 0.5)  # Fade to fully transparent over 0.5 seconds
+	tween.tween_property(instance, "modulate:a", 0, 2)  # Fade to fully transparent over 0.5 seconds
 
 
 # Helper function to get the currently selected unit from the "player_units" group

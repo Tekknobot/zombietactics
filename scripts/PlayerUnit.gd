@@ -846,7 +846,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 				selected_unit.has_attacked = true
 				selected_unit.has_moved = true
 				selected_unit.check_end_turn_conditions()
-				return  # Exit once a zombie is found
+				#return  # Exit once a zombie is found
 
 	# No adjacent zombies found
 	print("No zombies adjacent.")

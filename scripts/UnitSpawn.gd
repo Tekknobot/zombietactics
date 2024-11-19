@@ -1,13 +1,16 @@
 extends Node2D
 
+@export var highlight_tile: PackedScene  # Highlight tile packed scene for hover effect
+
 # Preload the unit scenes
 @export var unit_soldier: PackedScene  # Set the unit scene in the Inspector
 @export var unit_merc: PackedScene  # Set the unit scene in the Inspector
 @export var unit_dog: PackedScene  # Set the unit scene in the Inspector
 @export var unit_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
 @export var M1: PackedScene  # Set the unit scene for the zombie in the Inspector
+@export var R1: PackedScene  # Set the unit scene for the zombie in the Inspector
+@export var S3: PackedScene  # Set the unit scene for the zombie in the Inspector
 
-@export var highlight_tile: PackedScene  # Highlight tile packed scene for hover effect
 
 @onready var tilemap = get_parent().get_node("TileMap")  # Reference to the TileMap
 @onready var map_manager = get_node("/root/MapManager")
@@ -59,7 +62,7 @@ func _ready():
 # Function to spawn player units on one half of the map
 func spawn_player_units():
 	# List of unit scenes for easier access
-	var units = [unit_soldier, unit_merc, unit_dog]
+	var units = [unit_soldier, unit_merc, unit_dog, M1, R1, S3]
 	
 	# Spawn each unit at a random, valid position on one half of the map
 	for unit_type in units:
@@ -182,6 +185,9 @@ func is_occupied(tile_pos: Vector2i) -> bool:
 	for unit in get_tree().get_nodes_in_group("player_units"):
 		if tilemap.local_to_map(unit.position) == tile_pos:
 			return true
+	for zombie in get_tree().get_nodes_in_group("zombies"):
+		if tilemap.local_to_map(zombie.position) == tile_pos:
+			return true			
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if tilemap.local_to_map(structure.position) == tile_pos:
 			return true

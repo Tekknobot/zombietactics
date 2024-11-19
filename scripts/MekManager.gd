@@ -69,6 +69,10 @@ func _input(event: InputEvent) -> void:
 				var selected_unit = get_selected_unit()
 				if selected_unit:
 					instance.mek_melee(selected_unit)  # Pass the selected unit to mek_melee()
+					selected_unit.current_xp += 25
+					# Optional: Check for level up, if applicable
+					if selected_unit.current_xp >= selected_unit.xp_for_next_level:
+						selected_unit.level_up()					
 				else:
 					print("No selected unit found to act as attacker.")
 				

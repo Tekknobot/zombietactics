@@ -833,7 +833,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 					scale.x = 1
 
 				# Perform attack animation and damage
-				await get_tree().create_timer(1.5).timeout
+				await get_tree().create_timer(1).timeout
 				get_child(0).play("attack")
 
 				# Play sfx
@@ -842,17 +842,22 @@ func mek_melee(selected_unit: Area2D) -> void:
 							
 				zombie.flash_damage()
 				zombie.apply_damage(attack_damage)
-
+				
 				# Update the HUD to reflect new stats
 				var hud_manager = get_parent().get_parent().get_node("HUDManager")
 				hud_manager.update_hud_zombie(zombie)
-				hud_manager.hide_special_buttons()
-
-				# Update selected unit's state
-				selected_unit.has_attacked = true
-				selected_unit.has_moved = true
-				selected_unit.check_end_turn_conditions()
+				hud_manager.hide_special_buttons()				
 				#return  # Exit once a zombie is found
 
+	# Update selected unit's state
+	selected_unit.has_attacked = true
+	selected_unit.has_moved = true
+	
+	# Darken the unit to visually indicate its turn is over
+	selected_unit.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
+						
+	selected_unit.check_end_turn_conditions()
+	
 	# No adjacent zombies found
 	print("No zombies adjacent.")
+	

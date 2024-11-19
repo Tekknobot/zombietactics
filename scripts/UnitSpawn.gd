@@ -66,24 +66,33 @@ func spawn_player_units():
 	# List of unit scenes for easier access
 	var units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
 	
+	# Units that need color modulation
+	var mek_units = [M1, M2, R1, R3, S2, S3]
+
 	# Spawn each unit at a random, valid position on one half of the map
 	for unit_type in units:
 		var spawn_position = get_random_spawn_position(true)  # Pass true to restrict to player side
 		if spawn_position != Vector2i(-1, -1):
-			spawn_unit_at(unit_type, spawn_position)
+			var unit_instance = spawn_unit_at(unit_type, spawn_position)
+
+			# If the unit is a mek unit, modulate its color
+			if unit_type in mek_units:
+				#unit_instance.modulate = Color8(255, 110, 255)  # Random color modulation
+				pass
+				
 			player_units_spawned += 1
-	
+
 	# Once all player units are spawned, trigger zombie spawning
 	spawn_zombies()
 
-# Function to spawn a unit of a given type at a specified tile position
-func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i):
+
+func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 	if unit_type == null:
 		print("Unit scene not assigned.")
-		return
-	
+		return null
+
 	# Instantiate and position the unit
-	var unit_instance = unit_type.instantiate()
+	var unit_instance = unit_type.instantiate() as Node2D
 	unit_instance.position = tilemap.map_to_local(tile_pos)
 	unit_instance.z_index = int(unit_instance.position.y)
 
@@ -93,11 +102,13 @@ func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i):
 		abs(unit_instance.scale.x) if random_direction else -abs(unit_instance.scale.x),
 		unit_instance.scale.y
 	)
-	
+
 	# Add to scene tree and player units group
 	add_child(unit_instance)
 	unit_instance.add_to_group("player_units")
-	print("Player unit spawned at:", tile_pos)
+	print("Player unit spawned at:", tile_pos, "Facing:", "Right" if random_direction else "Left")
+
+	return unit_instance
 
 # Spawn zombies randomly on the opposite half of the map
 func spawn_zombies():

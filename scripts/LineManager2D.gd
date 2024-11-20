@@ -114,6 +114,9 @@ func _input(event: InputEvent) -> void:
 					player_to_act.has_attacked = true
 					player_to_act.has_moved = true
 					
+					var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+					hud_manager.hide_special_buttons()	
+										
 					# Trigger zombie action: find and chase player
 					clear_zombie_tiles()
 					player_to_act.check_end_turn_conditions()

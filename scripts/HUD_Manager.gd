@@ -16,6 +16,7 @@ extends CanvasLayer
 @onready var atk = $HUD/ATK
 
 @onready var mek = $HUD/Mek
+@onready var dynamite = $HUD/Dynamite
 
 func _ready():
 	if portrait:
@@ -35,7 +36,11 @@ func _ready():
 	if mek:
 		mek.connect("toggled", Callable(self, "_on_mek_toggled"))
 		print("Mek connected")
-				
+
+	if dynamite:
+		dynamite.connect("toggled", Callable(self, "_on_dynamite_toggled"))
+		print("Dynamite connected")
+						
 # Method to handle the toggle state change
 func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -70,6 +75,16 @@ func _on_mek_toggled(button_pressed: bool) -> void:
 		global_manager.mek_toggle_active = false  # Set the flag to false
 		print("Mek toggle deactivated!")
 
+func _on_dynamite_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		global_manager.dynamite_toggle_active = true  # Set the flag to true
+		print("Dynamite toggle activated!")	
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		global_manager.dynamite_toggle_active = false  # Set the flag to false
+		print("Dynamite toggle deactivated!")
 
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
@@ -225,8 +240,13 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "Dutch. Major" or character.player_name == "Bournetu. Kill":
 		mek.visible = true
+		
+	if character.player_name == "Dutch. Major":
+		dynamite.visible = true
+				
 
 func hide_special_buttons():
 	missile.visible = false
 	landmine.visible = false
 	mek.visible = false
+	dynamite.visible = false

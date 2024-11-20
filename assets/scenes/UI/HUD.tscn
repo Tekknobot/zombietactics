@@ -161,7 +161,7 @@ visible = false
 layout_mode = 0
 offset_left = 172.0
 offset_top = -192.0
-offset_right = 238.0
+offset_right = 214.0
 offset_bottom = -158.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
@@ -169,3 +169,17 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
 theme_override_styles/normal = SubResource("StyleBoxFlat_a3qd4")
 toggle_mode = true
 text = "Mek"
+
+[node name="Dynamite" type="Button" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 172.0
+offset_top = -154.0
+offset_right = 256.0
+offset_bottom = -120.0
+theme_override_fonts/font = ExtResource("3_fyyii")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
+theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
+toggle_mode = true
+text = "Dynamite"

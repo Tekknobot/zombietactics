@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://c5jsmnqwxgcuw"]
+
+[ext_resource type="Script" path="res://scripts/TNTCurve.gd" id="1_atb2c"]
+[ext_resource type="Texture2D" uid="uid://c5100qvyadyjq" path="res://assets/projectiles/default/tnt/tnt1.png" id="3_56slg"]
+[ext_resource type="Texture2D" uid="uid://cn6gewl7drect" path="res://assets/projectiles/default/tnt/tnt2.png" id="4_mddar"]
+[ext_resource type="AudioStream" uid="uid://cue0f2dfa4w6t" path="res://audio/SFX/rusty_machine_gun_fire_single.wav" id="5_g6ygy"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rngvo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_56slg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_mddar")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]
+
+[node name="TNT" type="Node2D"]
+script = ExtResource("1_atb2c")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -17)
+sprite_frames = SubResource("SpriteFrames_rngvo")
+autoplay = "default"
+frame_progress = 0.281636
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_g6ygy")
+autoplay = true

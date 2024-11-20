@@ -4,6 +4,7 @@ var missile_toggle_active: bool = false  # The flag to track the state of the to
 var landmine_toggle_active: bool = false
 
 var mek_toggle_active: bool = false
+var dynamite_toggle_active: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

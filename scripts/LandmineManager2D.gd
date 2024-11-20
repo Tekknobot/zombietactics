@@ -297,6 +297,9 @@ func move_along_path(delta: float) -> void:
 				player_to_move.has_moved = true
 				player_to_move.check_end_turn_conditions()
 				
+				var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+				hud_manager.update_hud(player_to_move)
+				
 			path_index += 1  # Move to the next tile in the path
 			player_to_move.get_child(0).play("default")
 			
@@ -332,3 +335,31 @@ func instantiate_mine_on_tile(tile_pos: Vector2i) -> void:
 # Call this function after every player action
 func on_player_action_completed():
 	emit_signal("player_action_completed")
+
+func add_xp():
+	# Add XP
+	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
+	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	
+	# Access the 'special' button within HUDManager
+	var missile_button = hud_manager.get_node("HUD/Missile")
+	global_manager.missile_toggle_active = false  # Deactivate the special toggle
+
+	# Get all nodes in the 'hovertile' group
+	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
+
+	# Iterate through the list and find the HoverTile node
+	for hover_tile in hover_tiles:
+		if hover_tile.name == "HoverTile":
+			# Check if 'last_selected_player' exists and has 'current_xp' property
+			if hover_tile.selected_player or hover_tile.selected_structure or hover_tile.selected_zombie:
+				hover_tile.selected_player.current_xp += 25
+				# Update the HUD to reflect new stats
+				hud_manager.update_hud(hover_tile.selected_player)	
+				print("Added 25 XP to", hover_tile.selected_player, "new XP:", hover_tile.selected_player.current_xp)		
+
+				# Optional: Check for level up, if applicable
+				if hover_tile.selected_player.current_xp >= hover_tile.selected_player.xp_for_next_level:
+					hover_tile.selected_player.level_up()			
+			else:
+				print("last_selected_player does not exist.")

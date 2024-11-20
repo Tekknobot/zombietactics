@@ -644,4 +644,5 @@ func reset_player_units():
 		player.has_moved = false
 		player.has_attacked = false
 		player.has_used_turn = false
+		player.can_start_turn = true
 		player.modulate = Color(1, 1, 1)

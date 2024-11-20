@@ -638,7 +638,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.update_hud(self)	
-		
+	hud_manager.hide_special_buttons()				
 	check_end_turn_conditions()
 
 # Function to check if the target is within the attack range

@@ -216,6 +216,9 @@ func _trigger_explosion(last_point: Vector2):
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 1.0
 
+	# Variable to track if XP should be added (only once per explosion)
+	var xp_awarded = false
+
 	# Check for PlayerUnit within explosion radius
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.position.distance_to(last_point) <= explosion_radius:
@@ -226,25 +229,30 @@ func _trigger_explosion(last_point: Vector2):
 			await get_tree().create_timer(0).timeout
 			player.visible = false  # Hide the player unit
 			player.remove_from_group("player_units")  # Remove from the group
-			add_xp()
 			print("Player Unit removed from explosion")
+			xp_awarded = true  # Mark XP as earned for this explosion
 
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:	
 			zombie.flash_damage()
-			# Check for PlayerUnit within explosion radius
 			for player in get_tree().get_nodes_in_group("player_units"):
 				if player.player_name == "Yoshida. Boi":			
-					zombie.apply_damage(player.attack_damage)			
-			add_xp()
+					zombie.apply_damage(player.attack_damage)
 			print("Zombie Unit removed from explosion")
+			xp_awarded = true  # Mark XP as earned for this explosion
 
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
-			add_xp()
+			print("Structure removed from explosion")
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+	# Add XP if at least one target was hit
+	if xp_awarded:
+		add_xp()
+
 
 func add_xp():
 	# Add XP
@@ -262,7 +270,7 @@ func add_xp():
 	for hover_tile in hover_tiles:
 		if hover_tile.name == "HoverTile":
 			# Check if 'last_selected_player' exists and has 'current_xp' property
-			if hover_tile.selected_player or hover_tile.selected_structure:
+			if hover_tile.selected_player or hover_tile.selected_structure or hover_tile.selected_zombie:
 				hover_tile.selected_player.current_xp += 25
 				# Update the HUD to reflect new stats
 				hud_manager.update_hud(hover_tile.selected_player)	

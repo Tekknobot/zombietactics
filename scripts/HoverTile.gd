@@ -8,6 +8,7 @@ var selected_player: Area2D = null
 var last_selected_player: Area2D = null
 
 var selected_structure: Area2D = null
+var selected_zombie: Area2D = null
 
 # Movement and attack range tiles
 var movement_range_tiles: Array[Vector2i] = []
@@ -120,15 +121,16 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	# Check if a zombie is at the tile
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
-		if tilemap.local_to_map(zombie.global_position) == tile_pos and global_manager.dynamite_toggle_active == false and global_manager.missile_toggle_active == false:
+		if tilemap.local_to_map(zombie.global_position) == tile_pos:
 			# Update the HUD to reflect new stats
 			var hud_manager = get_parent().get_node("HUDManager")
 			hud_manager.visible = true	
 						
 			# Play selection sound effect
 			audio_player.stream = select_audio
-			audio_player.play()			
-			
+			audio_player.play()		
+				
+			selected_zombie = zombie
 			zombie.selected = true
 			show_movement_tiles_zombie(zombie)
 			hud_manager.update_hud_zombie(zombie)

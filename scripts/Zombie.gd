@@ -68,6 +68,10 @@ var player_unit_is_selected = false
 
 @onready var turn_manager = get_parent().get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 
+var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
+var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
+var zombies: Array  # This will store the zombies sorted by zombie_id
+
 
 func _ready() -> void:
 	# Possible values for health and XP
@@ -170,9 +174,6 @@ func update_tile_position() -> void:
 	self.z_index = layer
 	astar.set_point_solid(position, true)
 
-var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
-var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
-var zombies: Array  # This will store the zombies sorted by zombie_id
 
 func find_and_chase_player_and_move(delta_time: float) -> void:
 	# Update the AStar grid before moving zombies
@@ -237,6 +238,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 				zombie.path_index = 0  # Reset path index to start from the first point
 			else:
 				print("No path found for Zombie ID:", zombie.zombie_id)
+				return
 
 		update_astar_grid()
 		

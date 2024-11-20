@@ -122,6 +122,7 @@ func _process(delta: float) -> void:
 				var zombies = get_tree().get_nodes_in_group("zombies")
 				if zombies.size() <= 0:
 					reset_player_units()
+					
 				#queue_free()  # Destroy the zombie once the death animation ends
 					
 	update_tile_position()

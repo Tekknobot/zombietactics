@@ -149,7 +149,7 @@ func _check_for_players_at_target() -> void:
 			print("Player found at explosion position, destroying:", player.name)
 			
 			attack_player(player)
-			player.apply_damage(50)
+			player.apply_damage(player.attack_damage)
 
 			# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 			var hud_manager = get_parent().get_parent().get_node("HUDManager")

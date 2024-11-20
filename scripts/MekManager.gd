@@ -63,11 +63,7 @@ func _input(event: InputEvent) -> void:
 	# Proceed only if left mouse button is pressed
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		# Check if the tile is movable
-		if is_tile_movable(tile_pos):
-			# Play sfx
-			audio_player.stream = mek_call_audio
-			audio_player.play()				
-				
+		if is_tile_movable(tile_pos):				
 			# Pick a random exported scene
 			var random_scene = get_random_scene()
 			if random_scene:
@@ -120,18 +116,27 @@ func is_within_bounds(tile_pos: Vector2i) -> bool:
 # Function to animate fade-in and fade-out
 func animate_fade_in_out(instance: Node2D) -> void:
 	var tween = create_tween()
-	
+
+	# Callback to play audio when fade-in begins
+	tween.tween_callback(Callable(self, "_play_mek_call_audio"))
+
 	# Fade-in animation
-	tween.tween_property(instance, "modulate:a", 1, 2)  # Fade to fully opaque over 0.5 seconds
+	tween.tween_property(instance, "modulate:a", 1, 2)  # Fade to fully opaque over 2 seconds
 	tween.set_trans(tween.TRANS_LINEAR).set_ease(tween.EASE_IN_OUT)
-	
-	# Play sfx
-	audio_player.stream = mek_call_audio
-	audio_player.play()	
-			
-	# Fade-out animation after a delay
+
+	# Add a delay before fade-out begins
 	tween.tween_interval(1.0)  # Wait 1 second after fade-in completes
-	tween.tween_property(instance, "modulate:a", 0, 2)  # Fade to fully transparent over 0.5 seconds
+
+	# Callback to play audio when fade-out begins
+	tween.tween_callback(Callable(self, "_play_mek_call_audio"))
+
+	# Fade-out animation
+	tween.tween_property(instance, "modulate:a", 0, 2)  # Fade to fully transparent over 2 seconds
+
+# Function to play mek_call audio
+func _play_mek_call_audio() -> void:
+	audio_player.stream = mek_call_audio
+	audio_player.play()
 
 
 # Helper function to get the currently selected unit from the "player_units" group

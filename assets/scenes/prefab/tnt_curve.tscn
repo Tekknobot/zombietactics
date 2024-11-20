@@ -19,7 +19,7 @@ animations = [{
 "speed": 12.0
 }]
 
-[node name="TNT" type="Node2D"]
+[node name="TNT" type="Node2D" groups=["TNT"]]
 z_index = 1000
 script = ExtResource("1_atb2c")
 

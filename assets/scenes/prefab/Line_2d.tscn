@@ -2,7 +2,7 @@
 
 [ext_resource type="AudioStream" uid="uid://bmery8486ov70" path="res://audio/SFX/missile_launch.wav" id="1_mp0cs"]
 
-[node name="Line2D" type="Line2D"]
+[node name="Line2D" type="Line2D" groups=["Line2D"]]
 z_index = 4000
 position = Vector2(2, 0)
 width = 1.0

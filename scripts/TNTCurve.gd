@@ -20,7 +20,7 @@ var projectile_hit: bool = false
 var attacker: Area2D = null  # Reference to the unit that fired the projectile
 
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
-
+@onready var audio_player = $AudioStreamPlayer2D 
 
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering
@@ -33,7 +33,7 @@ func _process(delta: float) -> void:
 		var animated_sprite = $AnimatedSprite2D  # Reference to the AnimatedSprite2D child
 		if animated_sprite:
 			animated_sprite.rotation += rotation_speed * delta  # Increment rotation relative to its center
-
+		
 	# Adjust z_index to ensure layering as it moves
 	#update_tile_position()
 

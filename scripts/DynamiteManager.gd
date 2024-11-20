@@ -48,7 +48,7 @@ func _input(event: InputEvent) -> void:
 		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 		
-	if dynamite_launched >= 3:
+	if dynamite_launched >= 1:
 		return
 			
 	# Handle mouse button events (right and left-click)
@@ -121,13 +121,14 @@ func _input(event: InputEvent) -> void:
 					dynamite_launched += 1
 					if dynamite_launched == 1:
 						add_xp()  # Add XP	
-										
+															
 					# Start the trajectory
-					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos, player_to_act)
+					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 					
 					player_to_act.has_attacked = true
 					player_to_act.has_moved = true
-
+					player_to_act.check_end_turn_conditions()
+					
 					var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
 					hud_manager.hide_special_buttons()	
 					
@@ -149,7 +150,7 @@ func clear_zombie_tiles():
 		zombie.clear_movement_tiles()
 						
 # Function to start the missile trajectory and visualize with Line2D
-func start_trajectory(start: Vector2, target: Vector2, player_to_act: Area2D) -> void:
+func start_trajectory(start: Vector2, target: Vector2) -> void:
 	onTrajectory = true
 	print("Starting trajectory to target:", target)
 
@@ -157,6 +158,12 @@ func start_trajectory(start: Vector2, target: Vector2, player_to_act: Area2D) ->
 	var line_inst = line2D_scene.instantiate()
 	add_child(line_inst)
 	line_inst.visible = false
+
+	# Destroy any line renderers
+	var line_2D = get_tree().get_nodes_in_group("Line2D")
+	for line in line_2D:
+		line.queue_free()
+		
 	print("Line2D instance hidden.")
 
 	# Define control points for a cubic Bézier curve (used for missile path simulation)
@@ -186,12 +193,7 @@ func start_trajectory(start: Vector2, target: Vector2, player_to_act: Area2D) ->
 		# Cleanup after animation
 		dynamite_inst.queue_free()
 
-	# Cleanup: Remove Line2D after animation
-	line_inst.queue_free()
-
 	onTrajectory = false
-	
-	player_to_act.check_end_turn_conditions()
 	
 	print("Trajectory animation completed and cleaned up.")
 

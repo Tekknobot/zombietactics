@@ -65,19 +65,6 @@ func add_zombie_unit(unit: Node) -> void:
 	if not zombie_units.has(unit):
 		zombie_units.append(unit)
 
-# Remove a unit from its respective group
-func remove_unit(unit: Node) -> void:
-	if player_units.has(unit):
-		player_units.erase(unit)
-
-	# If the removed unit is the current unit, adjust the index
-	if unit == current_unit:
-		end_current_turn()
-
-# Get the currently active unit
-func get_current_unit() -> Node:
-	return current_unit
-
 # Call this function after every player action
 func on_player_action_completed():
 	emit_signal("player_action_completed")

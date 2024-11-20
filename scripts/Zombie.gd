@@ -118,6 +118,10 @@ func _process(delta: float) -> void:
 				#print("Death animation finished, destroying zombie.")
 				self.remove_from_group("zombies")				
 				self.visible = false
+				
+				var zombies = get_tree().get_nodes_in_group("zombies")
+				if zombies.size() <= 0:
+					reset_player_units()
 				#queue_free()  # Destroy the zombie once the death animation ends
 					
 	update_tile_position()

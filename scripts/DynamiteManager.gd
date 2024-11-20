@@ -41,7 +41,7 @@ func _input(event: InputEvent) -> void:
 		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 	
-	if missiles_launched >= 1:
+	if missiles_launched >= 3:
 		return
 			
 	# Handle mouse button events (right and left-click)
@@ -207,7 +207,12 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 	dynamite_inst.global_position = points[points.size() - 1]
 	
 	_trigger_explosion(points[points.size() - 1])
-
+	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+					
+	# Access the 'special' button within HUDManager
+	var dynamite_button = hud_manager.get_node("HUD/Dynamite")
+	dynamite_button.button_pressed = false	
+	global_manager.dynamite_toggle_active = false
 
 # Call this function after every player action
 func on_player_action_completed():

@@ -824,6 +824,9 @@ func mek_melee(selected_unit: Area2D) -> void:
 				zombie.flash_damage()
 				zombie.apply_damage(attack_damage)
 				
+				zombie.second_audio_player.stream = zombie.hurt_audio
+				zombie.second_audio_player.play()
+				
 				# Update the HUD to reflect new stats
 				var hud_manager = get_parent().get_parent().get_node("HUDManager")
 				hud_manager.update_hud_zombie(zombie)

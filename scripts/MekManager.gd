@@ -138,7 +138,6 @@ func _play_mek_call_audio() -> void:
 	audio_player.stream = mek_call_audio
 	audio_player.play()
 
-
 # Helper function to get the currently selected unit from the "player_units" group
 func get_selected_unit() -> Node:
 	hovertile = get_node("/root/MapManager/HoverTile") 
@@ -148,7 +147,6 @@ func get_selected_unit() -> Node:
 func get_random_scene() -> PackedScene:
 	var scenes = [M1, M2, R1, R3, S2, S3]
 	return scenes[randi() % scenes.size()] if scenes.size() > 0 else null
-
 
 # Check if a tile is movable
 func is_tile_movable(tile_pos: Vector2i) -> bool:

@@ -564,10 +564,10 @@ func die() -> void:
 	self.visible = false
 	#queue_free()  # Remove player from the scene or handle accordingly		
 
-func level_up() -> void:
+func level_up() -> void:	
 	# Play SFX
-	audio_player.stream = levelup_audio
-	audio_player.play()
+	second_audio_player.stream = levelup_audio
+	second_audio_player.play()
 	print("Level up triggered!")
 	
 	# Add level-up bonuses

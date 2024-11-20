@@ -20,6 +20,7 @@ animations = [{
 }]
 
 [node name="TNT" type="Node2D"]
+z_index = 1000
 script = ExtResource("1_atb2c")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

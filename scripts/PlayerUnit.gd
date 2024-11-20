@@ -89,6 +89,8 @@ var has_moved: bool = false  # Tracks if the unit has moved this turn
 var has_attacked: bool = false  # Tracks if the unit has attacked this turn
 var has_used_turn: bool = false  # Tracks if it's currently this unit's turn
 
+var can_start_turn: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -770,27 +772,6 @@ func flash_damage():
 func get_attack_damage() -> int:
 	return attack_damage  # Replace with your variable holding attack damage
 
-func check_end_turn_conditions() -> void:
-	# Check if the unit has completed its turn
-	if has_moved and has_attacked:
-		print(self.name, "has completed its turn.")
-		has_used_turn = true
-
-		# Proceed to end the turn
-		await get_tree().create_timer(1.7).timeout	
-		
-		# Darken the unit to visually indicate its turn is over
-		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
-					
-		get_child(0).play("default")
-		end_turn()
-
-func end_turn() -> void:
-	if turn_manager:
-		turn_manager.end_current_unit_turn()  # Notify the turn manager to move to the next unit
-	else:
-		print("Turn manager is not set! Unable to proceed to the next unit.")
-
 func mek_melee(selected_unit: Area2D) -> void:
 	# Get the tilemap to convert positions
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -861,3 +842,27 @@ func mek_melee(selected_unit: Area2D) -> void:
 	# No adjacent zombies found
 	print("No zombies adjacent.")
 	
+func check_end_turn_conditions() -> void:
+	# Check if the unit has completed its turn
+	if has_moved and has_attacked:
+		print(self.name, "has completed its turn.")
+		has_used_turn = true
+		can_start_turn = false
+
+		# Proceed to end the turn
+		await get_tree().create_timer(1.7).timeout	
+		
+		# Darken the unit to visually indicate its turn is over
+		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
+					
+		get_child(0).play("default")
+		end_turn()
+
+func end_turn() -> void:
+	if turn_manager:
+		turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
+	else:
+		print("Turn manager is not set! Unable to proceed to the next unit.")
+
+func start_turn() -> void:
+	can_start_turn = true

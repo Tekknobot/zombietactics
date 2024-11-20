@@ -276,6 +276,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	is_moving = false
 	attacks = 0
 	
+	turn_manager.start_current_unit_turn()
 	reset_player_units()
 
 	

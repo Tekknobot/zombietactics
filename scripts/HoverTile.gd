@@ -98,7 +98,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	# Check if a player unit is at the tile
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
-		if tilemap.local_to_map(player.global_position) == tile_pos:
+		if tilemap.local_to_map(player.global_position) == tile_pos and player.can_start_turn:
 			# Update the HUD to reflect new stats
 			var hud_manager = get_parent().get_node("HUDManager")
 			hud_manager.visible = true		
@@ -150,6 +150,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	# If no unit or structure is found at the clicked tile, deselect the current player
 	if selected_player:
 		last_selected_player = selected_player  # Save the current player as last selected
+		
 	selected_player = null
 
 # Displays movement tiles for the selected player

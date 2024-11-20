@@ -24,8 +24,9 @@ var attacker: Area2D = null  # Reference to the unit that fired the projectile
 
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering
-	z_index = int(position.y)
-
+	#z_index = int(position.y)
+	pass
+	
 func _process(delta: float) -> void:	
 	# If the projectile is TNT, rotate its AnimatedSprite2D child
 	if name == "TNT":
@@ -34,7 +35,7 @@ func _process(delta: float) -> void:
 			animated_sprite.rotation += rotation_speed * delta  # Increment rotation relative to its center
 
 	# Adjust z_index to ensure layering as it moves
-	update_tile_position()
+	#update_tile_position()
 
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:

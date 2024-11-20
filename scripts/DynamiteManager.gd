@@ -40,16 +40,14 @@ func _ready() -> void:
 
 # Called every frame to process input and update hover tile position
 func _process(delta: float) -> void:
-	if dynamite_launched == 3 and not xp_added:
-		add_xp()  # Add XP
-		xp_added = true  # Ensure XP is only added once
+	pass
 	
 func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
 	if not global_manager.dynamite_toggle_active:
 		#print("Special toggle is off, ignoring mouse clicks.")
 		return
-	
+		
 	if dynamite_launched >= 3:
 		return
 			
@@ -63,8 +61,8 @@ func _input(event: InputEvent) -> void:
 				print("Right-click position set to:", right_click_position)
 
 		# Left-click to launch missile trajectory (only if right-click has been used to set target)
-		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory:
-			if event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory and dynamite_launched < 3:
+			if event.pressed:				
 				# Get all nodes in the 'hovertile' group
 				var hover_tiles = get_tree().get_nodes_in_group("hovertile")
 
@@ -121,8 +119,11 @@ func _input(event: InputEvent) -> void:
 					var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
 					
 					dynamite_launched += 1
+					if dynamite_launched == 1:
+						add_xp()  # Add XP	
+										
 					# Start the trajectory
-					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
+					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos, player_to_act)
 					
 					player_to_act.has_attacked = true
 					player_to_act.has_moved = true
@@ -132,8 +133,6 @@ func _input(event: InputEvent) -> void:
 					
 					# Trigger zombie action: find and chase player
 					clear_zombie_tiles()
-					
-					player_to_act.check_end_turn_conditions()
 					
 				else:
 					# If the mouse position is out of bounds, print a message or handle it as needed
@@ -150,7 +149,7 @@ func clear_zombie_tiles():
 		zombie.clear_movement_tiles()
 						
 # Function to start the missile trajectory and visualize with Line2D
-func start_trajectory(start: Vector2, target: Vector2) -> void:
+func start_trajectory(start: Vector2, target: Vector2, player_to_act: Area2D) -> void:
 	onTrajectory = true
 	print("Starting trajectory to target:", target)
 
@@ -191,6 +190,9 @@ func start_trajectory(start: Vector2, target: Vector2) -> void:
 	line_inst.queue_free()
 
 	onTrajectory = false
+	
+	player_to_act.check_end_turn_conditions()
+	
 	print("Trajectory animation completed and cleaned up.")
 
 # Function to animate the dynamite projectile along the Bézier curve points
@@ -230,10 +232,6 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 
 # Call this function after every player action
 func on_player_action_completed():
-	# Reset xp_added flag after 3 dynamites are launched
-	if dynamite_launched >= 3:
-		xp_added = false  # Reset xp_added after 3 dynamites are launched
-	
 	emit_signal("player_action_completed")
 
 # Function to generate Bézier curve points
@@ -284,6 +282,7 @@ func _trigger_explosion(last_point: Vector2):
 				pass
 			else:
 				player.get_child(0).play("death")
+				
 			await get_tree().create_timer(0).timeout
 			player.visible = false  # Hide the player unit
 			player.remove_from_group("player_units")  # Remove from the group
@@ -303,7 +302,6 @@ func _trigger_explosion(last_point: Vector2):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
 			
-
 func add_xp():
 	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)

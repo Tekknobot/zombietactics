@@ -292,11 +292,13 @@ func _trigger_explosion(last_point: Vector2):
 
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
-		if zombie.position.distance_to(last_point) <= explosion_radius:
-			zombie.get_child(0).play("death")
-			await get_tree().create_timer(0).timeout
-			zombie.visible = false  # Hide the zombie unit
-			zombie.remove_from_group("zombies")  # Remove from the group
+		if zombie.position.distance_to(last_point) <= explosion_radius:			
+			zombie.flash_damage()
+			# Check for PlayerUnit within explosion radius
+			for player in get_tree().get_nodes_in_group("player_units"):
+				if player.player_name == "Dutch. Major":			
+					zombie.apply_damage(player.attack_damage)	
+						
 			print("Zombie Unit removed from explosion")
 
 	# Check for Structures within explosion radius

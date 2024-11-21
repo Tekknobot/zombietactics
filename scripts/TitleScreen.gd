@@ -34,7 +34,7 @@ Bournetu Kill, a hardened soldier, leads the charge. Dutch Major, a mercenary wi
 
 Their mission: retrieve vital data from Novacrest, Sector 13. Once a manufacturing hub, now a war zone teeming with the undead. The risks are high, the objective clear, and the outcome uncertain.
 
-This is not a solo operation, but if they fail... millions die.
+This is not a solo operation, but if they fail... millions will die and all hope will be lost.
 
 """
 

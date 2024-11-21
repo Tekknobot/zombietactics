@@ -24,19 +24,17 @@ var elapsed_time : float = 0.0
 var introduction_text : String = """
 "The world has fallen."
 
-The outbreak spread faster than anyone could predict, turning cities into graveyards and humanity’s last hope into a distant memory. 
+The outbreak spread faster than anyone could predict, turning cities into graveyards and humanity’s last hope into a distant memory. Governments crumbled, and entire sectors became nothing but ruins, overrun by the undead.
 
-Governments crumbled, and entire sectors became nothing but ruins, overrun by the undead.
+In the shadows of a broken world, a team of unlikely allies has been assembled. Bournetu Kill, a hardened soldier with the rare and coveted skill to summon Mechas, leads the charge. His ability to call forth massive mechanical warriors could turn the tide in the ongoing battle, but it's a power that comes with its own price. Dutch Major, a mercenary with a reputation for not caring about anything but the payout, provides the muscle. And Yoshida Boi, a robot dog with artifical intelligence turned reluctant guide, crunches the numbers, knowing the chances of survival are slim.
 
-In the shadows of a broken world, a team of unlikely allies has been assembled. 
+Their mission: retrieve vital data from Novacrest, Sector 13. Once a manufacturing hub, now a war zone teeming with the undead. 
 
-Bournetu Kill, a hardened soldier, leads the charge. Dutch Major, a mercenary with a reputation for not caring about anything but the payout, provides the muscle. And Yoshida Boi, an artifically intelligent robot dog turned reluctant guide, crunches the numbers, knowing the chances of survival are slim.
+The risks are high, the objective clear, and the outcome uncertain. But with Bournetu's Mechas on their side, they may stand a chance. 
 
-Their mission: retrieve vital data from Novacrest, Sector 13. Once a manufacturing hub, now a war zone teeming with the undead. The risks are high, the objective clear, and the outcome uncertain.
-
-This is not a solo operation, but if they fail... millions will die and all hope will be lost.
-
+This is not a solo operation, but if they fail... millions will die and all hope for humanity will be lost.
 """
+
 
 func _ready():
 	# Connect button signals

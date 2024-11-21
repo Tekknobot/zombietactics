@@ -33,7 +33,7 @@ zombie_audio = ExtResource("2_l2s88")
 metadata/scene_name = &"TitleScreen"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(269.5, 269.5)
+position = Vector2(231.5, 269.5)
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_aaeo0")
 autoplay = "default"
@@ -51,9 +51,9 @@ color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 script = ExtResource("5_6ulmq")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 99.0
+offset_left = 52.0
 offset_top = 415.0
-offset_right = 189.0
+offset_right = 142.0
 offset_bottom = 563.0
 
 [node name="StartButton" type="Button" parent="VBoxContainer"]
@@ -98,6 +98,7 @@ text = "Copyright 2024 Zillatronics, Developed By Pizzzamoney"
 offset_left = 17.0
 offset_right = 117.0
 offset_bottom = 40.0
+theme_override_colors/default_color = Color(0.18359, 0.18359, 0.18359, 1)
 theme_override_fonts/normal_font = ExtResource("4_wapy1")
 theme_override_font_sizes/normal_font_size = 32
 text = "Version 1.0"
@@ -116,8 +117,8 @@ offset_bottom = 40.0
 
 [node name="Introduction" type="RichTextLabel" parent="Control"]
 offset_left = 515.0
-offset_top = 746.0
-offset_right = 1073.0
-offset_bottom = 1627.0
+offset_top = 731.0
+offset_right = 1104.0
+offset_bottom = 1958.0
 theme_override_fonts/normal_font = ExtResource("9_u12o7")
 theme_override_font_sizes/normal_font_size = 32

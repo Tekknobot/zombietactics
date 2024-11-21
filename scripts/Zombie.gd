@@ -283,8 +283,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	is_moving = false
 	attacks = 0
 	
-	turn_manager.start_current_unit_turn()
 	reset_player_units()
+	turn_manager.start_current_unit_turn()
 
 	
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
@@ -351,7 +351,7 @@ func attack_player(player: Area2D) -> void:
 	print("Zombie attacks player at position:", player.global_position)
 	
 	# Inflict damage on the player
-	take_damage(player, attack_damage)  # Call the take_damage function with 10 damage
+	give_damage(player, attack_damage)  # Call the take_damage function with 10 damage
 	current_xp += 25
 	
 	# Optional: Check for level up, if applicable
@@ -361,7 +361,7 @@ func attack_player(player: Area2D) -> void:
 	attacks += 1
 
 # New Function to handle player taking damage
-func take_damage(player: Area2D, damage: int) -> void:
+func give_damage(player: Area2D, damage: int) -> void:
 	# Check if the player has a health property, otherwise assume max health
 	if not player.has_method("apply_damage"):
 		print("Player object does not have an 'apply_damage' method")
@@ -371,12 +371,12 @@ func take_damage(player: Area2D, damage: int) -> void:
 		# Play sfx
 		player.audio_player.stream = dog_hurt_audio
 		player.audio_player.play()	
+		player.apply_damage(damage) 
 	else:
 		# Play sfx
 		player.audio_player.stream = hurt_audio
 		player.audio_player.play()	
-		
-	player.apply_damage(damage)  # Call the player's apply_damage method
+		player.apply_damage(damage)  # Call the player's apply_damage method
 
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
@@ -581,13 +581,13 @@ func level_up() -> void:
 	current_xp -= xp_for_next_level
 	xp_for_next_level += 25  # Increment XP threshold
 		
+	# Play visual effect
+	play_level_up_effect()
+
 	# Update HUD with new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.update_hud_zombie(self)  # Consolidate all updates into one method
-	
-	# Play visual effect
-	play_level_up_effect()
-		
+			
 	print("Level up completed!")
 	
 # Function to play level-up flickering effect (green to normal)

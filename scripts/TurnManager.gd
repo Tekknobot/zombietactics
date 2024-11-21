@@ -24,20 +24,25 @@ func _ready() -> void:
 	else:
 		print("No player units available to start.")
 
-# Start the current unit's turn
 func start_current_unit_turn() -> void:
 	trigger_zombies = false
-	
-	if current_group == "player_units":
-		if player_units.size() == 0:
-			print("No player units left.")
-			return
 
-	for current_unit in player_units:
-		if current_unit and current_unit.has_method("start_turn"):
-			current_unit.start_turn()  # Call start_turn on the current unit
+	# Ensure there are valid player units
+	if player_units.size() == 0:
+		print("No player units left.")
+		return
+
+	# Iterate through a copy of the array to allow safe removal of invalid units
+	for current_unit in player_units.duplicate():  # Use `.duplicate()` to avoid modifying the array while iterating
+		if current_unit and !current_unit.is_queued_for_deletion():  # Check if the unit is valid and not queued for deletion
+			if current_unit.has_method("start_turn"):
+				current_unit.start_turn()  # Call start_turn on the current unit
+			else:
+				print("Current unit does not have a 'start_turn' method!")
 		else:
-			print("Current unit does not have a 'start_turn' method!")
+			print("Invalid or removed unit found. Cleaning up.")
+			player_units.erase(current_unit)  # Remove invalid or freed units from the array
+
 
 func end_current_turn() -> void:
 	# Get all player units

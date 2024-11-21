@@ -72,6 +72,7 @@ var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
 var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
 var zombies: Array  # This will store the zombies sorted by zombie_id
 
+var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
 
 func _ready() -> void:
 	# Possible values for health and XP
@@ -243,7 +244,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 				zombie.path_index = 0  # Reset path index to start from the first point
 			else:
 				print("No path found for Zombie ID:", zombie.zombie_id)
-				return
+				pass
 
 		update_astar_grid()
 		
@@ -277,7 +278,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			check_for_attack()  # This will check for attacks after the zombie has moved
 			
 		# Wait before processing the next zombie
-		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
+		await get_tree().create_timer(0.7).timeout  # This introduces a delay, giving each zombie time to move
 
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false
@@ -285,10 +286,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	
 	reset_player_units()
 	turn_manager.start_current_unit_turn()
-
 	
-var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
-
 # Function to check adjacency and trigger attack if necessary
 func check_for_attack() -> void:
 	# Prevent checking if the zombie has already attacked
@@ -321,12 +319,11 @@ func check_for_attack() -> void:
 				scale.x = 1  # Flip sprite to face left
 
 			# Play attack animation on the zombie
-			self.get_child(0).play("attack")
+			get_child(0).play("attack")
 			print("Zombie just attacked.")
 			
-			if self.visible:
-				# Call the attack player function
-				attack_player(player)
+			attacks += 1
+			attack_player(player)
 			
 			# After the first attack, exit the loop
 			break
@@ -357,8 +354,6 @@ func attack_player(player: Area2D) -> void:
 	# Optional: Check for level up, if applicable
 	if current_xp >= xp_for_next_level:
 		level_up()
-			
-	attacks += 1
 
 # New Function to handle player taking damage
 func give_damage(player: Area2D, damage: int) -> void:
@@ -382,7 +377,7 @@ func give_damage(player: Area2D, damage: int) -> void:
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.update_hud(player)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
 		
-	print("Zombie dealt", damage, "damage to player")
+	print("Zombie dealt ", damage, " damage to player")
 
 # Function to check if the zombie is adjacent to a specific tile
 func is_adjacent_to_tile(zombie_tile: Vector2i, player: Area2D) -> bool:

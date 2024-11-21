@@ -99,7 +99,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	# Check if a player unit is at the tile
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
-		if tilemap.local_to_map(player.global_position) == tile_pos and player.can_start_turn:
+		if tilemap.local_to_map(player.global_position) == tile_pos and player.can_start_turn == true:
 			# Update the HUD to reflect new stats
 			var hud_manager = get_parent().get_node("HUDManager")
 			hud_manager.visible = true		

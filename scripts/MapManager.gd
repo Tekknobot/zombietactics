@@ -113,7 +113,9 @@ func _ready():
 	generate_map()
 
 func _process(delta):
-	pass
+	# Check if the Space key is pressed
+	if Input.is_action_just_pressed("space"):
+		reset_level()
 
 # Reload the current scene to reset the level
 func reset_level():

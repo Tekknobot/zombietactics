@@ -96,12 +96,12 @@ text = "Copyright 2024 Zillatronics, Developed By Pizzzamoney"
 
 [node name="Version" type="RichTextLabel" parent="."]
 offset_left = 17.0
-offset_right = 117.0
+offset_right = 135.0
 offset_bottom = 40.0
 theme_override_colors/default_color = Color(0.18359, 0.18359, 0.18359, 1)
 theme_override_fonts/normal_font = ExtResource("4_wapy1")
 theme_override_font_sizes/normal_font_size = 32
-text = "Version 1.0"
+text = "Version 1.0.0"
 
 [node name="TitleMusic" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("6_uylfg")

@@ -222,6 +222,10 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		var best_adjacent_tile: Vector2i = Vector2i()
 
 		var players = get_tree().get_nodes_in_group("player_units")
+		if players.size() <= 0:
+			print("GAME OVER")		
+			return
+		
 		for player in players:
 			var player_tile_pos = tilemap.local_to_map(player.global_position)
 			var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
@@ -324,6 +328,7 @@ func check_for_attack() -> void:
 			
 			attacks += 1
 			attack_player(player)
+			await get_tree().create_timer(0.5).timeout
 			
 			# After the first attack, exit the loop
 			break

@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 # Load your game scene
-@onready var game_scene_path = "res://assets/scenes/map_manager.scn"  # Adjust the path to your scene
+@onready var game_scene_path = "res://assets/scenes/dialogue_scene.tscn"  # Adjust the path to your scene
 @onready var map_fader = $MapFader
 @onready var start_button = $VBoxContainer/StartButton
 @onready var quit_button = $VBoxContainer/QuitButton

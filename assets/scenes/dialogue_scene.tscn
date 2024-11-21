@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://itb1ysowaj3i"]
+[gd_scene load_steps=6 format=3 uid="uid://itb1ysowaj3i"]
 
 [ext_resource type="Script" path="res://scripts/DialogueScene.gd" id="1_8s825"]
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="2_mpb0j"]
 [ext_resource type="FontFile" uid="uid://csnhk3q4gx0" path="res://assets/fonts/magofonts/mago1.ttf" id="3_1tlr2"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="4_f640f"]
+[ext_resource type="FontFile" uid="uid://dgugahs6bc7so" path="res://assets/fonts/magofonts/mago3.ttf" id="5_es7b5"]
 
 [node name="DialogueScene" type="Control"]
 layout_mode = 3
@@ -36,7 +37,7 @@ layout_mode = 2
 texture = ExtResource("2_mpb0j")
 
 [node name="Text" type="RichTextLabel" parent="DialogueBox/CharacterRow"]
-custom_minimum_size = Vector2(450, 0)
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("3_1tlr2")
 theme_override_font_sizes/normal_font_size = 32
@@ -55,3 +56,23 @@ theme_override_font_sizes/font_size = 32
 text = "Next"
 
 [node name="TypingTimer" type="Timer" parent="."]
+
+[node name="StoryChapter" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(750, 64)
+layout_mode = 0
+offset_left = 143.0
+offset_top = -214.0
+offset_right = 893.0
+offset_bottom = -150.0
+theme_override_fonts/normal_font = ExtResource("5_es7b5")
+theme_override_font_sizes/normal_font_size = 32
+
+[node name="Skip" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1056.0
+offset_top = 307.0
+offset_right = 1098.0
+offset_bottom = 341.0
+theme_override_fonts/font = ExtResource("4_f640f")
+theme_override_font_sizes/font_size = 32
+text = "SKIP"

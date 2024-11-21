@@ -14,7 +14,7 @@ extends CanvasLayer
 
 var scrolling_duration : float = 60.0  # Time it takes for the text to scroll up
 var start_pos : float = 0  # Start position of the text (adjust based on your scene)
-var target_pos : float = -1500  # End position (adjust based on your scene)
+var target_pos : float = -2000  # End position (adjust based on your scene)
 
 var speed : float = 1.0 / scrolling_duration  # Speed for the scroll
 

@@ -679,7 +679,7 @@ func die() -> void:
 	print("Player has died")
 	get_child(0).play("death")
 	
-	if self.player_name == "Dutch. Major" or self.player_name == "Bournetu. Kill" :
+	if self.player_name == "Dutch. Major" or self.player_name == "Logan. Raines" :
 		# Play sfx
 		audio_player.stream = death_audio
 		audio_player.play()

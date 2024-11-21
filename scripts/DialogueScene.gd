@@ -2,16 +2,16 @@ extends Control
 
 # Variables for dialogue data
 var dialogue = [
-	{ "speaker": "Bournetu. Kill", "text": "Major, I told you—this wasn’t a solo op. If we fail, millions die.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Major, I told you—this wasn’t a solo op. If we fail, millions die.", "portrait": "res://assets/portraits/soldier_port.png" },
 	{ "speaker": "Dutch. Major", "text": "And I told *you*, soldier boy, I don’t work for free. This intel better be worth it.", "portrait": "res://assets/portraits/rambo_port.png" },
 	{ "speaker": "Yoshida. Boi", "text": "Statistically speaking, your chances of survival are slim. But hey, I’m just the dog.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Bournetu. Kill", "text": "We’re in Novacrest, Sector 13. Used to be a manufacturing hub before the outbreak.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Logan. Raines", "text": "We’re in Novacrest, Sector 13. Used to be a manufacturing hub before the outbreak.", "portrait": "res://assets/portraits/soldier_port.png" },
 	{ "speaker": "Dutch. Major", "text": "Yeah, yeah, I remember. The last time I was here, it wasn’t crawling with brain-eaters. I liked it better then.", "portrait": "res://assets/portraits/rambo_port.png" },
 	{ "speaker": "Yoshida. Boi", "text": "Noted: Dutch prefers his cities uninfested. Scanning Sector 13... Little power, minimal heat signatures, but plenty of undead activity.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Bournetu. Kill", "text": "The objective is clear. We find the data core in this sector and secure it. No mistakes.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Logan. Raines", "text": "The objective is clear. We find the data core in this sector and secure it. No mistakes.", "portrait": "res://assets/portraits/soldier_port.png" },
 	{ "speaker": "Dutch. Major", "text": "Mistakes? Me? You’re lucky I’m even here. Let’s just grab the intel and get out before things get messy.", "portrait": "res://assets/portraits/rambo_port.png" },
 	{ "speaker": "Yoshida. Boi", "text": "Too late for that. Zombies inbound. Shall I mark their positions on your HUDs, or do you prefer surprises?", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Bournetu. Kill", "text": "Yoshida, mark them. We’ll clear the streets one tile at a time. Let’s move.", "portrait": "res://assets/portraits/soldier_port.png" }
+	{ "speaker": "Logan. Raines", "text": "Yoshida, mark them. We’ll clear the streets one tile at a time. Let’s move.", "portrait": "res://assets/portraits/soldier_port.png" }
 ]
 
 var chapter_text: String = "Chapter 1: No Way Out — The Descent into Sector 13"

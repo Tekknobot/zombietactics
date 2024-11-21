@@ -238,7 +238,7 @@ func show_special_buttons(character: PlayerUnit):
 		missile.visible = true
 		landmine.visible = true
 
-	if character.player_name == "Bournetu. Kill":
+	if character.player_name == "Logan. Raines":
 		mek.visible = true
 		
 	if character.player_name == "Dutch. Major":

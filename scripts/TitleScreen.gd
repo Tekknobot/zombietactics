@@ -28,7 +28,7 @@ The outbreak spread faster than anyone could predict, turning cities into gravey
 
 In the shadows of a broken world, a team of unlikely allies has been assembled. 
 
-Bournetu Kill, a hardened soldier with a history in the military and the ability to call on Mechas for assistance, leads the charge. 
+Logan Raines, a hardened soldier with a history in the military and the ability to call on Mechas for assistance, leads the charge. 
 
 Dutch Major, a mercenary with a reputation for not caring about anything but the payout, provides the muscle. 
 
@@ -40,8 +40,6 @@ The risks are high, the objective clear, and the outcome uncertain.
 
 This is not a solo operation, but if they fail... millions will die and all hope will be lost.
 """
-
-
 
 func _ready():
 	# Connect button signals

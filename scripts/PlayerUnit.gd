@@ -672,7 +672,8 @@ func apply_damage(damage: int) -> void:
 		die()  # Handle player death if health is 0
 	else:
 		print("Player health after attack:", current_health)
-
+				
+	
 # Optional death handling
 func die() -> void:
 	print("Player has died")

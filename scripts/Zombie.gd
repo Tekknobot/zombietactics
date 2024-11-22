@@ -50,6 +50,8 @@ var current_xp: int = 25
 var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
 
+@export var zombie_type: String
+
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
 @export var explosion_radius: float = 1.0  # Radius to check for units at the target position
@@ -475,7 +477,6 @@ func is_tile_movable(tile_pos: Vector2i) -> bool:
 	if is_structure(tile_pos) or is_unit_present(tile_pos):
 		return false
 	return true
-
 
 # Check if a tile is a water tile
 func is_water_tile(tile_id: int) -> bool:

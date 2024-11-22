@@ -6,7 +6,10 @@ extends Node2D
 @export var unit_soldier: PackedScene  # Set the unit scene in the Inspector
 @export var unit_merc: PackedScene  # Set the unit scene in the Inspector
 @export var unit_dog: PackedScene  # Set the unit scene in the Inspector
+
 @export var unit_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
+@export var unit_radioactive_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
+
 @export var M1: PackedScene  
 @export var M2: PackedScene  
 @export var R1: PackedScene  
@@ -124,7 +127,13 @@ func spawn_zombies():
 		
 		# Spawn zombie at the chosen position if valid
 		if spawn_position != Vector2i(-1, -1):
-			var zombie_instance = unit_zombie.instantiate()
+			# Randomly decide between spawning a normal zombie or a radioactive zombie
+			var zombie_instance
+			if randi() % 2 == 0:  # 50% chance to spawn a radioactive zombie
+				zombie_instance = unit_radioactive_zombie.instantiate()  # Instantiate radioactive zombie
+			else:
+				zombie_instance = unit_zombie.instantiate()  # Instantiate normal zombie
+				
 			zombie_instance.position = tilemap.map_to_local(spawn_position)
 			zombie_instance.z_index = int(zombie_instance.position.y)
 			

@@ -636,6 +636,8 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	# Optional: Check for level up, if applicable
 	if current_xp >= xp_for_next_level:
 		level_up()
+
+	item_manager.check_item_destroyed()		
 			
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")

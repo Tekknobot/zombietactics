@@ -8,16 +8,27 @@ var item_structure: Node = null  # The structure containing the item
 @export var item_scene: PackedScene  # Assign the Item.tscn in the Inspector
 @onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
+var item_discovered: bool = false
+var item_handled: bool = false  # Prevents multiple checks once the outcome is decided
+
 func _ready():
 	await get_tree().create_timer(1).timeout
 	assign_item_to_structure()
 
-func _process(delta: float) -> void:
+func check_item_destroyed():
+	# Skip if the item has already been handled
+	if item_handled:
+		return
+	
+	# Wait for 1 second before checking (e.g., to allow animations to play)
 	await get_tree().create_timer(1).timeout
+
 	var animated_sprite = item_structure.get_node("AnimatedSprite2D") as AnimatedSprite2D
 	if animated_sprite.animation == "demolished":
 		global_manager.secret_item_destroyed = true
+		item_handled = true  # Prevent further checks
 		print("Secret Item Destroyed: GAME OVER")
+
 
 # Function to assign the item to a random structure
 func assign_item_to_structure():
@@ -65,6 +76,7 @@ func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:
 
 func on_item_discovered(player: Area2D, structure: Node):
 	print("Item found by player:", player.name)
+	item_discovered = true
 	
 	# Instantiate the item scene
 	if item_scene:
@@ -86,7 +98,7 @@ func on_item_discovered(player: Area2D, structure: Node):
 			
 	# Perform your item discovery logic
 	structure.set_meta("contains_item", false)  # Mark the item as collected
-	item_structure = null  # Reset the item location
+	#item_structure = null  # Reset the item location
 
 	# Optional: Remove the highlight (if any)
 	if structure.has_method("highlight"):

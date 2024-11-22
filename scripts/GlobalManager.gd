@@ -20,3 +20,15 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+func reset_global_manager():
+	GlobalManager.missile_toggle_active = false 
+	GlobalManager.landmine_toggle_active = false
+
+	GlobalManager.mek_toggle_active = false
+	GlobalManager.dynamite_toggle_active = false
+
+	GlobalManager.secret_item_destroyed = false
+	GlobalManager.secret_item_found = false
+	GlobalManager.zombies_cleared = false
+	GlobalManager.players_killed = false	

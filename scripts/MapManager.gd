@@ -357,6 +357,7 @@ func clear_existing_structures():
 
 func _on_fade_in_complete():
 	if mission_manager.gameover == true:
+		GlobalManager.current_map_index = 0
 		get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")
 
 	if mission_manager.map_cleared == true:

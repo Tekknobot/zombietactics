@@ -55,7 +55,7 @@ var typing_speed = 0.05  # Time delay (seconds) between each character
 
 func _ready():
 	GlobalManager.current_map_index += 1
-	reset_global_manager()
+	GlobalManager.reset_global_manager()
 	
 	next_button.connect("pressed", Callable(self, "_on_next_button_pressed"))
 	typing_timer.connect("timeout", Callable(self, "_on_typing_timer_timeout"))
@@ -120,17 +120,6 @@ func _on_next_button_pressed():
 		current_line += 1
 		update_dialogue()
 
-func reset_global_manager():
-	GlobalManager.missile_toggle_active = false 
-	GlobalManager.landmine_toggle_active = false
-
-	GlobalManager.mek_toggle_active = false
-	GlobalManager.dynamite_toggle_active = false
-
-	GlobalManager.secret_item_destroyed = false
-	GlobalManager.secret_item_found = false
-	GlobalManager.zombies_cleared = false
-	GlobalManager.players_killed = false	
 
 func _on_skip_button_pressed():
 	# Replace with your logic for transitioning to the gameplay map

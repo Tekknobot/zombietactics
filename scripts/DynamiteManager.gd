@@ -278,7 +278,9 @@ func _trigger_explosion(last_point: Vector2):
 
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 1.0
-
+	
+	var xp_awarded = false
+			
 	# Check for PlayerUnit within explosion radius
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.position.distance_to(last_point) <= explosion_radius:
@@ -291,6 +293,11 @@ func _trigger_explosion(last_point: Vector2):
 			player.visible = false  # Hide the player unit
 			player.remove_from_group("player_units")  # Remove from the group
 			print("Player Unit removed from explosion")
+			
+			xp_awarded = true
+			
+			var hud_manager = get_parent().get_parent().get_node("HUDManager") 
+			hud_manager.update_hud(player)			
 
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
@@ -302,11 +309,21 @@ func _trigger_explosion(last_point: Vector2):
 					zombie.apply_damage(player.attack_damage)	
 						
 			print("Zombie Unit removed from explosion")
+			
+			xp_awarded = true
+			
+			var hud_manager = get_parent().get_node("HUDManager") 
+			hud_manager.update_hud_zombie(zombie)
 
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
+	
+	# Add XP if at least one target was hit
+	if xp_awarded:
+		await get_tree().create_timer(1).timeout
+		add_xp()	
 	
 	item_manager.check_item_destroyed()	
 	await get_tree().create_timer(1).timeout

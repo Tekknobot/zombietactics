@@ -35,8 +35,6 @@ var dialogue_2 = [
 	{ "speaker": "Logan. Raines", "text": "Once we get the core, we extract. No detours, no heroics. We finish this and get out.", "portrait": "res://assets/portraits/soldier_port.png" }
 ]
 
-
-
 var chapter_text: String = "Chapter 1: No Way Out — The Descent into Sector 13"
 var chapter_text_2: String = "Chapter 2: Into the Dark — The Heart of Sector 13"
 

@@ -127,13 +127,20 @@ func spawn_zombies():
 		
 		# Spawn zombie at the chosen position if valid
 		if spawn_position != Vector2i(-1, -1):
-			# Randomly decide between spawning a normal zombie or a radioactive zombie
 			var zombie_instance
-			if randi() % 2 == 0:  # 50% chance to spawn a radioactive zombie
-				zombie_instance = unit_radioactive_zombie.instantiate()  # Instantiate radioactive zombie
+			
+			# Determine the type of zombie to spawn based on the current map index
+			if GlobalManager.current_map_index == 2:
+				# 50% chance to spawn radioactive zombies on map index 2
+				if randi() % 2 == 0:
+					zombie_instance = unit_radioactive_zombie.instantiate()
+				else:
+					zombie_instance = unit_zombie.instantiate()
 			else:
-				zombie_instance = unit_zombie.instantiate()  # Instantiate normal zombie
-				
+				# Only spawn normal zombies on other maps
+				zombie_instance = unit_zombie.instantiate()
+			
+			# Set zombie properties
 			zombie_instance.position = tilemap.map_to_local(spawn_position)
 			zombie_instance.z_index = int(zombie_instance.position.y)
 			

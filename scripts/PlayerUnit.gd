@@ -50,7 +50,7 @@ signal player_action_completed
 
 # Player's health properties
 var max_health: int = 100
-var current_health: int = 50
+var current_health: int = 100
 
 # Player's portrait texture
 @export var portrait_texture: Texture

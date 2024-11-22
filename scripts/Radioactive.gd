@@ -143,8 +143,6 @@ func _on_damage_timeout(unit: Node):
 	if unit.is_in_group("player_units"):
 		unit.apply_damage(radiation_damage)  # Assuming the player has a `apply_damage()` method
 		
-		can_use_radiation_attack = false
-		
 		# Update the HUD to reflect new stats
 		var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud(unit)

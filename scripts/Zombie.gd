@@ -67,6 +67,7 @@ var player_unit_is_selected = false
 @export var dog_hurt_audio: AudioStream
 
 @onready var turn_manager = get_parent().get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
 var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
@@ -223,7 +224,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 		var players = get_tree().get_nodes_in_group("player_units")
 		if players.size() <= 0:
-			print("GAME OVER")		
+			print("Players Killed: GAME OVER")	
+			global_manager.players_killed = true	
 			return
 		
 		for player in players:

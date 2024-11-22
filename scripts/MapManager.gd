@@ -353,3 +353,6 @@ func clear_existing_structures():
 	# Remove all children that are in the "structures" group
 	for structure in get_tree().get_nodes_in_group("structures"):
 		structure.queue_free()  # Remove the structure from the scene
+
+func _on_fade_in_complete():
+	get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")

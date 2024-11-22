@@ -49,6 +49,7 @@ offset_right = 1196.0
 offset_bottom = 771.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 script = ExtResource("5_6ulmq")
+fade_duration = 3.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 52.0

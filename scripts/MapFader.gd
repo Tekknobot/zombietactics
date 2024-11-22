@@ -25,7 +25,6 @@ func _ready():
 		print("This is not the map_manager scene.")
 
 
-
 # Function to handle the fade-out effect
 func fade_out():
 	# Ensure the ColorRect starts fully opaque

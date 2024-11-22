@@ -6,10 +6,18 @@ var item_structure: Node = null  # The structure containing the item
 @onready var tilemap: TileMap = $TileMap  # Reference your TileMap node
 
 @export var item_scene: PackedScene  # Assign the Item.tscn in the Inspector
+@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 func _ready():
 	await get_tree().create_timer(1).timeout
 	assign_item_to_structure()
+
+func _process(delta: float) -> void:
+	await get_tree().create_timer(1).timeout
+	var animated_sprite = item_structure.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	if animated_sprite.animation == "demolished":
+		global_manager.secret_item_destroyed = true
+		print("Secret Item Destroyed: GAME OVER")
 
 # Function to assign the item to a random structure
 func assign_item_to_structure():

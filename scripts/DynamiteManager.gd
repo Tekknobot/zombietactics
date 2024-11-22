@@ -13,8 +13,6 @@ var target_position: Vector2
 
 var dynamite_launched : int = 0
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
-
 var hud: Control
 
 var player_to_act
@@ -48,7 +46,7 @@ func _process(delta: float) -> void:
 	
 func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
-	if not global_manager.dynamite_toggle_active:
+	if not GlobalManager.dynamite_toggle_active:
 		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 		
@@ -234,7 +232,7 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 	# Access the 'special' button within HUDManager
 	var dynamite_button = hud_manager.get_node("HUD/Dynamite")
 	dynamite_button.button_pressed = false	
-	global_manager.dynamite_toggle_active = false
+	GlobalManager.dynamite_toggle_active = false
 
 # Call this function after every player action
 func on_player_action_completed():
@@ -321,7 +319,7 @@ func add_xp():
 	
 	# Access the 'special' button within HUDManager
 	var missile_button = hud_manager.get_node("HUD/Missile")
-	global_manager.missile_toggle_active = false  # Deactivate the special toggle
+	GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
 
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")

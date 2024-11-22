@@ -14,7 +14,31 @@ var dialogue = [
 	{ "speaker": "Logan. Raines", "text": "Yoshida, mark them. We’ll clear the streets one tile at a time. Let’s move, and spread out!", "portrait": "res://assets/portraits/soldier_port.png" }
 ]
 
+var dialogue_2 = [
+	{ "speaker": "Yoshida. Boi", "text": "We’re approaching the core. Radiation levels are spiking again. I’d advise against prolonged exposure, but hey, I’m just a dog.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "We’ll move fast. Stay sharp. Dutch, keep an eye on our six while we search for the core.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Don’t worry about me. I’ve got this. But I’m not sure how much longer I can handle the heat. These zombies are getting thicker.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "You’re not the only one dealing with the heat, Dutch. These zombies are becoming a serious issue. Let’s find that core before they find us.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Focus, people. The core is in a nearby facility—Yoshida, scan for any signs of it. We don’t have much time.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "I’m on it. Scanners are picking up a signal. But it’s faint. This facility must be heavily damaged, or someone’s messing with the data.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Faint signals, radiation spikes, and an army of zombies? Perfect. What could possibly go wrong?", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Cut the sarcasm, Dutch. We find that core, extract the data, and get out. Easy, right?", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Hold up. Scanners are picking up a cluster of zombies ahead. They’re closing in on the core’s location.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Zombies ahead? What else is new? Just tell me where to shoot.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "It’s not just about shooting. We need to move carefully, take them out quietly. We don’t want the whole facility on us at once.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Agreed. Focus fire, clean shots. Dutch, lead the way. Yoshida, stay on comms and monitor the signal. I’ll cover the rear.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Lead the way? Sure, as long as there’s something to shoot at. Let’s just get this done.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "I’m detecting more movement... too many for a quiet approach. We’ll need to fight our way through.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Then we fight. Just don’t let them overwhelm us. We stick together, focus on the objective: the core.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Sounds like a plan. I’ve got your back, just don’t expect me to go easy on the zombies.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "I’ll keep scanning. The core should be in the next room. Let’s move.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Once we get the core, we extract. No detours, no heroics. We finish this and get out.", "portrait": "res://assets/portraits/soldier_port.png" }
+]
+
+
+
 var chapter_text: String = "Chapter 1: No Way Out — The Descent into Sector 13"
+var chapter_text_2: String = "Chapter 2: Into the Dark — The Heart of Sector 13"
 
 var current_line = 0
 var displayed_text = ""  # Current visible text for typewriter effect
@@ -32,12 +56,27 @@ var typing_speed = 0.05  # Time delay (seconds) between each character
 @onready var skip_button = $Skip  # Timer node for the typewriter effect
 
 func _ready():
+	GlobalManager.current_map_index += 1
+	
 	next_button.connect("pressed", Callable(self, "_on_next_button_pressed"))
 	typing_timer.connect("timeout", Callable(self, "_on_typing_timer_timeout"))
-	skip_button.connect("pressed", Callable(self, "_on_skip_button_pressed"))	
+	skip_button.connect("pressed", Callable(self, "_on_skip_button_pressed"))    
 	next_button.visible = false
-	story_chapter.text = chapter_text
+	
+	# Set dialogue and chapter text based on the current map index
+	match GlobalManager.current_map_index:
+		1:
+			story_chapter.text = chapter_text
+			dialogue = dialogue  # Use Chapter 1 dialogue
+		2:
+			story_chapter.text = chapter_text_2
+			dialogue = dialogue_2  # Use Chapter 2 dialogue
+		_:
+			story_chapter.text = "Chapter Unknown"
+			dialogue = []  # Fallback for undefined chapters
+
 	update_dialogue()
+
 
 func update_dialogue():
 	if current_line >= dialogue.size():

@@ -24,7 +24,6 @@ var move_speed: float = 75.0  # Movement speed for the soldier
 # Constants
 var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 @onready var map_manager = get_node("/root/MapManager")
 
 var right_click_position: Vector2
@@ -59,7 +58,7 @@ func _process(delta: float) -> void:
 	move_along_path(delta)
 
 func _input(event: InputEvent) -> void:
-	if not global_manager.landmine_toggle_active:
+	if not GlobalManager.landmine_toggle_active:
 		return
 
 	if event is InputEventMouseButton:
@@ -311,7 +310,7 @@ func move_along_path(delta: float) -> void:
 			
 			# Access the 'special' button within HUDManager
 			var landmine_button = hud_manager.get_node("HUD/Landmine")
-			global_manager.missile_toggle_active = false  # Deactivate the special toggle
+			GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
 			#hud_manager.update_hud(player_to_move)
 
 # Instantiate the mine on the current tile
@@ -343,7 +342,7 @@ func add_xp():
 	
 	# Access the 'special' button within HUDManager
 	var missile_button = hud_manager.get_node("HUD/Missile")
-	global_manager.missile_toggle_active = false  # Deactivate the special toggle
+	GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
 
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")

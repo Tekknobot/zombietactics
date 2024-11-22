@@ -19,8 +19,6 @@ var attack_range_tiles: Array[Vector2i] = []
 @onready var player_unit2 = $PlayerUnit2  # Reference to PlayerUnit2
 @onready var player_unit3 = $PlayerUnit3  # Reference to PlayerUnit3
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
-
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
 @export var select_audio: AudioStream
 @export var arm_attack_audio: AudioStream

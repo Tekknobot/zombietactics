@@ -13,8 +13,6 @@ var target_position: Vector2
 
 var missiles_launched : int = 0
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
-
 var hud: Control
 
 var player_to_act
@@ -37,7 +35,7 @@ func _ready() -> void:
 	
 func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
-	if not global_manager.missile_toggle_active:
+	if not GlobalManager.missile_toggle_active:
 		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 	
@@ -267,7 +265,7 @@ func add_xp():
 	
 	# Access the 'special' button within HUDManager
 	var missile_button = hud_manager.get_node("HUD/Missile")
-	global_manager.missile_toggle_active = false  # Deactivate the special toggle
+	GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
 
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")

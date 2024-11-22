@@ -9,6 +9,8 @@ var layer: int
 @export var explosion_radius: float = 1.0  # Radius to check for adjacent zombies or player units
 @export var explosion_scene: PackedScene  # Optional: Scene to instantiate for the explosion effect
 
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
+
 var is_demolished: bool = false
 var selected = false
 
@@ -107,6 +109,12 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 				print("Zombie found adjacent to demolished structure, triggering explosion.")
 				_create_explosion_at_tile(adj_tile)  # Create explosion at the zombie's tile
 				_remove_unit_from_group(zombie, "zombies")
+				
+				if zombies.size() <= 0:
+					zombie.reset_player_units()
+					GlobalManager.zombies_cleared = true
+					mission_manager.check_mission_manager()	
+								
 				#return  # Trigger the explosion once for the first adjacent zombie found
 
 		# Check for player units in the adjacent tiles
@@ -117,6 +125,10 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 				_create_explosion_at_tile(adj_tile)  # Create explosion at the player's tile
 				_remove_unit_from_group(player, "player_units")
 				player.update_astar_grid()
+				
+				if player_units.size() <= 0:
+					GlobalManager.players_killed = true
+					mission_manager.check_mission_manager()					
 				#return  # Trigger the explosion once for the first adjacent player unit found
 
 # Get adjacent tiles based on the current tile position

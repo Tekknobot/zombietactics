@@ -21,6 +21,7 @@ const DOWN_RIGHT_ROAD = 8
 
 # Preload the hover tile scene
 @onready var hover_tile = preload("res://assets/scenes/UI/hover_tile.tscn").instantiate()
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")
 
 # Grid dimensions
 var grid_width = 16
@@ -355,4 +356,8 @@ func clear_existing_structures():
 		structure.queue_free()  # Remove the structure from the scene
 
 func _on_fade_in_complete():
-	get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")
+	if mission_manager.gameover == true:
+		get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")
+
+	if mission_manager.map_cleared == true:
+		get_tree().change_scene_to_file("res://assets/scenes/dialogue_scene.tscn")

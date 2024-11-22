@@ -48,7 +48,7 @@ func fade_in():
 	
 # Function to handle the completion of the fade-in
 func _on_fade_in_finished():
-	get_parent()._on_fade_in_complete()
+	get_parent()._on_fade_in_complete() # See Map Manager node script.
 	emit_signal("fade_complete")  # Emit the signal indicating fade-in is complete	
 
 # Function to handle the completion of the fade-out (if needed)

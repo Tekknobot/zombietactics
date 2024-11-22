@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the GlobalManager in the scene
-
 @onready var portrait = $HUD/Portrait
 @onready var health_bar = $HUD/HealthBar
 @onready var player_name = $HUD/Name
@@ -44,46 +42,46 @@ func _ready():
 # Method to handle the toggle state change
 func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
-		global_manager.missile_toggle_active = true  # Set the flag to true
+		GlobalManager.missile_toggle_active = true  # Set the flag to true
 		print("Missile toggle activated!")
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()			
 	else:
-		global_manager.missile_toggle_active = false  # Set the flag to false
+		GlobalManager.missile_toggle_active = false  # Set the flag to false
 		print("Missile toggle deactivated!")
 
 func _on_landmine_toggled(button_pressed: bool) -> void:
 	if button_pressed:
-		global_manager.landmine_toggle_active = true  # Set the flag to true
+		GlobalManager.landmine_toggle_active = true  # Set the flag to true
 		print("Landmine toggle activated!")	
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
 	else:
-		global_manager.landmine_toggle_active = false  # Set the flag to false
+		GlobalManager.landmine_toggle_active = false  # Set the flag to false
 		print("Landmine toggle deactivated!")
 
 func _on_mek_toggled(button_pressed: bool) -> void:
 	if button_pressed:
-		global_manager.mek_toggle_active = true  # Set the flag to true
+		GlobalManager.mek_toggle_active = true  # Set the flag to true
 		print("Mek toggle activated!")	
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
 	else:
-		global_manager.mek_toggle_active = false  # Set the flag to false
+		GlobalManager.mek_toggle_active = false  # Set the flag to false
 		print("Mek toggle deactivated!")
 
 func _on_dynamite_toggled(button_pressed: bool) -> void:
 	if button_pressed:
-		global_manager.dynamite_toggle_active = true  # Set the flag to true
+		GlobalManager.dynamite_toggle_active = true  # Set the flag to true
 		print("Dynamite toggle activated!")	
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
 	else:
-		global_manager.dynamite_toggle_active = false  # Set the flag to false
+		GlobalManager.dynamite_toggle_active = false  # Set the flag to false
 		print("Dynamite toggle deactivated!")
 
 # Access and update HUD elements based on the selected player unit
@@ -94,7 +92,7 @@ func update_hud(character: PlayerUnit):
 	# Reset the missile toggle to "off" when updating the HUD
 	if missile:
 		missile.button_pressed = false  # This ensures the toggle is visually set to off
-		global_manager.missile_toggle_active = false  # Reset the special flag in global_manager
+		GlobalManager.missile_toggle_active = false  # Reset the special flag in global_manager
 
 		# Optionally emit the toggled signal to indicate the toggle state reset
 		missile.emit_signal("toggled", false)
@@ -102,7 +100,7 @@ func update_hud(character: PlayerUnit):
 
 	if landmine:
 		landmine.button_pressed = false  # This ensures the toggle is visually set to off
-		global_manager.landmine_toggle_active = false  # Reset the special flag in global_manager
+		GlobalManager.landmine_toggle_active = false  # Reset the special flag in global_manager
 
 		# Optionally emit the toggled signal to indicate the toggle state reset
 		landmine.emit_signal("toggled", false)

@@ -19,8 +19,6 @@ var projectile_hit: bool = false
 # Assuming `attacker` is set when the projectile is spawned
 var attacker: Area2D = null  # Reference to the unit that fired the projectile
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
-
 func _ready() -> void:
 	# Set the initial z_index based on y-position for correct layering
 	z_index = int(position.y)

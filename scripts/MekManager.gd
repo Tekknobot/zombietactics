@@ -9,7 +9,6 @@ extends Node2D
 
 @onready var tilemap = get_parent().get_node("TileMap")  # Reference to the TileMap
 @onready var map_manager = get_node("/root/MapManager")
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  
 @onready var hovertile = get_node("/root/MapManager/HoverTile") 
 
@@ -41,7 +40,7 @@ func _process(delta: float) -> void:
 		WATER_TILE_ID = 0  # Fallback value if no map is selected
 
 func _input(event: InputEvent) -> void:
-	if not global_manager.mek_toggle_active:
+	if not GlobalManager.mek_toggle_active:
 		return
 	
 	# Get the TileMap node
@@ -91,7 +90,7 @@ func _input(event: InputEvent) -> void:
 				else:
 					print("No selected unit found to act as attacker.")
 				
-				global_manager.mek_toggle_active = false
+				GlobalManager.mek_toggle_active = false
 
 				var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
 				

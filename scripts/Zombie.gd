@@ -67,7 +67,6 @@ var player_unit_is_selected = false
 @export var dog_hurt_audio: AudioStream
 
 @onready var turn_manager = get_parent().get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
-@onready var global_manager = get_parent().get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 @onready var mission_manager = get_parent().get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
 
 var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
@@ -125,6 +124,7 @@ func _process(delta: float) -> void:
 				var zombies = get_tree().get_nodes_in_group("zombies")
 				if zombies.size() <= 0:
 					reset_player_units()
+					GlobalManager.zombies_cleared = true
 					mission_manager.check_mission_manager()
 					
 				#queue_free()  # Destroy the zombie once the death animation ends
@@ -227,7 +227,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		if players.size() <= 0:
 			print("Players Killed: GAME OVER")	
-			global_manager.players_killed = true	
+			GlobalManager.players_killed = true	
 			mission_manager.check_mission_manager()
 			return
 		

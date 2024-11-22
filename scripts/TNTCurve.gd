@@ -19,7 +19,6 @@ var projectile_hit: bool = false
 # Assuming `attacker` is set when the projectile is spawned
 var attacker: Area2D = null  # Reference to the unit that fired the projectile
 
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 @onready var audio_player = $AudioStreamPlayer2D 
 
 func _ready() -> void:

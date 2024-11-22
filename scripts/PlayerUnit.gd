@@ -75,7 +75,6 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var explosion_radius: float = 1.0  # Radius to check for units at the target position
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # Adjust this path as necessary
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
 @export var death_audio: AudioStream
@@ -556,11 +555,11 @@ func clear_attack_range_tiles() -> void:
 
 func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_attack: bool = false) -> void:
 	# If this is a missile or landmine attack, check the respective toggle
-	if is_missile_attack and not global_manager.missile_toggle_active:
+	if is_missile_attack and not GlobalManager.missile_toggle_active:
 		print("Missile toggle is off, ignoring missile attack.")
 		return	
 
-	if is_landmine_attack and not global_manager.landmine_toggle_active:
+	if is_landmine_attack and not GlobalManager.landmine_toggle_active:
 		print("Landmine toggle is off, ignoring landmine attack.")
 		return	
 
@@ -583,11 +582,11 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		return
 
 	# Check if missile or landmine toggle is active, free the projectile immediately
-	if global_manager.missile_toggle_active:
+	if GlobalManager.missile_toggle_active:
 		print("Missile toggle active, freeing projectile immediately.")
 		projectile.queue_free()
 		return
-	elif global_manager.landmine_toggle_active:
+	elif GlobalManager.landmine_toggle_active:
 		print("Landmine toggle active, freeing projectile immediately.")
 		projectile.queue_free()
 		return

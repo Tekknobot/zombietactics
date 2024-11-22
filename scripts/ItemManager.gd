@@ -6,7 +6,6 @@ var item_structure: Node = null  # The structure containing the item
 @onready var tilemap: TileMap = $TileMap  # Reference your TileMap node
 
 @export var item_scene: PackedScene  # Assign the Item.tscn in the Inspector
-@onready var global_manager = get_node("/root/MapManager/GlobalManager")  # Reference to the SpecialToggleNode
 
 var item_discovered: bool = false
 var item_handled: bool = false  # Prevents multiple checks once the outcome is decided
@@ -25,7 +24,7 @@ func check_item_destroyed():
 
 	var animated_sprite = item_structure.get_node("AnimatedSprite2D") as AnimatedSprite2D
 	if animated_sprite.animation == "demolished":
-		global_manager.secret_item_destroyed = true
+		GlobalManager.secret_item_destroyed = true
 		item_handled = true  # Prevent further checks
 		print("Secret Item Destroyed: GAME OVER")
 
@@ -76,6 +75,9 @@ func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:
 func on_item_discovered(player: Area2D, structure: Node):
 	print("Item found by player:", player.name)
 	item_discovered = true
+	
+	if item_discovered == true:
+		GlobalManager.secret_item_found = true
 	
 	# Instantiate the item scene
 	if item_scene:

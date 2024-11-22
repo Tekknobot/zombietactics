@@ -63,7 +63,7 @@ func on_item_discovered(player: Area2D, structure: Node):
 		var item_instance = item_scene.instantiate()
 		add_child(item_instance)  # Add to the current scene
 		if structure.structure_type == "Building":
-			var offset = -48
+			var offset = -40
 			item_instance.position = structure.global_position + Vector2(0, offset)  # Adjust height
 		elif structure.structure_type == "Tower":
 			var offset = -58

@@ -84,6 +84,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var mek_attack_audio = preload("res://audio/SFX/mek_attack.wav")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
+@onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
 
 var has_moved: bool = false  # Tracks if the unit has moved this turn
 var has_attacked: bool = false  # Tracks if the unit has attacked this turn
@@ -349,8 +350,9 @@ func move_along_path(delta: float) -> void:
 			path_index += 1  # Move to the next tile in the path
 			get_child(0).play("default")
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
-			update_astar_grid()
 			has_moved = true
+			item_manager.check_for_item_discovery(self)
+			update_astar_grid()
 			check_end_turn_conditions()
 	
 # Visualize all walkable (non-solid) tiles in the A* grid

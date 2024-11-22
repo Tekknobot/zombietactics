@@ -327,7 +327,9 @@ func check_for_attack() -> void:
 			print("Zombie just attacked.")
 			
 			attacks += 1
-			attack_player(player)
+			if visible:
+				attack_player(player)
+			
 			await get_tree().create_timer(0.5).timeout
 			
 			# After the first attack, exit the loop

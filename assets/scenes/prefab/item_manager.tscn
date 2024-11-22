@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5g5dkbyof6fl"]
+
+[ext_resource type="Script" path="res://scripts/ItemManager.gd" id="1_on7sn"]
+[ext_resource type="PackedScene" uid="uid://0kd14tyuebfo" path="res://assets/scenes/prefab/floppy_disk.tscn" id="2_d2p6c"]
+
+[node name="ItemManager" type="Node2D"]
+script = ExtResource("1_on7sn")
+item_scene = ExtResource("2_d2p6c")

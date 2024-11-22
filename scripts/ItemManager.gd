@@ -1,0 +1,85 @@
+extends Node
+
+@export var item_name: String = "Secret Document"  # The name of the item to be found
+var item_structure: Node = null  # The structure containing the item
+
+@onready var tilemap: TileMap = $TileMap  # Reference your TileMap node
+
+@export var item_scene: PackedScene  # Assign the Item.tscn in the Inspector
+
+func _ready():
+	await get_tree().create_timer(1).timeout
+	assign_item_to_structure()
+
+# Function to assign the item to a random structure
+func assign_item_to_structure():
+	# Get all structures in the group
+	var structures = get_tree().get_nodes_in_group("structures")
+	if structures.size() == 0:
+		print("No structures found in the group!")
+		return
+
+	# Select a random structure
+	item_structure = structures[randi() % structures.size()]
+	print("Item assigned to structure:", item_structure.name)
+	
+	item_structure.modulate = Color(0.5, 0.5, 0.5)
+
+	# Optionally, you can mark the structure visually or with metadata
+	item_structure.set_meta("contains_item", true)  # Tag the structure
+	# Example: Highlight the structure for debugging (remove in final version)
+	if item_structure.has_method("highlight"):
+		item_structure.highlight(true)
+
+# Function to check if a player is adjacent to the structure containing the item
+func check_for_item_discovery(player: Area2D):
+	if not item_structure:
+		print("No item structure assigned!")
+		return
+
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	# Get the player's and structure's tile positions
+	var player_tile_pos = tilemap.local_to_map(player.global_position)
+	var structure_tile_pos = tilemap.local_to_map(item_structure.global_position)
+
+	# Check if the player is adjacent to the structure
+	if is_adjacent(player_tile_pos, structure_tile_pos):
+		print("Player discovered the item:", item_name)
+
+		# Trigger the discovery event (e.g., collect the item, update UI)
+		on_item_discovered(player, item_structure)
+
+# Helper function to check adjacency between two tiles
+func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:
+	var delta = tile_a - tile_b
+	return abs(delta.x) + abs(delta.y) == 1  # Manhattan distance = 1 for adjacency
+
+func on_item_discovered(player: Area2D, structure: Node):
+	print("Item found by player:", player.name)
+	
+	# Instantiate the item scene
+	if item_scene:
+		var item_instance = item_scene.instantiate()
+		add_child(item_instance)  # Add to the current scene
+		if structure.structure_type == "Building":
+			var offset = -48
+			item_instance.position = structure.global_position + Vector2(0, offset)  # Adjust height
+		elif structure.structure_type == "Tower":
+			var offset = -58
+			item_instance.position = structure.global_position + Vector2(0, offset)		
+		elif structure.structure_type == "Stadium":
+			var offset = -32
+			item_instance.position = structure.global_position + Vector2(0, offset)		
+		elif structure.structure_type == "District":
+			var offset = -48
+			item_instance.position = structure.global_position + Vector2(0, offset)		
+						
+			
+	# Perform your item discovery logic
+	structure.set_meta("contains_item", false)  # Mark the item as collected
+	item_structure = null  # Reset the item location
+
+	# Optional: Remove the highlight (if any)
+	if structure.has_method("highlight"):
+		structure.highlight(false)

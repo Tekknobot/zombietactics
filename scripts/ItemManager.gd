@@ -73,34 +73,36 @@ func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:
 	return abs(delta.x) + abs(delta.y) == 1  # Manhattan distance = 1 for adjacency
 
 func on_item_discovered(player: Area2D, structure: Node):
-	print("Item found by player:", player.name)
-	item_discovered = true
+	# Only allow item discovery if it has not been discovered yet
+	if item_discovered:
+		return  # Exit early if the item is already discovered
+
+	# Print information about the item discovery
+	print("Item found by player:", player.player_name)
+	item_discovered = true  # Set the flag to true indicating item was discovered
 	
-	if item_discovered == true:
-		GlobalManager.secret_item_found = true
+	# Update global manager to reflect item discovery
+	GlobalManager.secret_item_found = true
 	
 	# Instantiate the item scene
 	if item_scene:
 		var item_instance = item_scene.instantiate()
 		add_child(item_instance)  # Add to the current scene
-		if structure.structure_type == "Building":
-			var offset = -40
-			item_instance.position = structure.global_position + Vector2(0, offset)  # Adjust height
-		elif structure.structure_type == "Tower":
-			var offset = -58
-			item_instance.position = structure.global_position + Vector2(0, offset)		
-		elif structure.structure_type == "Stadium":
-			var offset = -32
-			item_instance.position = structure.global_position + Vector2(0, offset)		
-		elif structure.structure_type == "District":
-			var offset = -48
-			item_instance.position = structure.global_position + Vector2(0, offset)		
-						
-			
+		
+		# Adjust item position based on the structure type
+		match structure.structure_type:
+			"Building":
+				item_instance.position = structure.global_position + Vector2(0, -40)
+			"Tower":
+				item_instance.position = structure.global_position + Vector2(0, -58)
+			"Stadium":
+				item_instance.position = structure.global_position + Vector2(0, -32)
+			"District":
+				item_instance.position = structure.global_position + Vector2(0, -48)
+
 	# Perform your item discovery logic
 	structure.set_meta("contains_item", false)  # Mark the item as collected
-	#item_structure = null  # Reset the item location
-
+	
 	# Optional: Remove the highlight (if any)
 	if structure.has_method("highlight"):
 		structure.highlight(false)

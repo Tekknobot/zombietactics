@@ -28,6 +28,9 @@ var layer: int
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 var missiles_canceled = false
 
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
+@onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
+
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
@@ -253,6 +256,9 @@ func _trigger_explosion(last_point: Vector2):
 	if xp_awarded:
 		add_xp()
 
+	item_manager.check_item_destroyed()	
+	await get_tree().create_timer(1).timeout
+	mission_manager.check_mission_manager()
 
 func add_xp():
 	# Add XP

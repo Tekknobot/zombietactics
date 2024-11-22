@@ -85,12 +85,15 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
 
 var has_moved: bool = false  # Tracks if the unit has moved this turn
 var has_attacked: bool = false  # Tracks if the unit has attacked this turn
 var has_used_turn: bool = false  # Tracks if it's currently this unit's turn
 
 var can_start_turn: bool = false
+
+var attack_range_visible: bool = false  # Variable to track if attack range is visible
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -376,8 +379,6 @@ func visualize_walkable_tiles() -> void:
 	# Debug print to confirm visualization
 	print("Visualized walkable tiles.")
 
-var attack_range_visible: bool = false  # Variable to track if attack range is visible
-
 func _input(event: InputEvent) -> void:
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
@@ -636,8 +637,10 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	# Optional: Check for level up, if applicable
 	if current_xp >= xp_for_next_level:
 		level_up()
-
-	item_manager.check_item_destroyed()		
+	
+	item_manager.check_item_destroyed()
+	await get_tree().create_timer(1).timeout
+	mission_manager.check_mission_manager()
 			
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")

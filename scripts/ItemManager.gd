@@ -29,7 +29,6 @@ func check_item_destroyed():
 		item_handled = true  # Prevent further checks
 		print("Secret Item Destroyed: GAME OVER")
 
-
 # Function to assign the item to a random structure
 func assign_item_to_structure():
 	# Get all structures in the group

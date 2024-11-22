@@ -31,6 +31,10 @@ var missiles_canceled = false
 # Declare necessary variables for attack
 @export var dynamite_scene: PackedScene  # Packed scene for the projectile
 
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
+@onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
+
+
 # Declare a flag to track if XP has been added
 var xp_added: bool = false
 
@@ -305,6 +309,10 @@ func _trigger_explosion(last_point: Vector2):
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
+	
+	item_manager.check_item_destroyed()	
+	await get_tree().create_timer(1).timeout
+	mission_manager.check_mission_manager()		
 			
 func add_xp():
 	# Add XP

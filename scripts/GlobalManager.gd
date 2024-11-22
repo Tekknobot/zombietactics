@@ -1,6 +1,6 @@
 extends Node2D
 
-var missile_toggle_active: bool = false  # The flag to track the state of the toggle
+var missile_toggle_active: bool = false 
 var landmine_toggle_active: bool = false
 
 var mek_toggle_active: bool = false

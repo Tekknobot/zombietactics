@@ -31,7 +31,7 @@ var dialogue_2 = [
 	{ "speaker": "Yoshida. Boi", "text": "I’m detecting more movement... too many for a quiet approach. We’ll need to fight our way through.", "portrait": "res://assets/portraits/dog_port.png" },
 	{ "speaker": "Logan. Raines", "text": "Then we fight. Just don’t let them overwhelm us. We stick together, focus on the objective: the core.", "portrait": "res://assets/portraits/soldier_port.png" },
 	{ "speaker": "Dutch. Major", "text": "Sounds like a plan. I’ve got your back, just don’t expect me to go easy on the zombies.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "I’ll keep scanning. The core should be in the next room. Let’s move.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "I’ll keep scanning. The core should be in the one of the buildings. Let’s move.", "portrait": "res://assets/portraits/dog_port.png" },
 	{ "speaker": "Logan. Raines", "text": "Once we get the core, we extract. No detours, no heroics. We finish this and get out.", "portrait": "res://assets/portraits/soldier_port.png" }
 ]
 
@@ -55,6 +55,7 @@ var typing_speed = 0.05  # Time delay (seconds) between each character
 
 func _ready():
 	GlobalManager.current_map_index += 1
+	reset_global_manager()
 	
 	next_button.connect("pressed", Callable(self, "_on_next_button_pressed"))
 	typing_timer.connect("timeout", Callable(self, "_on_typing_timer_timeout"))
@@ -118,6 +119,18 @@ func _on_next_button_pressed():
 		# Move to the next dialogue line		
 		current_line += 1
 		update_dialogue()
+
+func reset_global_manager():
+	GlobalManager.missile_toggle_active = false 
+	GlobalManager.landmine_toggle_active = false
+
+	GlobalManager.mek_toggle_active = false
+	GlobalManager.dynamite_toggle_active = false
+
+	GlobalManager.secret_item_destroyed = false
+	GlobalManager.secret_item_found = false
+	GlobalManager.zombies_cleared = false
+	GlobalManager.players_killed = false	
 
 func _on_skip_button_pressed():
 	# Replace with your logic for transitioning to the gameplay map

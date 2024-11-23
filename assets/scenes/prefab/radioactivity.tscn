@@ -1,4 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://cxpprxqrolgiq"]
+[gd_scene load_steps=5 format=3 uid="uid://cxpprxqrolgiq"]
+
+[ext_resource type="Script" path="res://scripts/RadioactiveParticles.gd" id="1_l6jpo"]
 
 [sub_resource type="Gradient" id="Gradient_mdkgw"]
 offsets = PackedFloat32Array(0, 0.492958, 1)
@@ -17,6 +19,8 @@ angular_velocity_max = -1.60933e-05
 gravity = Vector3(0, -98, 0)
 radial_accel_min = -2.23517e-06
 radial_accel_max = -2.23517e-06
+tangential_accel_min = -100.0
+tangential_accel_max = 100.0
 color_ramp = SubResource("GradientTexture1D_nnd1b")
 hue_variation_min = -2.23517e-08
 hue_variation_max = -2.23517e-08
@@ -30,3 +34,4 @@ amount = 2
 process_material = SubResource("ParticleProcessMaterial_diek6")
 lifetime = 0.3
 trail_lifetime = 1.0
+script = ExtResource("1_l6jpo")

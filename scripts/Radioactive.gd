@@ -42,7 +42,7 @@ func spawn_particles_based_on_manhattan_distance():
 			# Debugging: Check the world position for tiles and particle spawn locations
 			print("Tile Position: ", tile_pos, " => World Position: ", world_pos)
 			
-			if !get_parent().is_tile_movable(world_pos) or !get_parent().is_unit_present(world_pos) or !get_parent().is_structure(world_pos):
+			if get_parent().is_tile_movable(tile_pos) and !get_parent().is_zombie_present(tile_pos):
 				# Spawn particle at the world position (not at the zombie's position)
 				spawn_radiation_particle(world_pos)
 
@@ -135,6 +135,10 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 				
 				unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
 				unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method
+
+				# Update the HUD to reflect new stats
+				var hud_manager = get_node("/root/MapManager/HUDManager")
+				hud_manager.update_hud(unit)	
 
 				# Mark the player as damaged this turn
 				damaged_units_this_turn.append(unit)

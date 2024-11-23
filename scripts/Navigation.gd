@@ -13,4 +13,5 @@ func _process(delta: float) -> void:
 	pass
 	
 func _on_menu_button_pressed():
+	GlobalManager.current_map_index -= 1
 	get_tree().change_scene_to_file(game_scene_path)  # Use the updated method

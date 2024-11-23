@@ -502,6 +502,16 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 			return true
 	return false
 
+# Check if there is a unit on the tile
+func is_zombie_present(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var all_units = get_tree().get_nodes_in_group("zombies")
+	for unit in all_units:
+		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
+		if tile_pos == unit_tile_pos:
+			return true
+	return false
+
 # Get all tiles within movement range based on Manhattan distance
 func get_movement_tiles() -> Array[Vector2i]:
 	var tiles_in_range: Array[Vector2i] = []

@@ -25,7 +25,7 @@ var layer: int
 var astar: AStarGrid2D = AStarGrid2D.new()
 var current_path: PackedVector2Array
 var path_index: int = 0
-var move_speed: float = 75.0
+var move_speed: float = 125.0
 
 var WATER_TILE_ID = 0
 
@@ -72,7 +72,7 @@ var player_unit_is_selected = false
 @onready var mission_manager = get_parent().get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
 
 var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
-var target_reach_threshold = 1  # Set a tolerance threshold to determine if the zombie reached the target tile
+var target_reach_threshold = 2  # Set a tolerance threshold to determine if the zombie reached the target tile
 var zombies: Array  # This will store the zombies sorted by zombie_id
 
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
@@ -276,30 +276,31 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			# Move the zombie toward the next path point
 			zombie.position += movement_vector * move_speed * delta_time
 			
-			# Check if the zombie has reached the target point
-			if zombie.position.distance_to(target_pos) <= target_reach_threshold:
-				# Zombie reached the current target point, so increment the path index
-				zombie.path_index += 1
+			# Convert zombie position and target position to tilemap coordinates
+			var zombie_tile_pos = tilemap.local_to_map(zombie.position)
+			var target_tile_pos = tilemap.local_to_map(target_pos)
+
+			# Debugging Information
+			print("Zombie position (tilemap):", zombie_tile_pos, "Target position (tilemap):", target_tile_pos)
 				
-				update_astar_grid()
-				
-				# If the zombie has completed its path, ensure to re-evaluate or update paths if necessary
-				if zombie.path_index >= zombie.current_path.size():
-					print("Zombie ID:", zombie.zombie_id, " has reached its final destination.")
-					
-		else:
-			update_astar_grid()
-			print("Zombie ID %d has no valid path to move." % zombie.zombie_id)
-		
 		if attacks >= 1:
 			pass
 		else:
 			# Call the attack check once per zombie after its movement
 			check_for_attack()  # This will check for attacks after the zombie has moved
-			
+		
 		# Wait before processing the next zombie
 		await get_tree().create_timer(0.7).timeout  # This introduces a delay, giving each zombie time to move
-
+		
+		# Address radioactive zombies
+		if zombie.zombie_type == "Radioactive":
+			zombie.get_child(4).active_particle_instances.clear()
+			for active_particle in zombie.get_child(4).active_particle_instances:
+				active_particle.queue_free()
+			zombie.get_child(4).particles_spawned = false
+		
+		update_astar_grid()	
+			
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false
 	attacks = 0
@@ -348,6 +349,7 @@ func check_for_attack() -> void:
 			
 			await get_tree().create_timer(0.5).timeout
 			
+			get_child(0).play("default")
 			# After the first attack, exit the loop
 			break
 	
@@ -475,7 +477,7 @@ func move_along_path(delta: float) -> void:
 			path_index += 1  # Move to the next tile in the path
 			get_child(0).play("default")  # Play idle animation when not moving
 			# After moving, update the AStar grid for any changes (optional)
-			update_astar_grid()
+			update_astar_grid()		
 			
 # Check if a tile is movable
 func is_tile_movable(tile_pos: Vector2i) -> bool:

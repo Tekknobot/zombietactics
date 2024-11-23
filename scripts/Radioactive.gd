@@ -131,12 +131,19 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 		if unit_tile_pos == tile_pos:
 			# Apply damage to the player if they're on the same tile as the particle
 			if not damaged_units_this_turn.has(unit):
-				unit.audio_player.stream = unit.hurt_audio
-				unit.audio_player.play()
+				if unit.player_name == "Yoshida. Boi":
+					unit.audio_player.stream = unit.dog_hurt_audio
+					unit.audio_player.play()
+					
+					unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
+					unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method
+				else:
+					unit.audio_player.stream = unit.hurt_audio
+					unit.audio_player.play()
+					
+					unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
+					unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method					
 				
-				unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
-				unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method
-
 				# Update the HUD to reflect new stats
 				var hud_manager = get_node("/root/MapManager/HUDManager")
 				hud_manager.update_hud(unit)	

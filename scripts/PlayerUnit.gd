@@ -80,6 +80,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var death_audio: AudioStream
 @export var levelup_audio: AudioStream
 @export var hurt_audio: AudioStream
+@export var dog_hurt_audio: AudioStream
 @export var mek_attack_audio = preload("res://audio/SFX/mek_attack.wav")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode

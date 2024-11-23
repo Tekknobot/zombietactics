@@ -63,7 +63,7 @@ var dialogue_3 = [
 ]
 
 
-var chapter_text: String = "Chapter 1: No Way Out — The Descent into Sector 13"
+var chapter_text_1: String = "Chapter 1: No Way Out — The Descent into Sector 13"
 var chapter_text_2: String = "Chapter 2: Into the Dark — The Heart of Sector 13"
 var chapter_text_3: String = "Chapter 3: Crimson Horizon — The Core Awakens"
 
@@ -99,7 +99,7 @@ func _ready():
 	# Set dialogue and chapter text based on the current map index
 	match GlobalManager.current_map_index:
 		1:
-			story_chapter.text = chapter_text
+			story_chapter.text = chapter_text_1
 			dialogue = dialogue  # Use Chapter 1 dialogue
 		2:
 			story_chapter.text = chapter_text_2

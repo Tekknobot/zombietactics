@@ -354,11 +354,3 @@ func clear_existing_structures():
 	# Remove all children that are in the "structures" group
 	for structure in get_tree().get_nodes_in_group("structures"):
 		structure.queue_free()  # Remove the structure from the scene
-
-func _on_fade_in_complete():
-	if mission_manager.gameover == true:
-		GlobalManager.current_map_index -= 1
-		get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")
-
-	if mission_manager.map_cleared == true:
-		get_tree().change_scene_to_file("res://assets/scenes/dialogue_scene.tscn")

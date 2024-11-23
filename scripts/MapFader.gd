@@ -7,6 +7,8 @@ extends ColorRect
 @onready var map_scene_name = "map_manager"  # The scene name you're checking
 @onready var titlescreen_name = "TitleScreen"  # The scene name you're checking
 
+@onready var map_manager = get_node("/root/MapManager")
+
 signal fade_complete  # Define a signal to emit when fade-in is complete
 
 # Ready function starts the fade-out effect if necessary
@@ -48,8 +50,38 @@ func fade_in():
 	
 # Function to handle the completion of the fade-in
 func _on_fade_in_finished():
-	get_parent()._on_fade_in_complete() # See Map Manager node script.
-	emit_signal("fade_complete")  # Emit the signal indicating fade-in is complete	
+	var current_scene = get_tree().current_scene
+	if not current_scene:
+		print("Error: No current scene loaded.")
+		emit_signal("fade_complete")
+		return
+
+	# Check scene name and handle transitions
+	match current_scene.name:
+		"TitleScreen":
+			change_scene("res://assets/scenes/dialogue_scene.tscn")
+			return
+
+		"MapManager":
+			if GlobalManager.gameover:
+				GlobalManager.current_map_index = 1
+				change_scene("res://assets/scenes/TitleScreen.tscn")
+
+			elif GlobalManager.map_cleared:
+				GlobalManager.current_map_index += 1
+				# Reset game after clearing Chapter 3.
+				if GlobalManager.current_map_index == 4:
+					GlobalManager.current_map_index = 1
+					get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")
+					return				
+				change_scene("res://assets/scenes/dialogue_scene.tscn")
+
+	emit_signal("fade_complete")
+
+func change_scene(scene_path: String):
+	print("Changing scene to: ", scene_path)
+	get_tree().change_scene_to_file(scene_path)
+	emit_signal("fade_complete")
 
 # Function to handle the completion of the fade-out (if needed)
 func _on_fade_out_finished():

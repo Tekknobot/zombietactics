@@ -15,7 +15,6 @@ extends Node2D
 @onready var audio_player = $AudioStreamPlayer2D  # Adjust the path as needed
 @export var mek_call_audio = preload("res://audio/SFX/call_mek.wav")
 
-
 # Constants
 var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 

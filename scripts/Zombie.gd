@@ -25,7 +25,7 @@ var layer: int
 var astar: AStarGrid2D = AStarGrid2D.new()
 var current_path: PackedVector2Array
 var path_index: int = 0
-var move_speed: float = 125.0
+var move_speed: float = 75.0
 
 var WATER_TILE_ID = 0
 
@@ -290,7 +290,9 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			check_for_attack()  # This will check for attacks after the zombie has moved
 		
 		# Wait before processing the next zombie
-		await get_tree().create_timer(0.7).timeout  # This introduces a delay, giving each zombie time to move
+		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
+		
+		update_astar_grid()	
 		
 		# Address radioactive zombies
 		if zombie.zombie_type == "Radioactive":
@@ -587,7 +589,10 @@ func apply_damage(damage: int) -> void:
 func die() -> void:
 	print("Zombie has died")
 	get_child(0).play("death")
-	await get_tree().create_timer(1).timeout
+	audio_player.stream = zombie_audio
+	audio_player.play()
+	
+	await get_tree().create_timer(2).timeout
 	
 	self.remove_from_group("zombies")
 	self.visible = false

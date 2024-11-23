@@ -122,13 +122,13 @@ func _process(delta):
 		
 # Function to check for player units in the same tile as the particle
 func check_for_player_units_in_tile(tile_pos: Vector2i):
-	var units_in_tile = get_tree().get_nodes_in_group("player_units")
+	var units_in_tile = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
 	for unit in units_in_tile:
 		# Get the unit's position in world coordinates
 		var unit_tile_pos = get_node("/root/MapManager/TileMap").local_to_map(unit.global_position)
 		
 		# Check if the player unit's tile position matches the tile position of the particle
-		if unit_tile_pos == tile_pos:
+		if unit_tile_pos == tile_pos and unit.is_in_group("player_units"):
 			# Apply damage to the player if they're on the same tile as the particle
 			if not damaged_units_this_turn.has(unit):
 				if unit.player_name == "Yoshida. Boi":
@@ -150,3 +150,22 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 
 				# Mark the player as damaged this turn
 				damaged_units_this_turn.append(unit)
+				
+		# Check if the player unit's tile position matches the tile position of the particle
+		if unit_tile_pos == tile_pos and unit.is_in_group("zombies"):
+			if unit.zombie_type == "Radioactive":
+				return
+			# Apply damage to the player if they're on the same tile as the particle
+			if not damaged_units_this_turn.has(unit):
+				unit.audio_player.stream = unit.hurt_audio
+				unit.audio_player.play()
+					
+				unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
+				unit.apply_damage(5)  # Assuming units have an `apply_damage` method					
+				
+				# Update the HUD to reflect new stats
+				var hud_manager = get_node("/root/MapManager/HUDManager")
+				hud_manager.update_hud_zombie(unit)	
+
+				# Mark the player as damaged this turn
+				damaged_units_this_turn.append(unit)				

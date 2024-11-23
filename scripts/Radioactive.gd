@@ -41,8 +41,9 @@ func spawn_particles_based_on_manhattan_distance():
 			# Debugging: Check the world position for tiles and particle spawn locations
 			print("Tile Position: ", tile_pos, " => World Position: ", world_pos)
 			
-			# Spawn particle at the world position (not at the zombie's position)
-			spawn_radiation_particle(world_pos)
+			if !get_parent().is_tile_movable(world_pos) or !get_parent().is_unit_present(world_pos) or !get_parent().is_structure(world_pos):
+				# Spawn particle at the world position (not at the zombie's position)
+				spawn_radiation_particle(world_pos)
 
 # Get all tiles within movement range based on Manhattan distance
 func get_radiation_tiles(zombie_tile_pos: Vector2i, movement_range: int) -> Array[Vector2i]:

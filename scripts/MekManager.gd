@@ -131,7 +131,7 @@ func animate_fade_in_out(instance: Node2D) -> void:
 
 	# Fade-out animation
 	tween.tween_property(instance, "modulate:a", 0, 2)  # Fade to fully transparent over 2 seconds
-
+	
 # Function to play mek_call audio
 func _play_mek_call_audio() -> void:
 	audio_player.stream = mek_call_audio

@@ -8,7 +8,7 @@ class_name ZombieUnit
 var next_zombie_id: int = 1
 
 # Movement range for zombies, they can move only up to this range
-@export var movement_range = 3
+@export var movement_range = 2
 var is_moving = false  # Flag to track if zombies are moving
 
 var tile_size = 32  # Or whatever your tile size is in pixels
@@ -88,6 +88,9 @@ func _ready() -> void:
 	# Randomize current_xp
 	current_xp = possible_values[randi() % possible_values.size()]
 	print("Current XP set to:", current_xp)
+
+	if self.zombie_type == "Radioactive":
+		movement_range = 3
 		
 	if map_manager.map_1:
 		WATER_TILE_ID = 0

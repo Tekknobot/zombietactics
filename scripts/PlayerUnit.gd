@@ -830,6 +830,10 @@ func mek_melee(selected_unit: Area2D) -> void:
 				# Update the HUD to reflect new stats
 				var hud_manager = get_parent().get_parent().get_node("HUDManager")
 				hud_manager.update_hud_zombie(zombie)
+
+				await get_tree().create_timer(1).timeout
+				hud_manager.update_hud(selected_unit)		
+						
 				hud_manager.hide_special_buttons()				
 				#return  # Exit once a zombie is found
 

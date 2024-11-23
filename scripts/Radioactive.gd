@@ -22,6 +22,7 @@ func spawn_particles_based_on_manhattan_distance():
 	var zombie = get_parent()  # The zombie node
 	if zombie.zombie_type == "Radioactive":  # Check if the zombie is radioactive
 		var zombie_tile_pos = tilemap.local_to_map(zombie.global_position)  # Convert zombie global position to tilemap coordinates
+		await get_tree().create_timer(1).timeout
 		var movement_range = zombie.movement_range  # Get the zombie's movement range
 
 		# Debugging: Print zombie position and movement range

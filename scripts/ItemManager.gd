@@ -24,8 +24,10 @@ func check_item_destroyed():
 
 	var animated_sprite = item_structure.get_node("AnimatedSprite2D") as AnimatedSprite2D
 	if animated_sprite.animation == "demolished":
+		on_item_destroyed(item_structure)
+		
 		GlobalManager.secret_item_destroyed = true
-		item_handled = true  # Prevent further checks
+		item_handled = true  # Prevent further checks	
 		print("Secret Item Destroyed: GAME OVER")
 
 # Function to assign the item to a random structure
@@ -72,6 +74,23 @@ func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:
 	var delta = tile_a - tile_b
 	return abs(delta.x) + abs(delta.y) == 1  # Manhattan distance = 1 for adjacency
 
+func on_item_destroyed(structure: Node):	
+	# Instantiate the item scene
+	if item_scene:
+		var item_instance = item_scene.instantiate()
+		add_child(item_instance)  # Add to the current scene
+		
+		# Adjust item position based on the structure type
+		match structure.structure_type:
+			"Building":
+				item_instance.position = structure.global_position + Vector2(0, -40)
+			"Tower":
+				item_instance.position = structure.global_position + Vector2(0, -58)
+			"Stadium":
+				item_instance.position = structure.global_position + Vector2(0, -32)
+			"District":
+				item_instance.position = structure.global_position + Vector2(0, -48)
+
 func on_item_discovered(player: Area2D, structure: Node):
 	# Only allow item discovery if it has not been discovered yet
 	if item_discovered:
@@ -102,7 +121,3 @@ func on_item_discovered(player: Area2D, structure: Node):
 
 	# Perform your item discovery logic
 	structure.set_meta("contains_item", false)  # Mark the item as collected
-	
-	# Optional: Remove the highlight (if any)
-	if structure.has_method("highlight"):
-		structure.highlight(false)

@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://cxpprxqrolgiq"]
+
+[sub_resource type="Gradient" id="Gradient_mdkgw"]
+offsets = PackedFloat32Array(0, 0.492958, 1)
+colors = PackedColorArray(0, 0.290196, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_nnd1b"]
+gradient = SubResource("Gradient_mdkgw")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_diek6"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 8.0
+spread = 180.0
+angular_velocity_min = -1.60933e-05
+angular_velocity_max = -1.60933e-05
+gravity = Vector3(0, -98, 0)
+radial_accel_min = -2.23517e-06
+radial_accel_max = -2.23517e-06
+color_ramp = SubResource("GradientTexture1D_nnd1b")
+hue_variation_min = -2.23517e-08
+hue_variation_max = -2.23517e-08
+
+[node name="Radioactivity" type="Node2D"]
+position = Vector2(44, 0)
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+position = Vector2(0, -8)
+process_material = SubResource("ParticleProcessMaterial_diek6")
+lifetime = 0.3
+trail_lifetime = 1.0

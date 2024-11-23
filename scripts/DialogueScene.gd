@@ -83,6 +83,11 @@ var typing_speed = 0.05  # Time delay (seconds) between each character
 @onready var skip_button = $Skip  # Timer node for the typewriter effect
 
 func _ready():
+	# Reset game after clearing Chapter 3.
+	if GlobalManager.current_map_index == 3:
+		GlobalManager.current_map_index == 0
+		get_tree().change_scene_to_file("res://assets/scenes/TitleScreen.tscn")
+		
 	GlobalManager.current_map_index += 1
 	GlobalManager.reset_global_manager()
 	

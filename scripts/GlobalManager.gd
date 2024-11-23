@@ -11,7 +11,7 @@ var secret_item_found: bool = false
 var zombies_cleared: bool = false
 var players_killed: bool = false
 
-var current_map_index: int = 2	# Minus one for desired level.
+var current_map_index: int = 0	# Level -1 for desired level.
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

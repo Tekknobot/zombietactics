@@ -194,3 +194,10 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 		if tile_pos == unit_tile_pos:
 			return true
 	return false
+	
+# Check if there is a unit on the tile
+func clear_tiles():
+	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for unit in all_units:
+		unit.clear_movement_tiles()

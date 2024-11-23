@@ -85,7 +85,7 @@ func attack_selected_player(tile_pos: Vector2i) -> void:
 
 # Moves the selected player to the specified tile
 func move_selected_player(tile_pos: Vector2i) -> void:
-	if selected_player.has_moved == false:
+	if selected_player.has_moved == false and GlobalManager.mek_toggle_active or GlobalManager.missile_toggle_active:
 		selected_player.move_player_to_target(tile_pos)
 		clear_action_tiles()  # Clear movement and attack tiles after moving
 

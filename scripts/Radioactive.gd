@@ -3,6 +3,7 @@ extends Node2D
 # Particle scene
 var particle_scene = preload("res://assets/scenes/prefab/radioactivity.tscn")  # Path to the particle scene
 var active_particle_instances = []  # To track active particles
+var damaged_units_this_turn = []  # Array to keep track of units damaged this turn
 
 # Reference to the Area2D node (parent node)
 var area2d = null
@@ -98,10 +99,42 @@ func spawn_radiation_particle(spawn_position: Vector2):
 	particle_instance.get_child(0).emitting = true  # Start emitting particles if needed
 	active_particle_instances.append(particle_instance)  # Track active particles
 
-# Function to update the particle positions (make them follow the zombie)
+# Function to update the particle positions and check if a player is on the same tile as any particle
 func _process(delta):
 	var zombie = get_parent()  # The zombie node
 	if zombie.zombie_type == "Radioactive" and not particles_spawned:
 		# Only spawn particles once, when the zombie is ready
 		spawn_particles_based_on_manhattan_distance()
 		particles_spawned = true  # Set the flag to true to avoid spawning multiple times
+	
+	# Check all active particles and see if any player unit is on the same tile
+	for particle_instance in active_particle_instances:
+		# Get the world position of the particle instance
+		var particle_world_pos = particle_instance.global_position
+		
+		# Convert the world position to tile position
+		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+		var particle_tile_pos = tilemap.local_to_map(particle_world_pos)
+		
+		# Check if a player unit is on the same tile
+		check_for_player_units_in_tile(particle_tile_pos)
+		
+# Function to check for player units in the same tile as the particle
+func check_for_player_units_in_tile(tile_pos: Vector2i):
+	var units_in_tile = get_tree().get_nodes_in_group("player_units")
+	for unit in units_in_tile:
+		# Get the unit's position in world coordinates
+		var unit_tile_pos = get_node("/root/MapManager/TileMap").local_to_map(unit.global_position)
+		
+		# Check if the player unit's tile position matches the tile position of the particle
+		if unit_tile_pos == tile_pos:
+			# Apply damage to the player if they're on the same tile as the particle
+			if not damaged_units_this_turn.has(unit):
+				unit.audio_player.stream = unit.hurt_audio
+				unit.audio_player.play()
+				
+				unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
+				unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method
+
+				# Mark the player as damaged this turn
+				damaged_units_this_turn.append(unit)

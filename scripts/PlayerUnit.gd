@@ -638,7 +638,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		level_up()
 	
 	item_manager.check_item_destroyed()
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(0).timeout
 	mission_manager.check_mission_manager()
 			
 	# Update the HUD to reflect new stats

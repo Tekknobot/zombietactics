@@ -122,6 +122,8 @@ func _process(delta: float) -> void:
 				#print("Death animation finished, destroying zombie.")
 				self.remove_from_group("zombies")				
 				self.visible = false
+				if self.zombie_type == "Radioactive":
+					self.get_child(4).active_particle_instances.clear()
 				
 				var zombies = get_tree().get_nodes_in_group("zombies")
 				if zombies.size() <= 0:

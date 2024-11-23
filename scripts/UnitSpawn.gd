@@ -9,6 +9,7 @@ extends Node2D
 
 @export var unit_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
 @export var unit_radioactive_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
+@export var unit_crusher_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
 
 @export var M1: PackedScene  
 @export var M2: PackedScene  
@@ -135,6 +136,15 @@ func spawn_zombies():
 				if randi() % 2 == 0:
 					zombie_instance = unit_radioactive_zombie.instantiate()
 				else:
+					zombie_instance = unit_zombie.instantiate()
+			elif GlobalManager.current_map_index == 3:
+				# Mixed spawning: crusher zombies, radioactive zombies, and normal zombies
+				var roll = randi() % 10  # Random roll (0 to 9)
+				if roll < 3:  # 30% chance for radioactive zombie
+					zombie_instance = unit_radioactive_zombie.instantiate()
+				elif roll < 6:  # 30% chance for crusher zombie
+					zombie_instance = unit_crusher_zombie.instantiate()
+				else:  # 40% chance for normal zombie
 					zombie_instance = unit_zombie.instantiate()
 			else:
 				# Only spawn normal zombies on other maps

@@ -1,0 +1,28 @@
+[gd_scene load_steps=13 format=3 uid="uid://bpujjl4f0a6vj"]
+
+[ext_resource type="Script" path="res://scripts/UnitSpawn.gd" id="1_g75ta"]
+[ext_resource type="PackedScene" uid="uid://bb3qswsg06tsw" path="res://assets/scenes/prefab/Soldier.scn" id="2_kgaux"]
+[ext_resource type="PackedScene" uid="uid://cct3cdw6v02yc" path="res://assets/scenes/prefab/Mercenary.scn" id="3_2iq33"]
+[ext_resource type="PackedScene" uid="uid://bttqppcimakh7" path="res://assets/scenes/prefab/Dog.scn" id="4_ya024"]
+[ext_resource type="PackedScene" uid="uid://d0asrf848kjy5" path="res://assets/scenes/prefab/Zombie.scn" id="5_c62vw"]
+[ext_resource type="PackedScene" uid="uid://co0dpk4e4o8oe" path="res://assets/scenes/prefab/Radioactive_Zombie.scn" id="6_0lsca"]
+[ext_resource type="PackedScene" uid="uid://ci0nvbknkouk5" path="res://assets/scenes/prefab/M1.scn" id="7_884qv"]
+[ext_resource type="PackedScene" uid="uid://isp3h3mc30kr" path="res://assets/scenes/prefab/M2.scn" id="8_xoq4l"]
+[ext_resource type="PackedScene" uid="uid://d0nuwcj38jovf" path="res://assets/scenes/prefab/R1.scn" id="9_nv1l8"]
+[ext_resource type="PackedScene" uid="uid://ljo4wh1814ie" path="res://assets/scenes/prefab/R3.scn" id="10_sagh2"]
+[ext_resource type="PackedScene" uid="uid://kjjhlcxrti0l" path="res://assets/scenes/prefab/S2.scn" id="11_5cx5h"]
+[ext_resource type="PackedScene" uid="uid://bedhvs5lsjiuk" path="res://assets/scenes/prefab/S3.scn" id="12_6asmv"]
+
+[node name="UnitSpawn" type="Node2D"]
+script = ExtResource("1_g75ta")
+unit_soldier = ExtResource("2_kgaux")
+unit_merc = ExtResource("3_2iq33")
+unit_dog = ExtResource("4_ya024")
+unit_zombie = ExtResource("5_c62vw")
+unit_radioactive_zombie = ExtResource("6_0lsca")
+M1 = ExtResource("7_884qv")
+M2 = ExtResource("8_xoq4l")
+R1 = ExtResource("9_nv1l8")
+R3 = ExtResource("10_sagh2")
+S2 = ExtResource("11_5cx5h")
+S3 = ExtResource("12_6asmv")

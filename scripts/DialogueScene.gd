@@ -35,8 +35,37 @@ var dialogue_2 = [
 	{ "speaker": "Logan. Raines", "text": "Once we get the core, we extract. No detours, no heroics. We finish this and get out.", "portrait": "res://assets/portraits/soldier_port.png" }
 ]
 
+var dialogue_3 = [
+	{ "speaker": "Logan. Raines", "text": "Crimson District. Used to be biotech labs. Now it’s a kill zone.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Dutch. Major", "text": "You mean a *death* zone. Something’s already creeping me out here.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Scanners picking up massive heat signatures ahead. Whatever’s there, it’s big.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Big? That’s not good. What exactly are we walking into?", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Reports suggest it’s a new type—‘Crushers.’ Stronger, faster, and meaner than the rest. Stick to cover.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Confirmed: Crushers detected. Enhanced movement range and significant damage output. Recommend cautious engagement.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Cautious? I prefer decisive. These things don’t look like they’ll go down easy.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Logan. Raines", "text": "They won’t. Keep your distance and focus fire. Yoshida, plot a route to the core.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Core located in central containment. Heavy hostile activity detected. Safe routes marked on HUD.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Great. Just what I needed—a maze full of walking tanks. Let’s move.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Contact! Crusher in Sector 2! Dutch, focus on suppressing fire! Yoshida, track its movements.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Suppressing fire? This thing’s charging! Someone slow it down before it flattens us!", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Crusher approaching! It regenerates slowly—take it out quickly or risk prolonged fights.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Stay spread out! Don’t let it take multiple targets at once. We hold it here!", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Regeneration or not, it’s going down. Keep shooting until it stays down!", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Crusher neutralized. Marking next waypoint. High density of hostiles ahead—more Crushers likely.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Let’s not waste time. Stick to safe zones and use choke points. We can’t handle another one unprepared.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Core located. Containment lock engaged. Defend the position while I override the system.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Here we go again. Hope we don’t get any more of those Crushers while we’re stuck here.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Hold position! We don’t leave until Yoshida finishes. Keep those Crushers off the perimeter.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Override complete! Core secured. Extract now before reinforcements arrive.", "portrait": "res://assets/portraits/dog_port.png" },
+	{ "speaker": "Dutch. Major", "text": "Let’s move before this place decides to throw more surprises our way.", "portrait": "res://assets/portraits/rambo_port.png" },
+	{ "speaker": "Logan. Raines", "text": "Extraction point marked. Move as a unit—no unnecessary risks. We’re not out of the woods yet.", "portrait": "res://assets/portraits/soldier_port.png" },
+	{ "speaker": "Yoshida. Boi", "text": "Extraction path clear. Minimal hostiles ahead. Mission success within reach.", "portrait": "res://assets/portraits/dog_port.png" }
+]
+
+
 var chapter_text: String = "Chapter 1: No Way Out — The Descent into Sector 13"
 var chapter_text_2: String = "Chapter 2: Into the Dark — The Heart of Sector 13"
+var chapter_text_3: String = "Chapter 3: Crimson Horizon — The Core Awakens"
 
 var current_line = 0
 var displayed_text = ""  # Current visible text for typewriter effect
@@ -70,6 +99,9 @@ func _ready():
 		2:
 			story_chapter.text = chapter_text_2
 			dialogue = dialogue_2  # Use Chapter 2 dialogue
+		3:
+			story_chapter.text = chapter_text_3
+			dialogue = dialogue_3  # Use Chapter 2 dialogue			
 		_:
 			story_chapter.text = "Chapter Unknown"
 			dialogue = []  # Fallback for undefined chapters

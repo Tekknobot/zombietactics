@@ -91,7 +91,11 @@ func _ready() -> void:
 
 	if self.zombie_type == "Radioactive":
 		movement_range = 3
-		
+
+	if self.zombie_type == "Crusher":
+		movement_range = 4
+		attack_damage = 50
+				
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
 	elif map_manager.map_2:

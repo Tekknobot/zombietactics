@@ -46,6 +46,7 @@ func assign_item_to_structure():
 
 	# Optionally, you can mark the structure visually or with metadata
 	item_structure.set_meta("contains_item", true)  # Tag the structure
+	item_structure.has_item = true
 	# Example: Highlight the structure for debugging (remove in final version)
 	if item_structure.has_method("highlight"):
 		item_structure.highlight(true)

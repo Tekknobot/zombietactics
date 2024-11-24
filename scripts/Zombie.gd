@@ -17,6 +17,8 @@ var tile_size = 32  # Or whatever your tile size is in pixels
 
 @onready var map_manager = get_parent().get_node("/root/MapManager")
 
+var is_zombie: bool = true
+
 var movement_tiles: Array[Node2D] = []
 var tile_pos: Vector2i
 var coord: Vector2

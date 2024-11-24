@@ -10,9 +10,12 @@ var layer: int
 @export var explosion_scene: PackedScene  # Optional: Scene to instantiate for the explosion effect
 
 @onready var mission_manager = get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
+@onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
 
 var is_demolished: bool = false
 var selected = false
+
+var has_item: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

@@ -43,7 +43,7 @@ func _input(event: InputEvent) -> void:
 		return
 			
 	# Handle mouse button events (right and left-click)
-	if event is InputEventMouseButton:
+	if event is InputEventMouseButton:				
 		# Right-click to set the target position
 		if event.button_index == MOUSE_BUTTON_RIGHT and not onTrajectory:
 			if event.pressed:
@@ -139,6 +139,7 @@ func clear_zombie_tiles():
 # Function to start the missile trajectory and visualize with Line2D
 func start_trajectory(start: Vector2, target: Vector2):
 	onTrajectory = true
+	
 	print("Starting trajectory to target:", target)
 
 	# Create a Line2D instance for visualizing the missile's trajectory
@@ -169,7 +170,6 @@ func start_trajectory(start: Vector2, target: Vector2):
 	missiles_launched = 0
 	
 	onTrajectory = false
-	
 	print("Trajectory animation completed and cleaned up.")
 
 # Call this function after every player action

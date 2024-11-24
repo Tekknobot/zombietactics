@@ -119,9 +119,9 @@ func _process(delta):
 		reset_level()
 
 # Reload the current scene to reset the level
-func reset_level():
-	print("Resetting level...")
+func reset_level():	
 	get_tree().reload_current_scene()
+	print("Resetting level...")
 
 func generate_map():
 	clear_existing_structures()  # Clear previous structures

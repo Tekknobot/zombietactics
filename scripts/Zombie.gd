@@ -136,7 +136,7 @@ func _process(delta: float) -> void:
 				
 				var zombies = get_tree().get_nodes_in_group("zombies")
 				if zombies.size() <= 0:
-					reset_player_units()
+					reset_player_units()	
 					GlobalManager.zombies_cleared = true
 					mission_manager.check_mission_manager()
 					

@@ -118,9 +118,6 @@ func _process(delta: float) -> void:
 	else:
 		print("Error: No map selected, defaulting WATER to 0.")
 		WATER_TILE_ID = 0  # Fallback value if no map is selected
-		
-	update_tile_position()
-	move_along_path(delta)
 	
 	if target_pos != position:  # Check if the projectile hasn't reached the target yet
 		# Move the projectile in the direction at a constant speed
@@ -145,7 +142,9 @@ func _process(delta: float) -> void:
 		# Prevent tile display or any other player action
 		return
 
-
+	update_tile_position()
+	move_along_path(delta)
+	
 # Function to update the tile position based on the current Area2D position
 func update_tile_position() -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

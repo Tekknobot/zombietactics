@@ -844,7 +844,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 				audio_player.play()	
 							
 				zombie.flash_damage()
-				zombie.apply_damage(attack_damage)
+				zombie.apply_damage(selected_unit.get_attack_damage())
 				
 				zombie.second_audio_player.stream = zombie.hurt_audio
 				zombie.second_audio_player.play()

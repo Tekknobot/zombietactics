@@ -137,13 +137,15 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 					
 					unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
 					unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method
+					unit.health_ui.value -= 5 
 				else:
 					unit.audio_player.stream = unit.hurt_audio
 					unit.audio_player.play()
 					
 					unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
 					unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method					
-				
+					unit.health_ui.value -= 5 
+					
 				# Update the HUD to reflect new stats
 				var hud_manager = get_node("/root/MapManager/HUDManager")
 				hud_manager.update_hud(unit)	
@@ -162,6 +164,7 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 					
 				unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
 				unit.apply_damage(5)  # Assuming units have an `apply_damage` method					
+				unit.health_ui.value -= 5 
 				
 				# Update the HUD to reflect new stats
 				var hud_manager = get_node("/root/MapManager/HUDManager")

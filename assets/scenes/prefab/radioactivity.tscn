@@ -30,7 +30,7 @@ position = Vector2(44, 0)
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 position = Vector2(0, -8)
-amount = 2
+amount = 1
 process_material = SubResource("ParticleProcessMaterial_diek6")
 lifetime = 0.3
 trail_lifetime = 1.0

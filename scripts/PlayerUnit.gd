@@ -657,7 +657,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		level_up()
 	
 	item_manager.check_item_destroyed()
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(0.1).timeout
 	mission_manager.check_mission_manager()
 			
 	# Update the HUD to reflect new stats
@@ -691,7 +691,10 @@ func apply_damage(damage: int) -> void:
 		die()  # Handle player death if health is 0
 	else:
 		print("Player health after attack:", current_health)
-				
+	
+	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.update_hud(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager						
 	
 # Optional death handling
 func die() -> void:
@@ -876,7 +879,7 @@ func check_end_turn_conditions() -> void:
 		can_start_turn = false
 
 		# Proceed to end the turn
-		await get_tree().create_timer(1.7).timeout	
+		await get_tree().create_timer(0.5).timeout	
 		
 		# Darken the unit to visually indicate its turn is over
 		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)

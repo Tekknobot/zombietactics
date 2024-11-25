@@ -32,7 +32,7 @@ var path_index: int = 0
 var WATER_TILE_ID = 0
 
 var attacks: int = 0
-var attack_damage: int = 25
+@export var attack_damage: int = 25
 
 var hud: Control
 
@@ -93,13 +93,6 @@ func _ready() -> void:
 	# Randomize current_xp
 	current_xp = possible_values[randi() % possible_values.size()]
 	print("Current XP set to:", current_xp)
-
-	if self.zombie_type == "Radioactive":
-		movement_range = 3
-
-	if self.zombie_type == "Crusher":
-		movement_range = 4
-		attack_damage = 50
 				
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
@@ -208,7 +201,7 @@ func update_unit_ui():
 	xp_ui.value = current_xp
 	xp_ui.max_value = max_xp
 	
-func find_and_chase_player_and_move(delta_time: float) -> void:
+func find_and_chase_player_and_move(delta_time: float) -> void:				
 	# Update the AStar grid before moving zombies
 	update_astar_grid()
 	
@@ -301,26 +294,22 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		else:
 			# Call the attack check once per zombie after its movement
 			check_for_attack()  # This will check for attacks after the zombie has moved
+
+		# Address radioactive zombies
+		if zombie.zombie_type == "Radioactive":
+			zombie.get_child(4).damaged_units_this_turn.clear()					
 		
 		# Wait before processing the next zombie
 		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
 		
-		update_astar_grid()	
-		
-		# Address radioactive zombies
-		if zombie.zombie_type == "Radioactive":
-			zombie.get_child(4).active_particle_instances.clear()
-			for active_particle in zombie.get_child(4).active_particle_instances:
-				active_particle.queue_free()
-			zombie.get_child(4).particles_spawned = false
-		
-		update_astar_grid()	
+		update_astar_grid()		
 			
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false
 	attacks = 0
 	
 	reset_player_units()
+	
 	turn_manager.start_current_unit_turn()
 	
 # Function to check adjacency and trigger attack if necessary
@@ -338,7 +327,7 @@ func check_for_attack() -> void:
 	# Check each player for adjacency and attack
 	for player in players:
 		# Check if the player is adjacent to this zombie
-		if is_adjacent_to_tile(tile_pos, player):
+		if is_adjacent_to_tile(tile_pos, player):			
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			
 			# Get world position of the target tile
@@ -361,9 +350,10 @@ func check_for_attack() -> void:
 			attacks += 1
 			if visible:
 				attack_player(player)
-			
+				player.health_ui.value -= attack_damage
+						
 			await get_tree().create_timer(0.5).timeout
-			
+				
 			get_child(0).play("default")
 			# After the first attack, exit the loop
 			break
@@ -413,10 +403,6 @@ func give_damage(player: Area2D, damage: int) -> void:
 		player.audio_player.play()	
 		player.apply_damage(damage)  # Call the player's apply_damage method
 
-	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
-	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.update_hud(player)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-		
 	print("Zombie dealt ", damage, " damage to player")
 
 # Function to check if the zombie is adjacent to a specific tile

@@ -4,6 +4,8 @@ var tile_pos: Vector2i
 var coord: Vector2
 var layer: int
 
+@onready var map_manager = get_parent().get_node("/root/MapManager")
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
@@ -14,5 +16,5 @@ func _process(delta: float) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	tile_pos = tilemap.local_to_map(position)
 	coord = tile_pos
-	layer = (tile_pos.x + tile_pos.y) + 1
+	layer = tile_pos.x + tile_pos.y
 	self.z_index = layer

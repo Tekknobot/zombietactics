@@ -27,7 +27,7 @@ var layer: int
 var astar: AStarGrid2D = AStarGrid2D.new()
 var current_path: PackedVector2Array
 var path_index: int = 0
-var move_speed: float = 75.0
+@export var move_speed: float = 75.0
 
 var WATER_TILE_ID = 0
 

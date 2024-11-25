@@ -85,7 +85,7 @@ func attack_selected_player(tile_pos: Vector2i) -> void:
 
 # Moves the selected player to the specified tile
 func move_selected_player(tile_pos: Vector2i) -> void:
-	if GlobalManager.missile_toggle_active or GlobalManager.dynamite_toggle_active:
+	if GlobalManager.missile_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.mek_toggle_active:
 		return
 		
 	if selected_player.has_moved == false:

@@ -89,7 +89,12 @@ func _input(event: InputEvent) -> void:
 				else:
 					print("No selected unit found to act as attacker.")
 				
+				await get_tree().create_timer(0.1).timeout
 				GlobalManager.mek_toggle_active = false
+
+				var hover_tiles = get_tree().get_nodes_in_group("hovertile")
+				for hovertile in hover_tiles:
+					hovertile.clear_action_tiles_zombie()
 
 				var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
 				

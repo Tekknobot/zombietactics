@@ -79,6 +79,9 @@ var zombies: Array  # This will store the zombies sorted by zombie_id
 
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
 
+@onready var health_ui = $HealthUI
+@onready var xp_ui = $XPUI
+
 func _ready() -> void:
 	# Possible values for health and XP
 	var possible_values = [25, 50, 75]
@@ -115,6 +118,7 @@ func _ready() -> void:
 
 	turn_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
 
+	update_unit_ui()
 
 # Called every frame
 func _process(delta: float) -> void:
@@ -143,6 +147,7 @@ func _process(delta: float) -> void:
 				#queue_free()  # Destroy the zombie once the death animation ends
 					
 	update_tile_position()
+	update_unit_ui()
 	move_along_path(delta)
 
 # Triggered when the player action is completed
@@ -196,7 +201,13 @@ func update_tile_position() -> void:
 	self.z_index = layer
 	astar.set_point_solid(position, true)
 
-
+func update_unit_ui():
+	health_ui.value = current_health
+	health_ui.max_value = max_health
+	
+	xp_ui.value = current_xp
+	xp_ui.max_value = max_xp
+	
 func find_and_chase_player_and_move(delta_time: float) -> void:
 	# Update the AStar grid before moving zombies
 	update_astar_grid()

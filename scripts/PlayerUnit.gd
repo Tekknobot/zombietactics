@@ -99,6 +99,11 @@ var can_start_turn: bool = false
 
 var attack_range_visible: bool = false  # Variable to track if attack range is visible
 
+@onready var health_ui = $HealthUI
+@onready var xp_ui = $XPUI
+
+@export var is_mek: bool
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -146,6 +151,9 @@ func _process(delta: float) -> void:
 		# Prevent tile display or any other player action
 		return
 
+	if is_mek == false:
+		update_unit_ui()
+		
 	update_tile_position()
 	move_along_path(delta)
 	
@@ -156,6 +164,13 @@ func update_tile_position() -> void:
 	coord = tile_pos
 	layer = (tile_pos.x + tile_pos.y) + 1
 	self.z_index = layer
+
+func update_unit_ui():
+	health_ui.value = current_health
+	health_ui.max_value = max_health
+	
+	xp_ui.value = current_xp
+	xp_ui.max_value = max_xp
 
 # Function to update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:

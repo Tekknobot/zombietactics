@@ -318,7 +318,6 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	for zombie in all_zombies:
 		if zombie.zombie_type == "Radioactive":
 			zombie.get_child(4).update_particles()
-			await get_tree().create_timer(1).timeout 
 			zombie.get_child(4).show_all_radiation()
 	
 	reset_player_units()

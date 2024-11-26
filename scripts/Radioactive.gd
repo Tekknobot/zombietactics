@@ -46,8 +46,7 @@ func update_particles():
 		# Ensure particles are updated in the correct order
 		spawn_particles_based_on_manhattan_distance()
 		await get_tree().create_timer(1).timeout
-		remove_overlapping_particles_for_all_zombies()	
-		await get_tree().create_timer(1).timeout		
+		remove_overlapping_particles_for_all_zombies()		
 		remove_out_of_range_radiation(zombie.tile_pos, zombie.movement_range)
 		
 		

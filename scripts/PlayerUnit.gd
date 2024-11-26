@@ -697,23 +697,23 @@ func apply_damage(damage: int) -> void:
 	hud_manager.update_hud(self)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager						
 	
 # Optional death handling
-func die() -> void:
-	print("Player has died")
-	get_child(0).play("death")
-	
+func die() -> void:	
 	if self.player_name == "Dutch. Major" or self.player_name == "Logan. Raines" :
 		# Play sfx
 		audio_player.stream = death_audio
 		audio_player.play()
-			
-	await get_tree().create_timer(1).timeout
+		await get_tree().create_timer(1).timeout
+		self.get_child(0).play("death")
 	
 	if self.player_name == "Yoshida. Boi":
 		_create_explosion()
 	
 	self.remove_from_group("player_units")
-	self.visible = false
+
+	await get_tree().create_timer(1).timeout
 		
+	self.visible = false
+	print("Player has died")	
 	#queue_free()  # Remove player from the scene or handle accordingly		
 
 func level_up() -> void:

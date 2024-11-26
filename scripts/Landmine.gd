@@ -47,12 +47,10 @@ func check_for_units_on_tile() -> void:
 		var player_tile_pos = tilemap.local_to_map(player.position)
 		if player_tile_pos == tile_pos:
 			print("Player stepped on landmine at tile: ", tile_pos)
-			player.get_child(0).play("death")
-			await get_tree().create_timer(0.1).timeout
-			player.visible = false  # Hide the zombie unit
-			player.remove_from_group("player_units")  # Remove from the group
-			print("Player Unit removed from landmine.")			
+			await get_tree().create_timer(0.1).timeout		
 			_create_explosion()
+			player.flash_damage()
+			player.apply_damage(50)
 			return  # Only trigger once per check
 
 # Function to create the explosion effect
@@ -78,7 +76,6 @@ func _create_explosion() -> void:
 
 	# Check for any zombies, players, or structures in the explosion radius
 	_check_for_zombies_at_target()
-	_check_for_players_at_target()
 	_check_for_structure_at_target()
 
 	# Optionally, you can queue_free() the landmine itself after the explosion
@@ -96,20 +93,6 @@ func _check_for_zombies_at_target() -> void:
 			
 			# Play the death animation on the zombie (assuming it has an animation called "death")
 			zombie.get_child(0).play("death")
-
-func _check_for_players_at_target() -> void:
-	# Find all nodes in the group "zombies"
-	for player in get_tree().get_nodes_in_group("player_units"):
-		if not player is Node2D:
-			continue  # Skip any non-Node2D members of the group
-		
-		# Check if the zombie is within the explosion radius
-		if player.position.distance_to(self.position) <= explosion_radius:
-			print("Player found at explosion position, destroying:", player.name)
-			
-			# Play the death animation on the zombie (assuming it has an animation called "death")
-			attack_player(player)
-			player.apply_damage(50)
 
 func _check_for_structure_at_target() -> void:
 	# Find all nodes in the group "structures"
@@ -166,8 +149,3 @@ func _check_for_structure_at_target() -> void:
 
 			else:
 				print("Structure does not have a valid 'structure_type' or 'get_structure_type' method.")
-
-# Function to handle the friendly attack logic
-func attack_player(player: Area2D) -> void:
-	if player.has_method("flash_damage"):
-		player.flash_damage()

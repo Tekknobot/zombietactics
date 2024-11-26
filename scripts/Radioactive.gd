@@ -170,21 +170,21 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 					unit.audio_player.play()
 					
 					unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
-					unit.apply_damage(get_parent().attack_damage)  # Assuming units have an `apply_damage` method					
+					unit.apply_damage(5)  # Assuming units have an `apply_damage` method					
 					unit.health_ui.value -= 5 
-					
-				# Update the HUD to reflect new stats
-				var hud_manager = get_node("/root/MapManager/HUDManager")
-				hud_manager.update_hud(unit)	
+				
+			# Update the HUD to reflect new stats
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			hud_manager.update_hud(unit)	
 
-				# Mark the player as damaged this turn
-				damaged_units_this_turn.append(unit)
+			# Mark the player as damaged this turn
+			damaged_units_this_turn.append(unit)
 				
 		# Check if the player unit's tile position matches the tile position of the particle
 		if unit_tile_pos == tile_pos and unit.is_in_group("zombies"):
 			if unit.zombie_type == "Radioactive":
 				return
-			# Apply damage to the player if they're on the same tile as the particle
+			# Apply damage to the zombie if they're on the same tile as the particle
 			if not damaged_units_this_turn.has(unit):
 				unit.audio_player.stream = unit.hurt_audio
 				unit.audio_player.play()

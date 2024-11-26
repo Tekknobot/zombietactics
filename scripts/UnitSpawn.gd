@@ -142,7 +142,7 @@ func spawn_zombies():
 				var roll = randi() % 10  # Random roll (0 to 9)
 				if roll < 3:  # 30% chance for radioactive zombie
 					zombie_instance = unit_radioactive_zombie.instantiate()
-				elif roll < 6:  # 30% chance for crusher zombie
+				elif roll < 6:  # 60% chance for crusher zombie
 					zombie_instance = unit_crusher_zombie.instantiate()
 				else:  # 40% chance for normal zombie
 					zombie_instance = unit_zombie.instantiate()

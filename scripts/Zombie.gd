@@ -7,8 +7,6 @@ class_name ZombieUnit
 @export var zombie_id: int  # Default to -1, will be set later
 var next_zombie_id: int = 1
 
-# Movement range for zombies, they can move only up to this range
-@export var movement_range = 2
 var is_moving = false  # Flag to track if zombies are moving
 
 var tile_size = 32  # Or whatever your tile size is in pixels
@@ -27,11 +25,13 @@ var layer: int
 var astar: AStarGrid2D = AStarGrid2D.new()
 var current_path: PackedVector2Array
 var path_index: int = 0
-@export var move_speed: float = 75.0
+@onready var move_speed: float = 75.0
 
 var WATER_TILE_ID = 0
 
 var attacks: int = 0
+
+@export var movement_range = 2
 @export var attack_damage: int = 25
 
 var hud: Control
@@ -297,8 +297,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 		# Address radioactive zombies
 		if zombie.zombie_type == "Radioactive":
-			zombie.get_child(4).damaged_units_this_turn.clear()					
-		
+			zombie.get_child(4).damaged_units_this_turn.clear()	
+						
 		# Wait before processing the next zombie
 		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
 		
@@ -309,7 +309,6 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	attacks = 0
 	
 	reset_player_units()
-	
 	turn_manager.start_current_unit_turn()
 	
 # Function to check adjacency and trigger attack if necessary

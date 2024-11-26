@@ -78,7 +78,7 @@ func spawn_particles_based_on_manhattan_distance():
 			print("Tile Position: ", tile_pos, " => World Position: ", world_pos)
 			
 			# Check if the tile is valid for spawning (movable, no zombie, and no radiation)
-			if get_parent().is_tile_movable(tile_pos) and !get_parent().is_zombie_present(tile_pos) and !is_radiation_present_on_tile(tile_pos):
+			if !get_parent().is_zombie_present(tile_pos) and !is_radiation_present_on_tile(tile_pos):
 				
 				# Spawn particle at the world position (not at the zombie's position)
 				spawn_radiation_particle(world_pos)
@@ -100,7 +100,7 @@ func get_radiation_tiles(zombie_tile_pos: Vector2i, movement_range: int) -> Arra
 				
 				# Check if the tile is valid (using get_cell() to ensure tile exists)
 				print("Checking Tile: ", target_tile_pos)  # Debugging
-				if tile_is_valid(target_tile_pos):
+				if tile_is_valid(target_tile_pos) and get_parent().is_tile_movable(target_tile_pos):
 					tiles_in_range.append(target_tile_pos)
 
 	# Debugging: Print how many tiles were found in range

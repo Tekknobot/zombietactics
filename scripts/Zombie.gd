@@ -233,9 +233,12 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			print("Zombie ID %d removed, skipping..." % zombie.zombie_id)
 			continue  # Skip this zombie and move to the next one
 
-		# Play sfx
-		audio_player.stream = zombie_audio
-		audio_player.play()
+		if zombie.current_path.size() <= 0:
+			pass
+		else:
+			# Play sfx
+			audio_player.stream = zombie_audio
+			audio_player.play()
 
 		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")

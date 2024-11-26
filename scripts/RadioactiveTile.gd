@@ -12,7 +12,7 @@ func _process(delta: float) -> void:
 	# Update tile position based on the sprite's world position
 	tile_pos = tilemap.local_to_map(position)
 	coord = tile_pos
-	layer = (tile_pos.x + tile_pos.y) - 1
+	layer = (tile_pos.x + tile_pos.y) - 2
 
 	# Set the z-index of the sprite to reflect its "layer" for rendering order
 	z_index = layer

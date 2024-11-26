@@ -303,7 +303,6 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		# Address radioactive zombies
 		if zombie.zombie_type == "Radioactive":
 			zombie.get_child(4).damaged_units_this_turn.clear()	
-			zombie.get_child(4).particles_need_update = true
 			
 						
 		# Wait before processing the next zombie
@@ -317,8 +316,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 	for zombie in all_zombies:
 		if zombie.zombie_type == "Radioactive":
+			zombie.get_child(4).particles_need_update = true			
 			zombie.get_child(4).update_particles()
-			zombie.get_child(4).show_all_radiation()
 	
 	reset_player_units()
 	turn_manager.start_current_unit_turn()

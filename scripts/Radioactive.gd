@@ -44,12 +44,12 @@ func update_particles():
 	var zombie = get_parent()
 	if zombie.zombie_type == "Radioactive":
 		# Ensure particles are updated in the correct order
-		spawn_particles_based_on_manhattan_distance()
-		await get_tree().create_timer(1).timeout
-		remove_overlapping_particles_for_all_zombies()		
-		remove_out_of_range_radiation(zombie.tile_pos, zombie.movement_range)
-		
-		
+		await spawn_particles_based_on_manhattan_distance()
+		#await get_tree().create_timer(1).timeout	
+		await remove_out_of_range_radiation(zombie.tile_pos, zombie.movement_range)
+		await remove_overlapping_particles_for_all_zombies()	
+	
+	show_all_radiation()	
 	
 func spawn_particles_based_on_manhattan_distance():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")  # Reference to your TileMap
@@ -256,7 +256,7 @@ func remove_overlapping_particles_for_all_zombies():
 # Function to hide all radiation particles
 func hide_all_radiation():
 	for particle_instance in active_particle_instances:
-		particle_instance.visible = false  # Hide the particle
+		particle_instance.get_child(1).visible = false  # Hide the particle
 		# Optionally, you can remove the particles from the scene entirely:
 		# particle_instance.queue_free()  # This will remove the particle from the scene
 		# active_particle_instances.erase(particle_instance)  # Remove from active list
@@ -265,6 +265,6 @@ func hide_all_radiation():
 # Function to show all radiation particles
 func show_all_radiation():
 	for particle_instance in active_particle_instances:
-		particle_instance.visible = true  # Show the particle
+		particle_instance.get_child(1).visible = true  # Show the particle
 		particle_instance.get_child(0).emitting = true  # Start emitting particles if needed
 	print("All radiation particles are visible.")

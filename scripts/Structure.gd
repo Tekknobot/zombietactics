@@ -24,8 +24,6 @@ func _ready() -> void:
 
 # Update the zombie's tile position and z_index
 func _process(delta: float) -> void:
-	update_tile_position()
-	
 	# Check for demolished state based on the structure type
 	if get_structure_type() == "Building":
 		_check_for_demolished_building_and_trigger_explosion()
@@ -35,6 +33,8 @@ func _process(delta: float) -> void:
 		_check_for_demolished_district_and_trigger_explosion()
 	elif get_structure_type() == "Stadium":
 		_check_for_demolished_stadium_and_trigger_explosion()
+
+	update_tile_position()
 
 # Function to handle the demolished "Building" type
 func _check_for_demolished_building_and_trigger_explosion():
@@ -87,7 +87,7 @@ func update_tile_position() -> void:
 	layer = (tile_pos.x + tile_pos.y) + 1
 
 	# Optionally, set the z_index in the node to ensure proper rendering order
-	self.z_index = layer
+	z_index = layer
 
 # Getter method for structure_type
 func get_structure_type() -> String:

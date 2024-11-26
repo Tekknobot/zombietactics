@@ -12,31 +12,46 @@ var cell_size = Vector2(32, 32)  # Correct the cell size to match the tile size 
 # This flag ensures particles are only spawned once
 var particles_spawned = false
 
+var tile_pos: Vector2i
+var coord: Vector2
+var layer: int
+
+# Flag to track if particle updates are needed
+var particles_need_update = true
+
 # Function to get the zombie's movement range and spawn particles around it
 func _ready():
-	area2d = get_parent()  # Get the Area2D node as the parent node
+	area2d = get_parent()
+	particles_need_update = true  # Trigger an initial update
+	update_particles()
 
-# Function to update the particle positions and check if a player is on the same tile as any particle
+# Function to update only when needed
 func _process(delta):
-	var zombie = get_parent()  # The zombie node
-	if zombie.zombie_type == "Radioactive":
-		# Only spawn particles once, when the zombie is ready
-		remove_out_of_range_radiation(get_parent().tile_pos, get_parent().movement_range)
-		spawn_particles_based_on_manhattan_distance()
-		remove_overlapping_particles_for_all_zombies()
-
-	# Check all active particles and see if any player unit is on the same tile
+	# Simplify to only check for interactions
 	for particle_instance in active_particle_instances:
-		# Get the world position of the particle instance
 		var particle_world_pos = particle_instance.global_position
-		
-		# Convert the world position to tile position
-		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		var particle_tile_pos = tilemap.local_to_map(particle_world_pos)
-		
-		# Check if a player unit is on the same tile
+		var particle_tile_pos = get_node("/root/MapManager/TileMap").local_to_map(particle_world_pos)
 		check_for_player_units_in_tile(particle_tile_pos)
+
+# Call this function to update particles when needed (e.g., zombie moves or turns change)
+func update_particles():
+	if !particles_need_update:
+		return  # Skip if no updates are needed
+	
+	# Reset the flag
+	particles_need_update = false	
+	
+	var zombie = get_parent()
+	if zombie.zombie_type == "Radioactive":
+		# Ensure particles are updated in the correct order
+		spawn_particles_based_on_manhattan_distance()
+		await get_tree().create_timer(1).timeout
+		remove_overlapping_particles_for_all_zombies()	
+		await get_tree().create_timer(1).timeout		
+		remove_out_of_range_radiation(zombie.tile_pos, zombie.movement_range)
 		
+		
+	
 func spawn_particles_based_on_manhattan_distance():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")  # Reference to your TileMap
 	var zombie = get_parent()  # The zombie node
@@ -120,6 +135,16 @@ func spawn_radiation_particle(spawn_position: Vector2):
 	var particle_instance = particle_scene.instantiate()
 	add_child(particle_instance)
 	particle_instance.global_position = spawn_position  # Ensure correct world placement
+
+	# Check if the particle is within the map bounds
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var particle_tile_pos = tilemap.local_to_map(spawn_position)
+	if !tilemap.get_used_rect().has_point(particle_tile_pos):
+		particle_instance.visible = false  # Hide the particle if outside map bounds
+		print("Particle off-map, setting visibility to false at position: ", particle_tile_pos)
+	else:
+		particle_instance.visible = true  # Ensure visible if within bounds
+	
 	particle_instance.get_child(0).emitting = true  # Start emitting particles if needed
 	active_particle_instances.append(particle_instance)  # Track active particles
 
@@ -192,38 +217,55 @@ func remove_out_of_range_radiation(zombie_tile_pos: Vector2i, movement_range: in
 	# Create a list of tiles that are within the valid range
 	var valid_tiles = get_radiation_tiles(zombie_tile_pos, movement_range)
 	
-	# Loop through the active particles in reverse to safely remove items
+	# Loop through the active particles to adjust visibility or remove them
 	for i in range(active_particle_instances.size() - 1, -1, -1):
 		var particle_instance = active_particle_instances[i]
 		var particle_tile_pos = tilemap.local_to_map(particle_instance.global_position)
 		
-		# If the particle is not within the valid range, remove it
-		if !valid_tiles.has(particle_tile_pos):
+		# Check if the particle is outside the map bounds
+		if !tilemap.get_used_rect().has_point(particle_tile_pos):
+			print("Particle off-map, setting visibility to false at position: ", particle_tile_pos)
+			particle_instance.visible = false
+		elif !valid_tiles.has(particle_tile_pos):
 			print("Removing radiation at tile: ", particle_tile_pos)
 			particle_instance.queue_free()  # Remove the particle from the scene
 			active_particle_instances.remove_at(i)  # Remove from the tracking list
+		else:
+			particle_instance.visible = true  # Ensure visibility for in-range particles
 
-# Helper function to remove overlapping radiation particles across all zombies
 func remove_overlapping_particles_for_all_zombies():
-	var tilemap: TileMap = get_node("/root/MapManager/TileMap")  # Reference to the TileMap
-	var tile_to_particle_map: Dictionary = {}  # Dictionary to track particles by tile position
-	
-	# Iterate through all zombies in the group
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var tile_to_particle_map: Dictionary = {}
+
 	var all_zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in all_zombies:
-		if zombie.zombie_type == "Radioactive":  # Only process radioactive zombies
+		if zombie.zombie_type == "Radioactive":
 			var zombie_particles = zombie.get_child(4).active_particle_instances
-			
-			# Check each particle instance for overlaps
 			for i in range(zombie_particles.size() - 1, -1, -1):
 				var particle_instance = zombie_particles[i]
 				var particle_tile_pos = tilemap.local_to_map(particle_instance.global_position)
-				
-				# If a particle already exists on this tile, remove the duplicate
+
 				if tile_to_particle_map.has(particle_tile_pos):
-					print("Removing duplicate particle at tile: ", particle_tile_pos)  # Debugging
-					particle_instance.queue_free()  # Remove the particle from the scene
-					zombie_particles.erase(particle_instance)  # Remove from tracking list
+					# Remove only if a duplicate exists
+					print("Removing duplicate particle at tile: ", particle_tile_pos)
+					particle_instance.queue_free()
+					zombie_particles.erase(particle_instance)
 				else:
-					# Add the particle to the map if no duplicate exists
+					# Register particle to avoid duplicates
 					tile_to_particle_map[particle_tile_pos] = particle_instance
+
+# Function to hide all radiation particles
+func hide_all_radiation():
+	for particle_instance in active_particle_instances:
+		particle_instance.visible = false  # Hide the particle
+		# Optionally, you can remove the particles from the scene entirely:
+		# particle_instance.queue_free()  # This will remove the particle from the scene
+		# active_particle_instances.erase(particle_instance)  # Remove from active list
+	print("All radiation particles are hidden.")
+
+# Function to show all radiation particles
+func show_all_radiation():
+	for particle_instance in active_particle_instances:
+		particle_instance.visible = true  # Show the particle
+		particle_instance.get_child(0).emitting = true  # Start emitting particles if needed
+	print("All radiation particles are visible.")

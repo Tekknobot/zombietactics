@@ -1,4 +1,4 @@
-extends GPUParticles2D
+extends Sprite2D
 
 var tile_pos: Vector2i
 var coord: Vector2

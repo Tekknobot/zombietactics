@@ -221,6 +221,11 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	# Set is_moving to true when zombies start moving
 	is_moving = true
 
+	var all_zombies = get_tree().get_nodes_in_group("zombies")
+	for zombie in all_zombies:
+		if zombie.zombie_type == "Radioactive":
+			zombie.get_child(4).hide_all_radiation()
+
 	# Loop through zombies and move them one by one based on their ID
 	for zombie in zombies:
 		# Skip the zombie if it has been removed from the group
@@ -298,6 +303,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		# Address radioactive zombies
 		if zombie.zombie_type == "Radioactive":
 			zombie.get_child(4).damaged_units_this_turn.clear()	
+			zombie.get_child(4).particles_need_update = true
+			
 						
 		# Wait before processing the next zombie
 		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
@@ -307,6 +314,12 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false
 	attacks = 0
+
+	for zombie in all_zombies:
+		if zombie.zombie_type == "Radioactive":
+			zombie.get_child(4).update_particles()
+			await get_tree().create_timer(1).timeout 
+			zombie.get_child(4).show_all_radiation()
 	
 	reset_player_units()
 	turn_manager.start_current_unit_turn()

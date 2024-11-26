@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cxpprxqrolgiq"]
+[gd_scene load_steps=7 format=3 uid="uid://cxpprxqrolgiq"]
 
 [ext_resource type="Script" path="res://scripts/RadioactiveParticles.gd" id="1_l6jpo"]
+[ext_resource type="Texture2D" uid="uid://ctm2u7b2oe0y7" path="res://assets/iso_tiles/effected/tile_radioactive.png" id="2_gyq8r"]
+[ext_resource type="Script" path="res://scripts/RadioactiveTile.gd" id="3_dv83y"]
 
 [sub_resource type="Gradient" id="Gradient_mdkgw"]
 offsets = PackedFloat32Array(0, 0.492958, 1)
@@ -35,3 +37,7 @@ process_material = SubResource("ParticleProcessMaterial_diek6")
 lifetime = 0.3
 trail_lifetime = 1.0
 script = ExtResource("1_l6jpo")
+
+[node name="TextureRect" type="Sprite2D" parent="."]
+texture = ExtResource("2_gyq8r")
+script = ExtResource("3_dv83y")

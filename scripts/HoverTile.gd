@@ -154,7 +154,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	if selected_player:
 		last_selected_player = selected_player  # Save the current player as last selected
 		
-	selected_player = null
+	#selected_player = null
 
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:

@@ -707,12 +707,12 @@ func die() -> void:
 		await get_tree().create_timer(1).timeout
 		self.get_child(0).play("death")
 	
+	await get_tree().create_timer(1).timeout
+	
 	if self.player_name == "Yoshida. Boi":
 		_create_explosion()
 	
 	self.remove_from_group("player_units")
-
-	await get_tree().create_timer(1).timeout
 		
 	self.visible = false
 	print("Player has died")	

@@ -148,8 +148,8 @@ func start_trajectory(start: Vector2, target: Vector2):
 	print("Line2D instance created for trajectory visualization.")
 
 	# Define control points for a cubic Bézier curve (used for missile path simulation)
-	var control1 = Vector2(start.x, start.y - 100)  # Slight upward control point
-	var control2 = Vector2(target.x, target.y - 100)  # Same for target
+	var control1 = Vector2(start.x, start.y - 200)  # Slight upward control point
+	var control2 = Vector2(target.x, target.y - 200)  # Same for target
 	var end = target
 
 	print("Bezier control points: start =", start, "control1 =", control1, "control2 =", control2, "end =", end)

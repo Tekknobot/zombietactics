@@ -160,7 +160,7 @@ func spawn_zombies():
 			
 			# Assign a unique name to the zombie
 			if zombie_names.size() > 0:
-				zombie_instance.zombie_name = zombie_names.pop_back()  # Remove the last name from the list
+				zombie_instance.zombie_name = zombie_instance.zombie_type + " " + zombie_names.pop_back()  # Remove the last name from the list
 
 			# Randomly determine the direction (left or right)
 			var random_direction = randi() % 2 == 0  # True for right, False for left

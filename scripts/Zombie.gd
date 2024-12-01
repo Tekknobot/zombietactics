@@ -146,6 +146,7 @@ func _process(delta: float) -> void:
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	#print("Player action completed!")
+	await get_tree().create_timer(1).timeout 
 	find_and_chase_player_and_move(get_process_delta_time())
 
 # Setup the AStarGrid2D with walkable tiles

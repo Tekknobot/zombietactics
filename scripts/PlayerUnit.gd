@@ -797,14 +797,16 @@ func get_attack_damage() -> int:
 	return attack_damage  # Replace with your variable holding attack damage
 
 func mek_melee(selected_unit: Area2D) -> void:
-	# Get the tilemap to convert positions
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		
 	if not tilemap:
 		print("TileMap not found!")
 		return
 
 	# Get the player's current tile position
 	var mek_tile_pos = tilemap.local_to_map(self.position)
+	camera.focus_on_tile(tilemap, mek_tile_pos)
 	
 	# Define adjacent tiles (4 directions: up, down, left, right)
 	var adjacent_tiles = [

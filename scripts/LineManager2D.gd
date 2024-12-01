@@ -222,18 +222,13 @@ func _trigger_explosion(last_point: Vector2):
 
 	# Check for PlayerUnit within explosion radius
 	for player in get_tree().get_nodes_in_group("player_units"):
-		if player.position.distance_to(last_point) <= explosion_radius:
-			if player.player_name == "Yoshida. Boi":
-				pass
-			else:
-				player.get_child(0).play("death")
-			await get_tree().create_timer(0).timeout
-			player.visible = false  # Hide the player unit
-			player.remove_from_group("player_units")  # Remove from the group
-			print("Player Unit removed from explosion")
+		if player.position.distance_to(last_point) <= explosion_radius:	
+			player.flash_damage()
+			player.apply_damage(player.attack_damage)
+					
 			xp_awarded = true  # Mark XP as earned for this explosion
-			
-			var hud_manager = get_parent().get_parent().get_node("HUDManager") 
+
+			var hud_manager = get_parent().get_node("HUDManager") 
 			hud_manager.update_hud(player)
 
 	# Check for ZombieUnit within explosion radius
@@ -244,7 +239,6 @@ func _trigger_explosion(last_point: Vector2):
 				if player.player_name == "Yoshida. Boi":			
 					zombie.apply_damage(player.attack_damage)
 					
-			print("Zombie Unit removed from explosion")
 			xp_awarded = true  # Mark XP as earned for this explosion
 
 			var hud_manager = get_parent().get_node("HUDManager") 

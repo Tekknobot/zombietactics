@@ -45,9 +45,9 @@ func _process(delta: float) -> void:
 	if is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_left"):
 		handle_left_click(tile_pos)
 		
-		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-		camera.focus_on_tile(tilemap, tile_pos)		
+		#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+		#var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		#camera.focus_on_tile(tilemap, tile_pos)		
 		
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
 		handle_right_click()
@@ -168,6 +168,11 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			selected_structure = structure		
 			# If the structure is selected, perform any necessary action (like highlighting it)
 			structure.selected = true
+			
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			camera.focus_on_tile(tilemap, selected_structure.tile_pos)
+						
 			return
 	
 	# If no unit or structure is found at the clicked tile, deselect the current player

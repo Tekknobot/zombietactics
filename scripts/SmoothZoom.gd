@@ -14,6 +14,11 @@ var return_to_default_timer: Timer = null
 var original_position: Vector2 = Vector2.ZERO
 var original_zoom: Vector2 = Vector2(2, 2)
 
+# Variables for dragging mechanic
+var is_dragging = false
+var drag_start_mouse_position: Vector2 = Vector2.ZERO
+var drag_start_camera_position: Vector2 = Vector2.ZERO
+
 func _ready():
 	# Initialize the return timer
 	return_to_default_timer = Timer.new()
@@ -49,7 +54,20 @@ func _process(delta):
 		if position.distance_to(original_position) < 0.1 and zoom.distance_to(original_zoom) < 0.01:
 			is_zooming_out = false
 
-func _on_return_to_default_timeout():
-	# Start zooming out after the timer
-	#is_zooming_out = true
-	pass
+	# Handle dragging mechanic
+	if is_dragging:
+		var mouse_delta = drag_start_mouse_position - get_viewport().get_mouse_position()
+		position = drag_start_camera_position + mouse_delta / zoom
+
+func _input(event):
+	# Handle mouse button press
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_MIDDLE:  # Middle mouse button
+			if event.pressed:
+				# Start dragging
+				is_dragging = true
+				drag_start_mouse_position = get_viewport().get_mouse_position()
+				drag_start_camera_position = position
+			else:
+				# Stop dragging
+				is_dragging = false

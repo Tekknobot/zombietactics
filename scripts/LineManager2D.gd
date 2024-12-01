@@ -192,6 +192,11 @@ func animate_trajectory(line_inst: Line2D, points: Array):
 		line_inst.clear_points()  # Clear existing points to update Line2D path
 		for j in range(i):
 			line_inst.add_point(points[j])
+			
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			
+			camera.focus_on_trajectory(points[j])		
 
 		# Check if missile has reached the target and trigger explosion
 		if i == points.size() - 1:

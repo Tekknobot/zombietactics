@@ -211,6 +211,11 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 		var start_point = points[i]
 		var end_point = points[i + 1]
 		
+		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			
+		camera.focus_on_trajectory(points[i])
+					
 		while elapsed_time < step_time:
 			# Calculate the time ratio
 			var t = elapsed_time / step_time

@@ -128,7 +128,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_tile(tilemap, selected_player.tile_pos)
+			#camera.focus_on_tile(tilemap, selected_player.tile_pos)
 						
 			show_movement_tiles(player)
 			hud_manager.update_hud(player)
@@ -151,7 +151,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_tile(tilemap, selected_zombie.tile_pos)
+			#camera.focus_on_tile(tilemap, selected_zombie.tile_pos)
 			
 			show_movement_tiles_zombie(zombie)
 			hud_manager.update_hud_zombie(zombie)
@@ -171,7 +171,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_tile(tilemap, selected_structure.tile_pos)
+			#camera.focus_on_tile(tilemap, selected_structure.tile_pos)
 						
 			return
 	

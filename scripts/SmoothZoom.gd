@@ -71,3 +71,9 @@ func _input(event):
 			else:
 				# Stop dragging
 				is_dragging = false
+
+func _on_return_to_default_timeout():
+	is_zooming_out = false
+
+func focus_on_trajectory(point: Vector2):
+	position = point

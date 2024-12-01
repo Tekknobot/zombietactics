@@ -37,6 +37,8 @@ var current_path: Array[Vector2i] = []  # Stores the path tiles
 var path_index: int = 0  # Index for the current step in the path
 var move_speed: float = 75.0  # Movement speed for the soldier
 
+var is_zombie: bool = false
+
 # Constants
 var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 

@@ -18,6 +18,7 @@ extends Node2D
 # Constants
 var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
 
+var fade_duration = 1
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -124,7 +125,7 @@ func animate_fade_in_out(instance: Node2D) -> void:
 	tween.tween_callback(Callable(self, "_play_mek_call_audio"))
 
 	# Fade-in animation
-	tween.tween_property(instance, "modulate:a", 1, 2)  # Fade to fully opaque over 2 seconds
+	tween.tween_property(instance, "modulate:a", 1, fade_duration)  # Fade to fully opaque over 2 seconds
 	tween.set_trans(tween.TRANS_LINEAR).set_ease(tween.EASE_IN_OUT)
 
 	# Add a delay before fade-out begins
@@ -134,7 +135,7 @@ func animate_fade_in_out(instance: Node2D) -> void:
 	tween.tween_callback(Callable(self, "_play_mek_call_audio"))
 
 	# Fade-out animation
-	tween.tween_property(instance, "modulate:a", 0, 3)  # Fade to fully transparent over 3 seconds
+	tween.tween_property(instance, "modulate:a", 0, fade_duration)  # Fade to fully transparent over 3 seconds
 	
 # Function to play mek_call audio
 func _play_mek_call_audio() -> void:

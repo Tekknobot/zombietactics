@@ -92,6 +92,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @onready var missile_manager = get_node("/root/MapManager/MissileManager")  # Reference to the SpecialToggleNode
 @onready var dynamite_manager = get_node("/root/MapManager/DynamiteManager")  # Reference to the SpecialToggleNode
 
+@onready var mek_manager = get_node("/root/MapManager/MekManager")  # Reference to the SpecialToggleNode
 
 var has_moved: bool = false  # Tracks if the unit has moved this turn
 var has_attacked: bool = false  # Tracks if the unit has attacked this turn

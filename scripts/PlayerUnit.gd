@@ -154,8 +154,7 @@ func _process(delta: float) -> void:
 		# Prevent tile display or any other player action
 		return
 
-	if is_mek == false:
-		update_unit_ui()
+	update_unit_ui()
 		
 	update_tile_position()
 	move_along_path(delta)

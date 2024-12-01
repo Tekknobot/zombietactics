@@ -74,7 +74,7 @@ func _input(event: InputEvent) -> void:
 				add_child(instance)
 				
 				# Start the instance with full transparency
-				instance.modulate = Color(1, 1, 1, 0)  # RGBA: fully transparent
+				instance.modulate = Color8(255, 110, 255, 0)  # RGBA: fully transparent
 				
 				# Animate fade-in and fade-out
 				animate_fade_in_out(instance)

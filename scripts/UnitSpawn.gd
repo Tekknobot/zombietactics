@@ -68,7 +68,7 @@ func _ready():
 # Function to spawn player units on one half of the map
 func spawn_player_units():
 	# List of unit scenes for easier access
-	var units = [unit_soldier, unit_merc, unit_dog] # M1, M2, R1, R3, S2, S3]
+	var units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
 	
 	# Units that need color modulation
 	var mek_units = [M1, M2, R1, R3, S2, S3]
@@ -144,7 +144,7 @@ func spawn_zombies():
 					zombie_instance = unit_radioactive_zombie.instantiate()
 				elif roll < 6:  # 60% chance for crusher zombie
 					zombie_instance = unit_crusher_zombie.instantiate()
-				else:  # 40% chance for normal zombie
+				else:  # 30% chance for normal zombie
 					zombie_instance = unit_zombie.instantiate()
 			else:
 				# Only spawn normal zombies on other maps

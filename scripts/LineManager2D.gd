@@ -205,7 +205,7 @@ func animate_trajectory(line_inst: Line2D, points: Array):
 			break
 
 		# Simulate animation speed by waiting a short time before updating trajectory
-		await get_tree().create_timer(0.01).timeout
+		await get_tree().create_timer(0.02).timeout
 	
 	print("Trajectory animation function completed.")
 

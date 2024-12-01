@@ -78,6 +78,10 @@ func _input(event: InputEvent) -> void:
 				
 				# Animate fade-in and fade-out
 				animate_fade_in_out(instance)
+
+				var camera: Camera2D = get_node("/root/MapManager/Camera2D")				
+				camera.focus_on_tile(tilemap, tile_pos)	
+				camera.zoom_focus = Vector2i(3, 3)	
 				
 				# Get the selected attacker from the "player_units" group
 				var selected_unit = get_selected_unit()
@@ -135,7 +139,13 @@ func animate_fade_in_out(instance: Node2D) -> void:
 	tween.tween_callback(Callable(self, "_play_mek_call_audio"))
 
 	# Fade-out animation
-	tween.tween_property(instance, "modulate:a", 0, fade_duration)  # Fade to fully transparent over 3 seconds
+	tween.tween_property(instance, "modulate:a", 0, fade_duration)  # Fade to fully transparent over 3 seconds				
+	
+	await get_tree().create_timer(4).timeout
+	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	camera.focus_on_tile(tilemap, instance.tile_pos)
+	camera.zoom_focus = Vector2i(2, 2)		
 	
 # Function to play mek_call audio
 func _play_mek_call_audio() -> void:

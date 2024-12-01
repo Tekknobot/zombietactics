@@ -223,7 +223,7 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 			dynamite_inst.global_position = start_point.lerp(end_point, t)
 			elapsed_time += get_process_delta_time()
 			
-			await get_tree().create_timer(0.01).timeout  # Wait until the next frame (await instead of yield)
+			await get_tree().create_timer(0.02).timeout  # Wait until the next frame (await instead of yield)
 			
 		# Reset elapsed time for the next segment
 		elapsed_time = 0.0

@@ -28,13 +28,6 @@ func _ready() -> void:
 	tilemap = get_node("/root/MapManager/TileMap")
 	visible = true
 	
-	await get_tree().create_timer(1).timeout
-	
-	var zombies = get_tree().get_nodes_in_group("zombies")
-	for zombie in zombies:
-		selected_zombie = zombie
-		break
-	
 # Called every frame to process input and update hover tile position
 func _process(delta: float) -> void:
 	var mouse_pos: Vector2 = get_global_mouse_position()
@@ -95,8 +88,10 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 	if GlobalManager.missile_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.mek_toggle_active:
 		return
 	
-	if selected_zombie.selected:
-		return
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	for zombie in zombies:
+		if zombie.selected:
+			return
 		
 	if selected_player.has_moved == false:
 		selected_player.move_player_to_target(tile_pos)
@@ -125,10 +120,6 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			
 			selected_player = player
 			player.selected = true
-			
-			var zombies = get_tree().get_nodes_in_group("zombies")
-			for zombie in zombies:		
-				zombie.selected = false
 					
 			show_movement_tiles(player)
 			hud_manager.update_hud(player)

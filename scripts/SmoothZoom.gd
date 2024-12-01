@@ -51,4 +51,5 @@ func _process(delta):
 
 func _on_return_to_default_timeout():
 	# Start zooming out after the timer
-	is_zooming_out = true
+	#is_zooming_out = true
+	pass

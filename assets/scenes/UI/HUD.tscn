@@ -34,6 +34,14 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 grow_vertical = 0
 
+[node name="PortraitColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = -154.0
+offset_right = 152.0
+offset_bottom = -26.0
+color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+
 [node name="Portrait" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 1

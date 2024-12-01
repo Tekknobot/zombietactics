@@ -44,6 +44,11 @@ func _process(delta: float) -> void:
 	# Handle left-click and right-click actions
 	if is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_left"):
 		handle_left_click(tile_pos)
+		
+		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		camera.focus_on_tile(tilemap, tile_pos)		
+		
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
 		handle_right_click()
 		
@@ -120,7 +125,11 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			
 			selected_player = player
 			player.selected = true
-					
+			
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			camera.focus_on_tile(tilemap, selected_player.tile_pos)
+						
 			show_movement_tiles(player)
 			hud_manager.update_hud(player)
 			return
@@ -140,6 +149,10 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			selected_zombie = zombie
 			zombie.selected = true
 
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			camera.focus_on_tile(tilemap, selected_zombie.tile_pos)
+			
 			show_movement_tiles_zombie(zombie)
 			hud_manager.update_hud_zombie(zombie)
 			return

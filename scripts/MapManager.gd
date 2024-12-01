@@ -24,8 +24,8 @@ const DOWN_RIGHT_ROAD = 8
 @onready var mission_manager = get_node("/root/MapManager/MissionManager")
 
 # Grid dimensions
-var grid_width = 16
-var grid_height = 16
+var grid_width = 32
+var grid_height = 32
 
 # Noise generation
 var noise = FastNoiseLite.new()
@@ -159,10 +159,22 @@ func generate_map():
 	var horizontal_y2 = get_unique_random_odd(grid_height, picked_horizontal_odd_y)
 	var vertical_x2 = get_unique_random_odd(grid_width, picked_vertical_odd_x)
 
+	var horizontal_y3 = get_unique_random_odd(grid_height, picked_horizontal_odd_y)
+	var vertical_x3 = get_unique_random_odd(grid_width, picked_vertical_odd_x)
+	var horizontal_y4 = get_unique_random_odd(grid_height, picked_horizontal_odd_y)
+	var vertical_x4 = get_unique_random_odd(grid_width, picked_vertical_odd_x)
+
+
 	generate_roads(Vector2i(0, horizontal_y1), Vector2i(1, 0))  # Horizontal road 1
 	generate_roads(Vector2i(vertical_x1, 0), Vector2i(0, 1))    # Vertical road 1
 	generate_roads(Vector2i(0, horizontal_y2), Vector2i(1, 0))  # Horizontal road 2
 	generate_roads(Vector2i(vertical_x2, 0), Vector2i(0, 1))    # Vertical road 2
+
+	generate_roads(Vector2i(0, horizontal_y3), Vector2i(1, 0))  # Horizontal road 1
+	generate_roads(Vector2i(vertical_x3, 0), Vector2i(0, 1))    # Vertical road 1
+	generate_roads(Vector2i(0, horizontal_y4), Vector2i(1, 0))  # Horizontal road 2
+	generate_roads(Vector2i(vertical_x4, 0), Vector2i(0, 1))    # Vertical road 2
+
 
 	spawn_structures()  # Spawn structures after generating the map
 
@@ -181,7 +193,7 @@ func get_unique_random_odd(max_value: int, picked_list: Array) -> int:
 func get_random_odd(max_value: int) -> int:
 	var rand_value: int
 	var attempts: int = 0
-	const MAX_ATTEMPTS: int = 100  # Limit attempts to prevent infinite loop
+	const MAX_ATTEMPTS: int = 1024  # Limit attempts to prevent infinite loop
 
 	# Loop until a valid odd number is found or attempts are exhausted
 	while attempts < MAX_ATTEMPTS:
@@ -219,7 +231,7 @@ func set_tile(x: int, y: int, tile_id: int):
 
 func generate_roads(start: Vector2i, direction: Vector2i):
 	var x = start.x
-	var y = start.y
+	var y = start.y	
 
 	# Generate roads depending on the direction
 	if direction.x != 0:  # Horizontal road

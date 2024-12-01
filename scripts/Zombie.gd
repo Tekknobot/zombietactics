@@ -270,7 +270,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 					closest_player = player
 					best_adjacent_tile = adj_tile
 		
-		update_astar_grid()
+		#update_astar_grid()
 		
 		# Calculate path to the best adjacent tile if a valid target is found
 		if closest_player and best_adjacent_tile != Vector2i():
@@ -282,7 +282,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 				print("No path found for Zombie ID:", zombie.zombie_id)
 				pass
 
-		update_astar_grid()
+		#update_astar_grid()
 		
 		# Move the zombie step by step along its path
 		if zombie.path_index < zombie.current_path.size():
@@ -313,7 +313,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		# Wait before processing the next zombie
 		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
 		
-		update_astar_grid()		
+		#update_astar_grid()		
 			
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false

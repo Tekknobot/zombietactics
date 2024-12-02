@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0d32xudpro3j"]
+
+[ext_resource type="Script" path="res://scripts/InputBlocker.gd" id="1_jddf2"]
+
+[node name="InputBlocker" type="CanvasLayer"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -300.0
+offset_right = 300.0
+grow_vertical = 0
+color = Color(1, 1, 1, 0)
+script = ExtResource("1_jddf2")

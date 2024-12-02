@@ -22,6 +22,7 @@ const DOWN_RIGHT_ROAD = 8
 # Preload the hover tile scene
 @onready var hover_tile = preload("res://assets/scenes/UI/hover_tile.tscn").instantiate()
 @onready var mission_manager = get_node("/root/MapManager/MissionManager")
+@onready var hud_manager = get_node("/root/MapManager/HUDManager")
 
 # Grid dimensions
 var grid_width = 32

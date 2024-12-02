@@ -116,7 +116,7 @@ func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 
 # Spawn zombies randomly on the opposite half of the map
 func spawn_zombies():
-	var zombie_count = 16
+	var zombie_count = 32
 	var spawn_attempts = 0
 	
 	# Shuffle zombie names to ensure uniqueness
@@ -212,6 +212,7 @@ func get_random_spawn_position(is_player_side: bool) -> Vector2i:
 	
 	print("Could not find a valid spawn position after multiple attempts.")
 	return Vector2i(-1, -1)  # Return an invalid position if none found
+
 
 # Checks if a tile is spawnable (not water)
 func is_spawnable_tile(tile_pos: Vector2i) -> bool:

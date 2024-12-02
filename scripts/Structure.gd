@@ -43,8 +43,9 @@ func _process(delta: float) -> void:
 		item_manager.check_item_destroyed()
 		await get_tree().create_timer(1).timeout
 		mission_manager.check_mission_manager()	
-		mission_manager.audio_player.stream = mission_manager.gameover_audio
-		mission_manager.audio_player.play()		
+		if GlobalManager.secret_item_destroyed:
+			mission_manager.audio_player.stream = mission_manager.gameover_audio
+			mission_manager.audio_player.play()		
 		
 
 # Function to handle the demolished "Building" type

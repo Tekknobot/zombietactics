@@ -82,6 +82,8 @@ var is_attacking = false  # Flag to check if the zombie is already attacking in 
 @onready var health_ui = $HealthUI
 @onready var xp_ui = $XPUI
 
+var zombies_that_can_move: int = 0
+
 func _ready() -> void:
 	# Possible values for health and XP
 	var possible_values = [25, 50, 75]
@@ -204,15 +206,19 @@ func update_unit_ui():
 	xp_ui.max_value = max_xp
 	
 func find_and_chase_player_and_move(delta_time: float) -> void:				
+	zombies_that_can_move = 0
+	
 	# Update the AStar grid before moving zombies
 	update_astar_grid()
 	
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-	# Find all zombies in the group and sort by `zombie_id`
+	# Main sorting logic
 	var zombies = get_tree().get_nodes_in_group("zombies")
+	var players = get_tree().get_nodes_in_group("player_units")
+	# Pass the custom sort function to sort the zombies
 	zombies.sort_custom(func(a, b):
-		return a.zombie_id < b.zombie_id
+		return zombie_sort_function(a, b, players)
 	)
 
 	# Ensure that zombies exist before proceeding
@@ -234,6 +240,8 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		if not zombie.is_in_group("zombies"):
 			print("Zombie ID %d removed, skipping..." % zombie.zombie_id)
 			continue  # Skip this zombie and move to the next one
+		
+		zombies_that_can_move += 1
 
 		if zombie.current_path.size() <= 0:
 			pass
@@ -251,7 +259,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		var min_distance = INF
 		var best_adjacent_tile: Vector2i = Vector2i()
 
-		var players = get_tree().get_nodes_in_group("player_units")
+		#var players = get_tree().get_nodes_in_group("player_units")
 		if players.size() <= 0:
 			print("Players Killed: GAME OVER")	
 			GlobalManager.players_killed = true	
@@ -316,6 +324,9 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		# Wait before processing the next zombie
 		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
 		
+		if zombies_that_can_move >= 3:
+			break
+		
 		#update_astar_grid()		
 			
 	# After all zombies are done moving, set is_moving to false
@@ -329,6 +340,21 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	
 	reset_player_units()
 	turn_manager.start_current_unit_turn()
+
+# Helper function to calculate the distance to the nearest player
+func nearest_player_distance(entity: Node2D, players: Array) -> float:
+	var min_distance = INF  # Start with a very large value
+	for player in players:
+		if player is Node2D:
+			var distance = entity.global_position.distance_to(player.global_position)
+			if distance < min_distance:
+				min_distance = distance
+	return min_distance
+
+# Custom sort function for zombies based on nearest player distance
+func zombie_sort_function(a: Node2D, b: Node2D, players: Array) -> bool:
+	return nearest_player_distance(a, players) < nearest_player_distance(b, players)
+
 	
 # Function to check adjacency and trigger attack if necessary
 func check_for_attack() -> void:

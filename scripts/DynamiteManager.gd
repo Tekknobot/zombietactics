@@ -364,11 +364,7 @@ func _trigger_explosion(last_point: Vector2):
 	# Add XP if at least one target was hit
 	if xp_awarded:
 		await get_tree().create_timer(1).timeout
-		add_xp()	
-	
-	item_manager.check_item_destroyed()	
-	await get_tree().create_timer(1).timeout
-	mission_manager.check_mission_manager()		
+		add_xp()		
 			
 func add_xp():
 	# Add XP

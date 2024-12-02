@@ -286,10 +286,6 @@ func _trigger_explosion(last_point: Vector2):
 		await get_tree().create_timer(1).timeout
 		add_xp()
 
-	item_manager.check_item_destroyed()	
-	await get_tree().create_timer(1).timeout
-	mission_manager.check_mission_manager()
-
 func add_xp():
 	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)

@@ -11,7 +11,7 @@ var item_discovered: bool = false
 var item_handled: bool = false  # Prevents multiple checks once the outcome is decided
 
 func _ready():
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(0.1).timeout
 	assign_item_to_structure()
 
 func check_item_destroyed():

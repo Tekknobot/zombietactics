@@ -682,9 +682,9 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	if current_xp >= xp_for_next_level:
 		level_up()
 	
-	item_manager.check_item_destroyed()
+	#item_manager.check_item_destroyed()
 	await get_tree().create_timer(0.1).timeout
-	mission_manager.check_mission_manager()
+	#mission_manager.check_mission_manager()
 			
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")

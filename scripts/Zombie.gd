@@ -340,10 +340,10 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 	is_moving = false
 	attacks = 0
 
-	for zombie in all_zombies:
-		if zombie.zombie_type == "Radioactive":
-			zombie.get_child(4).particles_need_update = true			
-			zombie.get_child(4).update_particles()
+	for radioactive_zombie in all_zombies:
+		if radioactive_zombie.zombie_type == "Radioactive":
+			radioactive_zombie.get_child(4).particles_need_update = true			
+			radioactive_zombie.get_child(4).update_particles()
 	
 	zombies_moved = 0
 	reset_player_units()

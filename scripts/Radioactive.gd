@@ -262,9 +262,41 @@ func hide_all_radiation():
 		# active_particle_instances.erase(particle_instance)  # Remove from active list
 	print("All radiation particles are hidden.")
 
-# Function to show all radiation particles
 func show_all_radiation():
+	# Loop through all active particle instances
 	for particle_instance in active_particle_instances:
-		particle_instance.get_child(1).visible = true  # Show the particle
-		particle_instance.get_child(0).emitting = true  # Start emitting particles if needed
-	print("All radiation particles are visible.")
+		var particle_child = particle_instance.get_child(1)  # Get the child responsible for fade
+		particle_child.visible = true  # Ensure the child is visible
+		particle_instance.get_child(0).emitting = true  # Start emitting particles
+		
+		particle_child.modulate.a = 0.0
+		
+		# Start the alpha modulation asynchronously
+		fade_in_particle(particle_child, 2)  # Adjust fade duration here
+	
+	print("All radiation particles are visible with alpha modulation.")
+
+# Function to handle the fade-in effect for a single particle's child
+@onready var fade_timer = Timer.new()
+
+func fade_in_particle(particle_child, fade_duration: float):
+	# Add a timer to the scene if not already added
+	if fade_timer.get_parent() == null:
+		add_child(fade_timer)
+	
+	# Set up the fade parameters
+	var modulate_alpha = 0.0
+	var step_count = 10  # Number of steps in the fade
+	var alpha_step = 1.0 / step_count  # Alpha increment per step
+	fade_timer.wait_time = fade_duration / step_count  # Time per step
+	fade_timer.one_shot = true
+	
+	while modulate_alpha < 1.0:
+		modulate_alpha += alpha_step
+		if modulate_alpha > 1.0:
+			modulate_alpha = 1.0
+		particle_child.modulate = Color(1, 1, 1, modulate_alpha)  # Adjust the alpha of child 1
+
+		# Wait for the timer to finish before the next increment
+		fade_timer.start()
+		await fade_timer.timeout

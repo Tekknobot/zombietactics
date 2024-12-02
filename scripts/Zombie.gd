@@ -111,6 +111,8 @@ func _ready() -> void:
 	turn_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
 
 	update_unit_ui()
+	
+	setup_astar()
 
 # Called every frame
 func _process(delta: float) -> void:
@@ -137,7 +139,7 @@ func _process(delta: float) -> void:
 					mission_manager.check_mission_manager()
 					
 				#queue_free()  # Destroy the zombie once the death animation ends
-					
+								
 	update_tile_position()
 	update_unit_ui()
 	move_along_path(delta)
@@ -181,8 +183,6 @@ func update_astar_grid() -> void:
 			# Mark the tile in the AStar grid
 			astar.set_point_solid(tile_position, is_solid)
 
-	#print("AStar grid updated with size:", grid_width, "x", grid_height)
-	
 	# Clear any previous configuration to avoid conflicts
 	astar.update()
 
@@ -202,9 +202,10 @@ func update_unit_ui():
 	xp_ui.value = current_xp
 	xp_ui.max_value = max_xp
 	
-func find_and_chase_player_and_move(delta_time: float) -> void:				
-	# Update the AStar grid before moving zombies
+func find_and_chase_player_and_move(delta_time: float) -> void:
+	# Update the AStar grid once at the start of the zombie turn
 	update_astar_grid()
+	await get_tree().create_timer(1).timeout
 	
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
@@ -244,7 +245,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 
 		# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
-		hud_manager.update_hud_zombie(zombie)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
+		hud_manager.update_hud_zombie(zombie)  # Pass the selected unit to the HUDManager
 		
 		# Find the closest player for this zombie
 		var closest_player: Area2D = null
@@ -270,8 +271,6 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 					closest_player = player
 					best_adjacent_tile = adj_tile
 		
-		#update_astar_grid()
-		
 		# Calculate path to the best adjacent tile if a valid target is found
 		if closest_player and best_adjacent_tile != Vector2i():
 			var current_path = astar.get_point_path(zombie.tile_pos, best_adjacent_tile)
@@ -281,13 +280,18 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			else:
 				print("No path found for Zombie ID:", zombie.zombie_id)
 				pass
-
-		#update_astar_grid()
 		
 		# Move the zombie step by step along its path
 		if zombie.path_index < zombie.current_path.size():
 			var target_pos = zombie.current_path[zombie.path_index]
 			var movement_vector = (target_pos - zombie.position).normalized()
+
+			# Update the AStar grid dynamically for zombie movement
+			var old_tile_pos = zombie.tile_pos
+			zombie.tile_pos = tilemap.local_to_map(zombie.position + movement_vector * move_speed * delta_time)
+
+			# Clear the old position and mark the new one as solid
+			astar.set_point_solid(old_tile_pos, false)  # The zombie leaves the old tile
 
 			# Move the zombie toward the next path point
 			zombie.position += movement_vector * move_speed * delta_time
@@ -312,11 +316,9 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		if zombie.zombie_type == "Radioactive":
 			zombie.get_child(4).damaged_units_this_turn.clear()	
 			
-						
-		# Wait before processing the next zombie
-		update_astar_grid()	
-		await get_tree().create_timer(1).timeout  # This introduces a delay, giving each zombie time to move
-					
+		await get_tree().create_timer(1).timeout  # Introduces a delay before the next zombie moves
+		
+		astar.set_point_solid(zombie.tile_pos, true)  # The zombie occupies the new tile
 			
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false

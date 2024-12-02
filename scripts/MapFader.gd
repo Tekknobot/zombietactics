@@ -13,6 +13,7 @@ signal fade_complete  # Define a signal to emit when fade-in is complete
 
 # Ready function starts the fade-out effect if necessary
 func _ready():
+	await get_tree().create_timer(0.5).timeout 
 	var root_node = get_tree().current_scene  # Get the root node of the current scene
 	if root_node.has_meta("scene_name") and root_node.get_meta("scene_name") == map_scene_name:
 		fade_out()

@@ -82,6 +82,12 @@ var is_attacking = false  # Flag to check if the zombie is already attacking in 
 @onready var health_ui = $HealthUI
 @onready var xp_ui = $XPUI
 
+# Define a limit for the number of zombies to process
+var zombie_limit = 9
+var zombies_moved = 0  # Counter for zombies moved
+
+signal astar_setup_complete
+
 func _ready() -> void:
 	# Possible values for health and XP
 	var possible_values = [25, 50, 75]
@@ -111,7 +117,7 @@ func _ready() -> void:
 	turn_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
 
 	update_unit_ui()
-	
+
 	setup_astar()
 
 # Called every frame
@@ -153,8 +159,11 @@ func _on_player_action_completed() -> void:
 
 # Setup the AStarGrid2D with walkable tiles
 func setup_astar() -> void:
-	update_astar_grid()  # Update AStar grid to reflect current map state
+	await update_astar_grid()  # Update AStar grid to reflect current map state
 	print("AStar grid setup completed.")
+	
+	# Emit the signal when setup is complete
+	emit_signal("astar_setup_complete")	
 
 # Function to update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:
@@ -235,6 +244,10 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		if not zombie.is_in_group("zombies"):
 			print("Zombie ID %d removed, skipping..." % zombie.zombie_id)
 			continue  # Skip this zombie and move to the next one
+
+		if zombies_moved >= zombie_limit:
+			break  # Stop processing once the limit is reached
+
 
 		if zombie.current_path.size() <= 0:
 			pass
@@ -319,7 +332,10 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 		await get_tree().create_timer(1).timeout  # Introduces a delay before the next zombie moves
 		
 		astar.set_point_solid(zombie.tile_pos, true)  # The zombie occupies the new tile
-			
+		
+		# Increment the counter
+		zombies_moved += 1
+					
 	# After all zombies are done moving, set is_moving to false
 	is_moving = false
 	attacks = 0

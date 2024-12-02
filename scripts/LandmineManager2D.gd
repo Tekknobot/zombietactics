@@ -56,8 +56,15 @@ func _process(delta: float) -> void:
 		WATER_TILE_ID = 0  # Fallback value if no map is selected
 		
 	move_along_path(delta)
+	
+	is_mouse_over_gui()
 
 func _input(event: InputEvent) -> void:
+	# Block gameplay input if the mouse is over GUI
+	if is_mouse_over_gui():
+		print("Input blocked by GUI.")
+		return  # Prevent further input handling
+					
 	if not GlobalManager.landmine_toggle_active:
 		return
 
@@ -75,6 +82,23 @@ func _input(event: InputEvent) -> void:
 				else:
 					print("Tile is not walkable!")
 
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is Button:
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any button.")
+	return false
+	
 # Update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:
 	# Get the tilemap and determine its grid size

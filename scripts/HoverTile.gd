@@ -47,15 +47,6 @@ func _process(delta: float) -> void:
 		
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
 		handle_right_click()
-
-func _unhandled_input(event: InputEvent):
-	if event is InputEventMouseButton and event.pressed:
-		# Only handle input if no GUI element consumed it
-		if get_viewport().gui_get_focus_owner() == null:
-			print("Gameplay input handled:", event)
-			# Trigger attack or other gameplay actions here
-		else:
-			print("Input consumed by GUI:", get_viewport().gui_get_focus_owner())
 		
 # Checks if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:
@@ -109,6 +100,11 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 
 # Selects a unit or structure at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:	
+	GlobalManager.dynamite_toggle_active = false
+	GlobalManager.landmine_toggle_active = false
+	GlobalManager.mek_toggle_active = false
+	GlobalManager.missile_toggle_active = false
+	
 	clear_action_tiles()  # Clear any previous selection tiles
 	clear_action_tiles_zombie()  # Clear any previous zombie selection tiles
 	

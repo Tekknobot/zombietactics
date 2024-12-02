@@ -32,8 +32,16 @@ var missiles_canceled = false
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
+
+func _process(delta: float) -> void:
+	is_mouse_over_gui()
 	
 func _input(event: InputEvent) -> void:
+	# Block gameplay input if the mouse is over GUI
+	if is_mouse_over_gui():
+		print("Input blocked by GUI.")
+		return  # Prevent further input handling
+					
 	# Only respond to clicks if the special toggle is active
 	if not GlobalManager.missile_toggle_active:
 		#print("Special toggle is off, ignoring mouse clicks.")
@@ -126,7 +134,24 @@ func _input(event: InputEvent) -> void:
 					# If the mouse position is out of bounds, print a message or handle it as needed
 					print("Mouse position out of map bounds:", mouse_local)
 					return
-					
+
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is Button:
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any button.")
+	return false
+						
 # Function to trigger the zombies' actions: find and chase player
 func clear_zombie_tiles():
 	# Get all zombies in the "zombie" group

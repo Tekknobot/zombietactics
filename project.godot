@@ -27,12 +27,16 @@ GlobalManager="*res://scripts/GlobalManager.gd"
 [display]
 
 window/size/viewport_height=728
-window/size/mode=4
+window/size/mode=2
 window/stretch/mode="viewport"
 
 [editor]
 
 version_control/autoload_on_startup=true
+
+[global_group]
+
+hud_controls="HUD Buttons"
 
 [input]
 

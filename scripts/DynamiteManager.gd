@@ -36,18 +36,21 @@ var missiles_canceled = false
 # Declare a flag to track if XP has been added
 var xp_added: bool = false
 
+var is_mouse_over_gui_flag = false
+
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
+	#debug_ui_rectangles()
 
 # Called every frame to process input and update hover tile position
 func _process(delta: float) -> void:
-	pass
+	is_mouse_over_gui()
 	
-func _input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:			
 	# Only respond to clicks if the special toggle is active
 	if not GlobalManager.dynamite_toggle_active:
-		#print("Special toggle is off, ignoring mouse clicks.")
+		print("Special toggle is off, ignoring mouse clicks.")
 		return
 		
 	if dynamite_launched >= 1:
@@ -55,16 +58,21 @@ func _input(event: InputEvent) -> void:
 			
 	# Handle mouse button events (right and left-click)
 	if event is InputEventMouseButton:
+		# Block gameplay input if the mouse is over GUI
+		if is_mouse_over_gui():
+			print("Input blocked by GUI.")
+			return  # Prevent further input handling
+			
 		# Right-click to set the target position
 		if event.button_index == MOUSE_BUTTON_RIGHT and not onTrajectory:
 			if event.pressed:
 				# Set the position of the right-click as the target position
 				right_click_position = get_global_mouse_position()
 				print("Right-click position set to:", right_click_position)
-
+					
 		# Left-click to launch missile trajectory (only if right-click has been used to set target)
 		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory and dynamite_launched < 3:
-			if event.pressed:				
+			if event.pressed:													
 				# Get all nodes in the 'hovertile' group
 				var hover_tiles = get_tree().get_nodes_in_group("hovertile")
 
@@ -141,7 +149,42 @@ func _input(event: InputEvent) -> void:
 					# If the mouse position is out of bounds, print a message or handle it as needed
 					print("Mouse position out of map bounds:", mouse_local)
 					return
-					
+
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is Button:
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any button.")
+	return false
+
+
+func debug_ui_rectangles():
+	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is Button:
+			var rect = control.get_global_rect()
+			print("Button:", control.name, "Global Rect:", rect)
+
+			# Create a ColorRect to represent the button's rectangle
+			var debug_rect = ColorRect.new()
+			debug_rect.size = rect.size  # Set the size of the rectangle
+			debug_rect.position = rect.position  # Set the position of the rectangle
+			debug_rect.color = Color(1, 0, 0, 1)  # Solid red
+
+			# Add the debug rectangle to the CanvasLayer
+			get_parent().get_node("HUDManager").add_child(debug_rect)  # Adjust as necessary
+
+						
 # Function to trigger the zombies' actions: find and chase player
 func clear_zombie_tiles():
 	# Get all zombies in the "zombie" group

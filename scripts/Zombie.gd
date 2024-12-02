@@ -153,7 +153,7 @@ func _process(delta: float) -> void:
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	#print("Player action completed!")
-	await get_tree().create_timer(1).timeout 
+	await get_tree().create_timer(0.5).timeout 
 	mission_manager.check_mission_manager()
 	find_and_chase_player_and_move(get_process_delta_time())
 
@@ -345,6 +345,7 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			zombie.get_child(4).particles_need_update = true			
 			zombie.get_child(4).update_particles()
 	
+	zombies_moved = 0
 	reset_player_units()
 	turn_manager.start_current_unit_turn()
 

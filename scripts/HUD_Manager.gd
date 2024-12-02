@@ -16,6 +16,9 @@ extends CanvasLayer
 @onready var mek = $HUD/Mek
 @onready var dynamite = $HUD/Dynamite
 
+@onready var end_turn = $HUD/EndTurn
+@onready var turn_manager = get_node("/root/MapManager/TurnManager")
+
 func _ready():
 	if portrait:
 		print("Portrait node found!")
@@ -38,6 +41,11 @@ func _ready():
 	if dynamite:
 		dynamite.connect("toggled", Callable(self, "_on_dynamite_toggled"))
 		print("Dynamite connected")
+
+	if end_turn:
+		end_turn.connect("pressed", Callable(self, "_on_endturn_pressed"))
+		print("EndTurn connected")
+
 						
 # Method to handle the toggle state change
 func _on_missile_toggled(button_pressed: bool) -> void:
@@ -91,6 +99,10 @@ func _on_dynamite_toggled(button_pressed: bool) -> void:
 	else:
 		GlobalManager.dynamite_toggle_active = false  # Set the flag to false
 		print("Dynamite toggle deactivated!")
+
+func _on_endturn_pressed() -> void:
+	print("End Turn button pressed")
+	turn_manager.on_player_action_completed()
 
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
@@ -240,6 +252,8 @@ func update_hud_zombie(character: ZombieUnit):
 		print("Updated XP bar: Max=", xp_bar.max_value, ", Current=", xp_bar.value)		
 
 func show_special_buttons(character: PlayerUnit):
+	end_turn.visible = true
+	
 	if character.player_name == "Yoshida. Boi":
 		missile.visible = true
 		landmine.visible = true
@@ -252,6 +266,8 @@ func show_special_buttons(character: PlayerUnit):
 				
 
 func hide_special_buttons():
+	end_turn.visible = false
+	
 	missile.visible = false
 	landmine.visible = false
 	mek.visible = false

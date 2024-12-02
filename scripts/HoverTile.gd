@@ -43,14 +43,19 @@ func _process(delta: float) -> void:
 
 	# Handle left-click and right-click actions
 	if is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_left"):
-		handle_left_click(tile_pos)
-		
-		#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		#var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-		#camera.focus_on_tile(tilemap, tile_pos)		
+		handle_left_click(tile_pos)		
 		
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
 		handle_right_click()
+
+func _unhandled_input(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed:
+		# Only handle input if no GUI element consumed it
+		if get_viewport().gui_get_focus_owner() == null:
+			print("Gameplay input handled:", event)
+			# Trigger attack or other gameplay actions here
+		else:
+			print("Input consumed by GUI:", get_viewport().gui_get_focus_owner())
 		
 # Checks if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:

@@ -16,6 +16,7 @@ var is_demolished: bool = false
 var selected = false
 
 var has_item: bool = false
+var demolished_flag: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -35,6 +36,11 @@ func _process(delta: float) -> void:
 		_check_for_demolished_stadium_and_trigger_explosion()
 
 	update_tile_position()
+
+	if is_demolished and has_item and !demolished_flag:
+		item_manager.on_item_destroyed(self)
+		mission_manager.check_mission_manager()	
+		demolished_flag = true
 
 # Function to handle the demolished "Building" type
 func _check_for_demolished_building_and_trigger_explosion():

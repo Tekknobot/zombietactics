@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var map_fader = get_node("/root/MapManager/MapFader")
+@onready var map_fader = get_node("/root/MapManager/CanvasLayer").get_node("MapFader")
 @onready var hud_manager = get_node("/root/MapManager/HUDManager")
 
 @onready var audio_player = $AudioStreamPlayer2D

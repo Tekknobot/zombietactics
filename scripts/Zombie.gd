@@ -292,6 +292,9 @@ func find_and_chase_player_and_move(delta_time: float) -> void:
 			# Move the zombie toward the next path point
 			zombie.position += movement_vector * move_speed * delta_time
 			
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			camera.focus_on_position(zombie.position)			
+			
 			# Convert zombie position and target position to tilemap coordinates
 			var zombie_tile_pos = tilemap.local_to_map(zombie.position)
 			var target_tile_pos = tilemap.local_to_map(target_pos)

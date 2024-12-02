@@ -76,4 +76,9 @@ func _on_return_to_default_timeout():
 	is_zooming_out = false
 
 func focus_on_trajectory(point: Vector2):
-	position = point
+	is_zooming_in = true
+	target_tile_pos = point
+	
+func focus_on_position(target_position: Vector2):
+	is_zooming_in = true
+	target_tile_pos = target_position	

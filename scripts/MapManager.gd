@@ -202,7 +202,7 @@ func get_random_odd(max_value: int) -> int:
 			rand_value += 1  # Convert to odd if even
 
 		# Ensure the number is not 0 or 16
-		if rand_value != 0 and rand_value != 15:
+		if rand_value != 0 and rand_value != 31:
 			return rand_value  # Valid odd number found
 
 		attempts += 1

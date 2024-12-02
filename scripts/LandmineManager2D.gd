@@ -284,6 +284,9 @@ func move_along_path(delta: float) -> void:
 		var move_distance = min(distance_to_target, move_speed * delta)  # Move only as far as the remaining distance
 		player_to_move.position += direction * move_distance
 		
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		camera.focus_on_position(player_to_move.position)		
+		
 		# Check if we have reached the target tile
 		if distance_to_target <= move_distance:  # Threshold to determine if we reached the target
 			# Only instantiate the mine if we're not on the last tile

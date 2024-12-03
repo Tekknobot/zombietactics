@@ -31,12 +31,15 @@ var can_spawn = true  # Flag to control if further spawning is allowed
 # Track unique zombie IDs
 var zombie_id_counter = 0  # Counter to assign unique IDs to zombies
 
-# List of 16 zombie names
 var zombie_names = [
 	"Walker", "Crawler", "Stalker", "Biter",
 	"Lurker", "Rotter", "Shambler", "Moaner",
 	"Sniffer", "Stumbler", "Gnawer", "Howler",
-	"Groaner", "Clawer", "Grunter", "Chomper"
+	"Groaner", "Clawer", "Grunter", "Chomper",
+	"Slasher", "Growler", "Drooler", "Scratcher",
+	"Bleeder", "Rumbler", "Sludger", "Mangler",
+	"Spitter", "Hunter", "Dragger", "Slimer",
+	"Ripper", "Rager", "Slasher", "Tumbler"
 ]
 
 func _ready():

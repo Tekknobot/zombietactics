@@ -1,7 +1,8 @@
-[gd_scene load_steps=16 format=4 uid="uid://rdlfqfdmhgit"]
+[gd_scene load_steps=20 format=4 uid="uid://rdlfqfdmhgit"]
 
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
+[ext_resource type="Script" path="res://scripts/AdjustTextLabel.gd" id="3_y7bf6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nx3cq"]
 bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
@@ -15,16 +16,32 @@ bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o3ylw"]
 bg_color = Color(1, 1, 0, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_afkfq"]
+content_margin_left = 5.0
+bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kld57"]
+content_margin_left = 5.0
+bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1gp3x"]
+content_margin_left = 5.0
+bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_upmy2"]
 bg_color = Color(0.6, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a3qd4"]
+content_margin_left = 5.0
+content_margin_right = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v731d"]
 bg_color = Color(0.6, 0, 0.00392157, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_arpbt"]
+content_margin_left = 5.0
+content_margin_right = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
 
 [sub_resource type="Image" id="Image_uvny1"]
@@ -287,6 +304,8 @@ cache/0/50/0/glyphs/68/texture_idx = 0
 bg_color = Color(0.6, 0, 0.00392157, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oycun"]
+content_margin_left = 5.0
+content_margin_right = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
 
 [node name="HUD" type="Control"]
@@ -296,12 +315,19 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 grow_vertical = 0
 
+[node name="DesignBG" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_top = -278.0
+offset_right = 477.0
+offset_bottom = -1.0
+
 [node name="PortraitColorRect" type="ColorRect" parent="."]
 layout_mode = 0
 offset_left = 24.0
-offset_top = -154.0
+offset_top = -187.0
 offset_right = 152.0
-offset_bottom = -26.0
+offset_bottom = -59.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
 [node name="Portrait" type="TextureRect" parent="."]
@@ -311,9 +337,9 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 24.0
-offset_top = -154.0
+offset_top = -187.0
 offset_right = 152.0
-offset_bottom = -26.0
+offset_bottom = -59.0
 grow_vertical = 0
 texture = ExtResource("1_v0rww")
 
@@ -321,9 +347,9 @@ texture = ExtResource("1_v0rww")
 custom_minimum_size = Vector2(8, 128)
 layout_mode = 0
 offset_left = 14.0
-offset_top = -154.0
+offset_top = -187.0
 offset_right = 22.0
-offset_bottom = -26.0
+offset_bottom = -59.0
 theme_override_styles/background = SubResource("StyleBoxFlat_nx3cq")
 theme_override_styles/fill = SubResource("StyleBoxFlat_r5qri")
 step = 1.0
@@ -335,9 +361,9 @@ show_percentage = false
 custom_minimum_size = Vector2(8, 128)
 layout_mode = 0
 offset_left = 154.0
-offset_top = -154.0
+offset_top = -187.0
 offset_right = 162.0
-offset_bottom = -26.0
+offset_bottom = -59.0
 theme_override_styles/background = SubResource("StyleBoxFlat_np2bf")
 theme_override_styles/fill = SubResource("StyleBoxFlat_o3ylw")
 step = 1.0
@@ -345,66 +371,84 @@ value = 25.0
 fill_mode = 3
 show_percentage = false
 
-[node name="Name" type="RichTextLabel" parent="."]
+[node name="LevelStatName" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(376, 26)
 layout_mode = 0
-offset_left = 25.0
-offset_top = -188.0
-offset_right = 231.0
-offset_bottom = -162.0
+offset_left = 14.0
+offset_top = -57.0
+offset_right = 390.0
+offset_bottom = -31.0
+theme_override_constants/separation = 2
+
+[node name="Name" type="RichTextLabel" parent="LevelStatName"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_afkfq")
 text = "Dutch. Major"
+autowrap_mode = 0
+script = ExtResource("3_y7bf6")
 
-[node name="Level" type="RichTextLabel" parent="."]
-layout_mode = 0
-offset_left = 24.0
-offset_top = -31.0
-offset_right = 153.0
-offset_bottom = -5.0
-theme_override_fonts/normal_font = ExtResource("3_fyyii")
-theme_override_font_sizes/normal_font_size = 32
-text = "Level 1"
-
-[node name="HP" type="RichTextLabel" parent="."]
-layout_mode = 0
-offset_left = 172.0
-offset_top = -69.0
-offset_right = 301.0
-offset_bottom = -43.0
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_fonts/normal_font = ExtResource("3_fyyii")
-theme_override_font_sizes/normal_font_size = 32
-text = "HP: 100 of 100"
-
-[node name="XP" type="RichTextLabel" parent="."]
-layout_mode = 0
-offset_left = 172.0
-offset_top = -48.0
-offset_right = 301.0
-offset_bottom = -22.0
+[node name="Level" type="RichTextLabel" parent="LevelStatName"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
 theme_override_colors/default_color = Color(1, 1, 0, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
-text = "XP: 25 of 100"
+theme_override_styles/normal = SubResource("StyleBoxFlat_kld57")
+text = "Level 1"
+autowrap_mode = 0
+script = ExtResource("3_y7bf6")
 
-[node name="ATK" type="RichTextLabel" parent="."]
+[node name="StatContainer" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(315, 26)
 layout_mode = 0
-offset_left = 172.0
-offset_top = -89.0
-offset_right = 301.0
-offset_bottom = -63.0
+offset_left = 14.0
+offset_top = -29.0
+offset_right = 390.0
+offset_bottom = -3.0
+theme_override_constants/separation = 2
+
+[node name="ATK" type="RichTextLabel" parent="StatContainer"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
 theme_override_colors/default_color = Color(1, 0, 0, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_1gp3x")
 text = "ATK: 25"
+autowrap_mode = 0
+script = ExtResource("3_y7bf6")
+
+[node name="HP" type="RichTextLabel" parent="StatContainer"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_1gp3x")
+text = "HP: 100 of 100"
+autowrap_mode = 0
+script = ExtResource("3_y7bf6")
+
+[node name="XP" type="RichTextLabel" parent="StatContainer"]
+custom_minimum_size = Vector2(115, 0)
+layout_mode = 2
+theme_override_colors/default_color = Color(1, 1, 0, 1)
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_1gp3x")
+text = "XP: 25 of 100"
+autowrap_mode = 0
+script = ExtResource("3_y7bf6")
 
 [node name="Missile" type="Button" parent="." groups=["hud_controls"]]
-visible = false
 layout_mode = 0
-offset_left = 172.0
-offset_top = -192.0
-offset_right = 238.0
-offset_bottom = -158.0
+offset_left = 164.0
+offset_top = -187.0
+offset_right = 230.0
+offset_bottom = -161.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
@@ -413,12 +457,11 @@ toggle_mode = true
 text = "Missile"
 
 [node name="Landmine" type="Button" parent="." groups=["hud_controls"]]
-visible = false
 layout_mode = 0
-offset_left = 172.0
-offset_top = -154.0
-offset_right = 256.0
-offset_bottom = -120.0
+offset_left = 164.0
+offset_top = -159.0
+offset_right = 250.0
+offset_bottom = -133.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
@@ -427,12 +470,11 @@ toggle_mode = true
 text = "Landmine"
 
 [node name="Mek" type="Button" parent="." groups=["hud_controls"]]
-visible = false
 layout_mode = 0
-offset_left = 172.0
-offset_top = -192.0
-offset_right = 229.0
-offset_bottom = -158.0
+offset_left = 164.0
+offset_top = -187.0
+offset_right = 222.0
+offset_bottom = -161.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
@@ -441,12 +483,11 @@ toggle_mode = true
 text = "Mecha"
 
 [node name="Dynamite" type="Button" parent="." groups=["hud_controls"]]
-visible = false
 layout_mode = 0
-offset_left = 172.0
-offset_top = -192.0
-offset_right = 256.0
-offset_bottom = -158.0
+offset_left = 164.0
+offset_top = -187.0
+offset_right = 246.0
+offset_bottom = -161.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
@@ -455,12 +496,11 @@ toggle_mode = true
 text = "Dynamite"
 
 [node name="EndTurn" type="Button" parent="." groups=["hud_controls"]]
-visible = false
 layout_mode = 0
-offset_left = 346.0
-offset_top = -60.0
-offset_right = 443.0
-offset_bottom = -26.0
+offset_left = 164.0
+offset_top = -85.0
+offset_right = 254.0
+offset_bottom = -59.0
 theme_override_fonts/font = SubResource("FontFile_i7klw")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/pressed = SubResource("StyleBoxFlat_wmxr2")

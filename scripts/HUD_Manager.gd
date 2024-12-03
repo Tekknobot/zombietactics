@@ -2,16 +2,16 @@ extends CanvasLayer
 
 @onready var portrait = $HUD/Portrait
 @onready var health_bar = $HUD/HealthBar
-@onready var player_name = $HUD/Name
+@onready var player_name = $HUD/LevelStatName/Name
 @onready var xp_bar = $HUD/XPBar
-@onready var level = $HUD/Level
+@onready var level = $HUD/LevelStatName/Level
 
 @onready var missile = $HUD/Missile 
 @onready var landmine = $HUD/Landmine
 
-@onready var hp = $HUD/HP
-@onready var xp = $HUD/XP
-@onready var atk = $HUD/ATK
+@onready var hp = $HUD/StatContainer/HP
+@onready var xp = $HUD/StatContainer/XP
+@onready var atk = $HUD/StatContainer/ATK
 
 @onready var mek = $HUD/Mek
 @onready var dynamite = $HUD/Dynamite
@@ -134,6 +134,7 @@ func update_hud(character: PlayerUnit):
 	# Update player name if the player_name label exists
 	if player_name:
 		player_name.text = character.player_name  # Set the player name text from the character
+		player_name.adjust_size_to_content()
 		print("Player name updated to: ", player_name.text)
 	else:
 		print("Player name node is null!")
@@ -154,24 +155,28 @@ func update_hud(character: PlayerUnit):
 	
 	if level:
 		level.text = "Level " + str(character.current_level)
+		level.adjust_size_to_content()
 		print("Level updated to: ", level.text)
 	else:
 		print("Level node is null!")
 
 	if hp:
 		hp.text = "HP: " + str(character.current_health) + " of " + str(character.max_health)
+		hp.adjust_size_to_content()
 		print("HP updated to: ", hp.text)
 	else:
 		print("HP node is null!")
 
 	if xp:
 		xp.text = "XP: " + str(character.current_xp) + " of " + str(character.xp_for_next_level)
+		xp.adjust_size_to_content()
 		print("XP updated to: ", xp.text)
 	else:
 		print("XP node is null!")
 
 	if atk:
 		atk.text = "ATK: " + str(character.attack_damage)
+		atk.adjust_size_to_content()
 		print("ATK updated to: ", atk.text)
 	else:
 		print("ATK node is null!")
@@ -199,6 +204,7 @@ func update_hud_zombie(character: ZombieUnit):
 	# Update player name if the player_name label exists
 	if player_name:
 		player_name.text = character.zombie_name  # Set the player name text from the character
+		player_name.adjust_size_to_content()
 		print("Player name updated to: ", player_name.text)
 	else:
 		print("Player name node is null!")
@@ -219,24 +225,28 @@ func update_hud_zombie(character: ZombieUnit):
 	
 	if level:
 		level.text = "Level " + str(character.current_level)
+		level.adjust_size_to_content()
 		print("Level updated to: ", level.text)
 	else:
 		print("Level node is null!")
 
 	if hp:
 		hp.text = "HP: " + str(character.current_health) + " of " + str(character.max_health)
+		hp.adjust_size_to_content()
 		print("HP updated to: ", hp.text)
 	else:
 		print("HP node is null!")
 
 	if xp:
 		xp.text = "XP: " + str(character.current_xp) + " of " + str(character.xp_for_next_level)
+		xp.adjust_size_to_content()
 		print("XP updated to: ", xp.text)
 	else:
 		print("XP node is null!")
 
 	if atk:
 		atk.text = "ATK: " + str(character.attack_damage)
+		atk.adjust_size_to_content()
 		print("ATK updated to: ", atk.text)
 	else:
 		print("ATK node is null!")

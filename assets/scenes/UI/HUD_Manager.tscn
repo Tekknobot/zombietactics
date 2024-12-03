@@ -1,9 +1,21 @@
-[gd_scene load_steps=5 format=3 uid="uid://ostvhqva4npp"]
+[gd_scene load_steps=15 format=3 uid="uid://ostvhqva4npp"]
 
 [ext_resource type="PackedScene" uid="uid://rdlfqfdmhgit" path="res://assets/scenes/UI/HUD.tscn" id="1_iqwu7"]
 [ext_resource type="Script" path="res://scripts/HUD_Manager.gd" id="1_ymcj8"]
 [ext_resource type="Script" path="res://scripts/Navigation.gd" id="3_jawwu"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_lf15b"]
+[ext_resource type="Texture2D" uid="uid://bkcwqu2daxeth" path="res://assets/portraits/soldier_port.png" id="5_giiwy"]
+[ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="6_sg366"]
+[ext_resource type="Texture2D" uid="uid://bk6yt4vowxo7j" path="res://assets/portraits/dog_port.png" id="7_qo40y"]
+[ext_resource type="Texture2D" uid="uid://lfmluokjn1j6" path="res://assets/portraits/pilots/l0_por04.png" id="8_esie1"]
+[ext_resource type="Texture2D" uid="uid://c6nugp4n3dm8a" path="res://assets/portraits/pilots/l0_por06.png" id="9_jyg8a"]
+[ext_resource type="Texture2D" uid="uid://dd7tye4sh84h7" path="res://assets/portraits/pilots/l0_por07.png" id="10_nk4bl"]
+[ext_resource type="Texture2D" uid="uid://b51r4y38hvqvj" path="res://assets/portraits/pilots/l0_por08.png" id="11_uhv8a"]
+[ext_resource type="Texture2D" uid="uid://ct5fmcph4qs8w" path="res://assets/portraits/pilots/l0_por10.png" id="12_4kt7h"]
+[ext_resource type="Texture2D" uid="uid://gqlqs845wp2q" path="res://assets/portraits/pilots/l0_por03.png" id="13_ihxk8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lhc5"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
 [node name="HUDManager" type="CanvasLayer"]
 script = ExtResource("1_ymcj8")
@@ -17,21 +29,81 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -40.0
 grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("3_jawwu")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Navigation"]
-layout_mode = 0
-offset_left = -53.0
-offset_top = -26.0
-offset_right = 13.0
-offset_bottom = 14.0
-
-[node name="Button" type="Button" parent="Navigation/HBoxContainer"]
+[node name="Button" type="Button" parent="Navigation"]
 layout_mode = 2
+offset_left = -69.0
+offset_top = -29.0
+offset_right = -3.0
+offset_bottom = -3.0
 theme_override_fonts/font = ExtResource("3_lf15b")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_2lhc5")
 text = "RETURN"
+
+[node name="MiniPortraitHUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 374.0
+offset_top = -67.0
+offset_right = -175.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ColorRect" type="ColorRect" parent="MiniPortraitHUD"]
+layout_mode = 0
+offset_left = 23.0
+offset_top = -5.0
+offset_right = 619.0
+offset_bottom = 63.0
+color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MiniPortraitHUD"]
+layout_mode = 0
+offset_left = 25.0
+offset_top = -3.0
+offset_right = 617.0
+offset_bottom = 61.0
+theme_override_constants/separation = 2
+
+[node name="Port1" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("5_giiwy")
+
+[node name="Port2" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("6_sg366")
+
+[node name="Port3" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("7_qo40y")
+
+[node name="Port4" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("8_esie1")
+
+[node name="Port5" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("9_jyg8a")
+
+[node name="Port6" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("10_nk4bl")
+
+[node name="Port7" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("11_uhv8a")
+
+[node name="Port8" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("12_4kt7h")
+
+[node name="Port9" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("13_ihxk8")

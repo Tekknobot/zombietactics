@@ -1,32 +1,74 @@
-[gd_scene load_steps=20 format=4 uid="uid://rdlfqfdmhgit"]
+[gd_scene load_steps=25 format=4 uid="uid://rdlfqfdmhgit"]
 
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="1_v0rww"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_fyyii"]
 [ext_resource type="Script" path="res://scripts/AdjustTextLabel.gd" id="3_y7bf6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nx3cq"]
-bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r5qri"]
 bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np2bf"]
-bg_color = Color(0.0846899, 0.0846899, 0.0846899, 1)
+bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o3ylw"]
 bg_color = Color(1, 1, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_afkfq"]
 content_margin_left = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kld57"]
 content_margin_left = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1gp3x"]
 content_margin_left = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nfkfn"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_upmy2"]
 bg_color = Color(0.6, 0, 0, 1)
@@ -35,6 +77,18 @@ bg_color = Color(0.6, 0, 0, 1)
 content_margin_left = 5.0
 content_margin_right = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s8yyv"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v731d"]
 bg_color = Color(0.6, 0, 0.00392157, 1)
@@ -43,6 +97,25 @@ bg_color = Color(0.6, 0, 0.00392157, 1)
 content_margin_left = 5.0
 content_margin_right = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anqlu"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_63cqt"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="Image" id="Image_uvny1"]
 data = {
@@ -300,6 +373,13 @@ cache/0/50/0/glyphs/68/size = Vector2(15, 18)
 cache/0/50/0/glyphs/68/uv_rect = Rect2(46, 1, 15, 18)
 cache/0/50/0/glyphs/68/texture_idx = 0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n8cjo"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wmxr2"]
 bg_color = Color(0.6, 0, 0.00392157, 1)
 
@@ -307,6 +387,11 @@ bg_color = Color(0.6, 0, 0.00392157, 1)
 content_margin_left = 5.0
 content_margin_right = 5.0
 bg_color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -315,19 +400,19 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 grow_vertical = 0
 
-[node name="DesignBG" type="ColorRect" parent="."]
-visible = false
+[node name="PortraitBorder" type="ColorRect" parent="."]
 layout_mode = 0
-offset_top = -278.0
-offset_right = 477.0
-offset_bottom = -1.0
+offset_left = 18.0
+offset_top = -206.0
+offset_right = 150.0
+offset_bottom = -74.0
 
 [node name="PortraitColorRect" type="ColorRect" parent="."]
 layout_mode = 0
-offset_left = 24.0
-offset_top = -187.0
-offset_right = 152.0
-offset_bottom = -59.0
+offset_left = 20.0
+offset_top = -204.0
+offset_right = 148.0
+offset_bottom = -76.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
 [node name="Portrait" type="TextureRect" parent="."]
@@ -336,20 +421,20 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = -187.0
-offset_right = 152.0
-offset_bottom = -59.0
+offset_left = 20.0
+offset_top = -204.0
+offset_right = 148.0
+offset_bottom = -76.0
 grow_vertical = 0
 texture = ExtResource("1_v0rww")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 custom_minimum_size = Vector2(8, 128)
 layout_mode = 0
-offset_left = 14.0
-offset_top = -187.0
-offset_right = 22.0
-offset_bottom = -59.0
+offset_left = 6.0
+offset_top = -206.0
+offset_right = 16.0
+offset_bottom = -74.0
 theme_override_styles/background = SubResource("StyleBoxFlat_nx3cq")
 theme_override_styles/fill = SubResource("StyleBoxFlat_r5qri")
 step = 1.0
@@ -360,10 +445,10 @@ show_percentage = false
 [node name="XPBar" type="ProgressBar" parent="."]
 custom_minimum_size = Vector2(8, 128)
 layout_mode = 0
-offset_left = 154.0
-offset_top = -187.0
+offset_left = 152.0
+offset_top = -206.0
 offset_right = 162.0
-offset_bottom = -59.0
+offset_bottom = -74.0
 theme_override_styles/background = SubResource("StyleBoxFlat_np2bf")
 theme_override_styles/fill = SubResource("StyleBoxFlat_o3ylw")
 step = 1.0
@@ -374,10 +459,10 @@ show_percentage = false
 [node name="LevelStatName" type="HBoxContainer" parent="."]
 custom_minimum_size = Vector2(376, 26)
 layout_mode = 0
-offset_left = 14.0
-offset_top = -57.0
-offset_right = 390.0
-offset_bottom = -31.0
+offset_left = 6.0
+offset_top = -72.0
+offset_right = 382.0
+offset_bottom = -40.0
 theme_override_constants/separation = 2
 
 [node name="Name" type="RichTextLabel" parent="LevelStatName"]
@@ -404,10 +489,10 @@ script = ExtResource("3_y7bf6")
 [node name="StatContainer" type="HBoxContainer" parent="."]
 custom_minimum_size = Vector2(315, 26)
 layout_mode = 0
-offset_left = 14.0
-offset_top = -29.0
-offset_right = 390.0
-offset_bottom = -3.0
+offset_left = 6.0
+offset_top = -38.0
+offset_right = 382.0
+offset_bottom = -6.0
 theme_override_constants/separation = 2
 
 [node name="ATK" type="RichTextLabel" parent="StatContainer"]
@@ -444,65 +529,75 @@ autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 
 [node name="Missile" type="Button" parent="." groups=["hud_controls"]]
+visible = false
 layout_mode = 0
 offset_left = 164.0
-offset_top = -187.0
+offset_top = -206.0
 offset_right = 230.0
-offset_bottom = -161.0
+offset_bottom = -176.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxFlat_nfkfn")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
 theme_override_styles/normal = SubResource("StyleBoxFlat_a3qd4")
 toggle_mode = true
 text = "Missile"
 
 [node name="Landmine" type="Button" parent="." groups=["hud_controls"]]
+visible = false
 layout_mode = 0
 offset_left = 164.0
-offset_top = -159.0
+offset_top = -173.0
 offset_right = 250.0
-offset_bottom = -133.0
+offset_bottom = -143.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxFlat_s8yyv")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
 theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
 toggle_mode = true
 text = "Landmine"
 
 [node name="Mek" type="Button" parent="." groups=["hud_controls"]]
+visible = false
 layout_mode = 0
 offset_left = 164.0
-offset_top = -187.0
+offset_top = -206.0
 offset_right = 222.0
-offset_bottom = -161.0
+offset_bottom = -176.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxFlat_anqlu")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_upmy2")
 theme_override_styles/normal = SubResource("StyleBoxFlat_a3qd4")
 toggle_mode = true
 text = "Mecha"
 
 [node name="Dynamite" type="Button" parent="." groups=["hud_controls"]]
+visible = false
 layout_mode = 0
 offset_left = 164.0
-offset_top = -187.0
+offset_top = -206.0
 offset_right = 246.0
-offset_bottom = -161.0
+offset_bottom = -176.0
 theme_override_fonts/font = ExtResource("3_fyyii")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxFlat_63cqt")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
 theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
 toggle_mode = true
 text = "Dynamite"
 
 [node name="EndTurn" type="Button" parent="." groups=["hud_controls"]]
+visible = false
 layout_mode = 0
-offset_left = 164.0
-offset_top = -85.0
-offset_right = 254.0
-offset_bottom = -59.0
+offset_left = 6.0
+offset_top = -239.0
+offset_right = 96.0
+offset_bottom = -209.0
 theme_override_fonts/font = SubResource("FontFile_i7klw")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxFlat_n8cjo")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_wmxr2")
 theme_override_styles/normal = SubResource("StyleBoxFlat_oycun")
 text = "End TURN"

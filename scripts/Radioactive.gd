@@ -175,7 +175,7 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 				
 			# Update the HUD to reflect new stats
 			var hud_manager = get_node("/root/MapManager/HUDManager")
-			hud_manager.update_hud(unit)	
+			#hud_manager.update_hud(unit)	
 
 			# Mark the player as damaged this turn
 			damaged_units_this_turn.append(unit)
@@ -195,7 +195,7 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 				
 				# Update the HUD to reflect new stats
 				var hud_manager = get_node("/root/MapManager/HUDManager")
-				hud_manager.update_hud_zombie(unit)	
+				#hud_manager.update_hud_zombie(unit)	
 
 				# Mark the player as damaged this turn
 				damaged_units_this_turn.append(unit)				

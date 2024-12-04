@@ -100,10 +100,7 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 
 # Selects a unit or structure at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:	
-	GlobalManager.dynamite_toggle_active = false
-	GlobalManager.landmine_toggle_active = false
-	GlobalManager.mek_toggle_active = false
-	GlobalManager.missile_toggle_active = false
+	var hud_manager = get_parent().get_node("HUDManager")
 	
 	clear_action_tiles()  # Clear any previous selection tiles
 	clear_action_tiles_zombie()  # Clear any previous zombie selection tiles
@@ -112,8 +109,12 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos and player.can_start_turn == true:
+			hud_manager.dynamite.button_pressed = false	
+			hud_manager.landmine.button_pressed = false	
+			hud_manager.mek.button_pressed = false	
+			hud_manager.missile.button_pressed = false		
+					
 			# Update the HUD to reflect new stats
-			var hud_manager = get_parent().get_node("HUDManager")
 			hud_manager.visible = true		
 				
 			# Play selection sound effect
@@ -139,8 +140,12 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
+			hud_manager.dynamite.button_pressed = false	
+			hud_manager.landmine.button_pressed = false	
+			hud_manager.mek.button_pressed = false	
+			hud_manager.missile.button_pressed = false	
+			
 			# Update the HUD to reflect new stats
-			var hud_manager = get_parent().get_node("HUDManager")
 			hud_manager.visible = true	
 						
 			# Play selection sound effect
@@ -162,6 +167,11 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var structures = get_tree().get_nodes_in_group("structures")
 	for structure in structures:
 		if tilemap.local_to_map(structure.global_position) == tile_pos:
+			hud_manager.dynamite.button_pressed = false	
+			hud_manager.landmine.button_pressed = false	
+			hud_manager.mek.button_pressed = false	
+			hud_manager.missile.button_pressed = false	
+			
 			# Play selection sound effect
 			audio_player.stream = select_audio
 			audio_player.play()

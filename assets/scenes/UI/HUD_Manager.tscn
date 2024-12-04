@@ -16,6 +16,11 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lhc5"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
 
 [node name="HUDManager" type="CanvasLayer"]
 script = ExtResource("1_ymcj8")
@@ -35,8 +40,8 @@ script = ExtResource("3_jawwu")
 
 [node name="Button" type="Button" parent="Navigation"]
 layout_mode = 2
-offset_left = -69.0
-offset_top = -29.0
+offset_left = -73.0
+offset_top = -33.0
 offset_right = -3.0
 offset_bottom = -3.0
 theme_override_fonts/font = ExtResource("3_lf15b")
@@ -50,26 +55,33 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 374.0
+offset_left = 381.0
 offset_top = -67.0
-offset_right = -175.0
+offset_right = -168.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ColorRect" type="ColorRect" parent="MiniPortraitHUD"]
+[node name="Border" type="ColorRect" parent="MiniPortraitHUD"]
 layout_mode = 0
 offset_left = 23.0
+offset_top = -7.0
+offset_right = 621.0
+offset_bottom = 61.0
+
+[node name="ColorRect" type="ColorRect" parent="MiniPortraitHUD"]
+layout_mode = 0
+offset_left = 25.0
 offset_top = -5.0
 offset_right = 619.0
-offset_bottom = 63.0
+offset_bottom = 59.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MiniPortraitHUD"]
 layout_mode = 0
 offset_left = 25.0
-offset_top = -3.0
-offset_right = 617.0
-offset_bottom = 61.0
+offset_top = -5.0
+offset_right = 619.0
+offset_bottom = 59.0
 theme_override_constants/separation = 2
 
 [node name="Port1" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]

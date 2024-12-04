@@ -232,6 +232,8 @@ func clear_action_tiles() -> void:
 		selected_player.clear_movement_tiles()
 		selected_player.clear_attack_range_tiles()
 		selected_player.selected = false
+	if selected_zombie:
+		selected_zombie.selected = false	
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()
 
@@ -241,6 +243,11 @@ func clear_action_tiles_zombie() -> void:
 	for zombie in zombies:
 		zombie.selected = false
 		zombie.clear_movement_tiles()
+
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		player.selected = false
+		player.clear_movement_tiles()		
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position

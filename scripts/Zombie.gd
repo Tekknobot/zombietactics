@@ -187,12 +187,6 @@ func _process(delta: float) -> void:
 					
 					active_zombie.emit_signal("movement_completed")  # Notify main loop
 					active_zombie.get_child(0).play("default")
-
-					var all_zombies = get_tree().get_nodes_in_group("zombies")
-					for zombie in all_zombies:
-						if zombie.zombie_type == "Radioactive":
-							zombie.get_child(4).particles_need_update = true
-							zombie.get_child(4).update_particles()
 				
 					# Check for adjacent attacks
 					await check_for_attack(active_zombie)
@@ -219,6 +213,12 @@ func process_zombie_queue() -> void:
 		reset_player_units()
 		turn_manager.start_current_unit_turn()
 		zombies_processed = 0  # Reset the counter for the next turn
+		
+		var all_zombies = get_tree().get_nodes_in_group("zombies")
+		for zombie in all_zombies:
+			if zombie.zombie_type == "Radioactive":
+				zombie.get_child(4).particles_need_update = true
+				zombie.get_child(4).update_particles()		
 		return
 
 	active_zombie = zombie_queue.pop_front()

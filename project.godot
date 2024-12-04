@@ -37,6 +37,7 @@ version_control/autoload_on_startup=true
 [global_group]
 
 hud_controls="HUD Buttons"
+portrait_controls="Mini Portrait"
 
 [input]
 

@@ -85,55 +85,55 @@ offset_right = 619.0
 offset_bottom = 59.0
 theme_override_constants/separation = 2
 
-[node name="Port1" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port1" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("5_giiwy")
 script = ExtResource("6_27nvl")
 player_name = "Logan. Raines"
 
-[node name="Port2" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port2" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("6_sg366")
 script = ExtResource("6_27nvl")
 player_name = "Dutch. Major"
 
-[node name="Port3" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port3" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("7_qo40y")
 script = ExtResource("6_27nvl")
 player_name = "Yoshida. Boi"
 
-[node name="Port4" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port4" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("8_esie1")
 script = ExtResource("6_27nvl")
 player_name = "Chuck. Genius"
 
-[node name="Port5" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port5" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("9_jyg8a")
 script = ExtResource("6_27nvl")
 player_name = "Sarah. Reese"
 
-[node name="Port6" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port6" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("10_nk4bl")
 script = ExtResource("6_27nvl")
 player_name = "Angel. Charlie"
 
-[node name="Port7" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port7" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("11_uhv8a")
 script = ExtResource("6_27nvl")
 player_name = "John. Doom"
 
-[node name="Port8" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port8" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("12_4kt7h")
 script = ExtResource("6_27nvl")
 player_name = "Aleks. Ducat"
 
-[node name="Port9" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
+[node name="Port9" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
 texture = ExtResource("13_ihxk8")
 script = ExtResource("6_27nvl")

@@ -30,6 +30,8 @@ func _ready() -> void:
 	
 # Called every frame to process input and update hover tile position
 func _process(delta: float) -> void:
+	is_mouse_over_gui()
+	
 	var mouse_pos: Vector2 = get_global_mouse_position()
 	mouse_pos.y += 8  # Optional offset to align tiles if necessary
 	var tile_pos: Vector2i = tilemap.local_to_map(tilemap.to_local(mouse_pos))
@@ -41,12 +43,17 @@ func _process(delta: float) -> void:
 	else:
 		visible = false  # Hide hover tile if out of bounds
 
+	# Block gameplay input if the mouse is over GUI
+	if is_mouse_over_gui():
+		print("Input blocked by GUI.")
+		return  # Prevent further input handling
+
 	# Handle left-click and right-click actions
 	if is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_left"):
 		handle_left_click(tile_pos)		
 		
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
-		handle_right_click()
+		handle_right_click()	
 		
 # Checks if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:
@@ -234,3 +241,20 @@ func clear_action_tiles_zombie() -> void:
 	for zombie in zombies:
 		zombie.selected = false
 		zombie.clear_movement_tiles()
+
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var portrait_controls = get_tree().get_nodes_in_group("portrait_controls")
+	for control in portrait_controls:
+		if control is TextureRect:
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking TextureRect:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over TextureRect:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any TextureRect.")
+	return false

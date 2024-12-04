@@ -1,10 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://ostvhqva4npp"]
+[gd_scene load_steps=16 format=3 uid="uid://ostvhqva4npp"]
 
 [ext_resource type="PackedScene" uid="uid://rdlfqfdmhgit" path="res://assets/scenes/UI/HUD.tscn" id="1_iqwu7"]
 [ext_resource type="Script" path="res://scripts/HUD_Manager.gd" id="1_ymcj8"]
 [ext_resource type="Script" path="res://scripts/Navigation.gd" id="3_jawwu"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_lf15b"]
 [ext_resource type="Texture2D" uid="uid://bkcwqu2daxeth" path="res://assets/portraits/soldier_port.png" id="5_giiwy"]
+[ext_resource type="Script" path="res://scripts/CheckPlayerStatus.gd" id="6_27nvl"]
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="6_sg366"]
 [ext_resource type="Texture2D" uid="uid://bk6yt4vowxo7j" path="res://assets/portraits/dog_port.png" id="7_qo40y"]
 [ext_resource type="Texture2D" uid="uid://lfmluokjn1j6" path="res://assets/portraits/pilots/l0_por04.png" id="8_esie1"]
@@ -49,7 +50,7 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxFlat_2lhc5")
 text = "RETURN"
 
-[node name="MiniPortraitHUD" type="Control" parent="."]
+[node name="MiniPortraitsHUD" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 12
 anchor_top = 1.0
@@ -61,14 +62,14 @@ offset_right = -168.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="Border" type="ColorRect" parent="MiniPortraitHUD"]
+[node name="Border" type="ColorRect" parent="MiniPortraitsHUD"]
 layout_mode = 0
 offset_left = 23.0
 offset_top = -7.0
 offset_right = 621.0
 offset_bottom = 61.0
 
-[node name="ColorRect" type="ColorRect" parent="MiniPortraitHUD"]
+[node name="ColorRect" type="ColorRect" parent="MiniPortraitsHUD"]
 layout_mode = 0
 offset_left = 25.0
 offset_top = -5.0
@@ -76,7 +77,7 @@ offset_right = 619.0
 offset_bottom = 59.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MiniPortraitHUD"]
+[node name="MiniPortraits" type="HBoxContainer" parent="MiniPortraitsHUD"]
 layout_mode = 0
 offset_left = 25.0
 offset_top = -5.0
@@ -84,38 +85,56 @@ offset_right = 619.0
 offset_bottom = 59.0
 theme_override_constants/separation = 2
 
-[node name="Port1" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port1" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("5_giiwy")
+script = ExtResource("6_27nvl")
+player_name = "Logan. Raines"
 
-[node name="Port2" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port2" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("6_sg366")
+script = ExtResource("6_27nvl")
+player_name = "Dutch. Major"
 
-[node name="Port3" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port3" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("7_qo40y")
+script = ExtResource("6_27nvl")
+player_name = "Yoshida. Boi"
 
-[node name="Port4" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port4" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("8_esie1")
+script = ExtResource("6_27nvl")
+player_name = "Chuck. Genius"
 
-[node name="Port5" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port5" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("9_jyg8a")
+script = ExtResource("6_27nvl")
+player_name = "Sarah. Reese"
 
-[node name="Port6" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port6" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("10_nk4bl")
+script = ExtResource("6_27nvl")
+player_name = "Angel. Charlie"
 
-[node name="Port7" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port7" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("11_uhv8a")
+script = ExtResource("6_27nvl")
+player_name = "John. Doom"
 
-[node name="Port8" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port8" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("12_4kt7h")
+script = ExtResource("6_27nvl")
+player_name = "Aleks. Ducat"
 
-[node name="Port9" type="TextureRect" parent="MiniPortraitHUD/HBoxContainer"]
+[node name="Port9" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
 texture = ExtResource("13_ihxk8")
+script = ExtResource("6_27nvl")
+player_name = "Annie. Switch"

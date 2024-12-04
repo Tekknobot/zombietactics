@@ -186,8 +186,8 @@ func check_for_player_units_in_tile(tile_pos: Vector2i):
 				return
 			# Apply damage to the zombie if they're on the same tile as the particle
 			if not damaged_units_this_turn.has(unit):
-				unit.audio_player.stream = unit.hurt_audio
-				unit.audio_player.play()
+				#unit.audio_player.stream = unit.hurt_audio
+				#unit.audio_player.play()
 					
 				unit.flash_damage()  # Assuming there's a flash_damage method for visual effect
 				unit.apply_damage(5)  # Assuming units have an `apply_damage` method					
@@ -295,6 +295,7 @@ func fade_in_particle(particle_child, fade_duration: float):
 		modulate_alpha += alpha_step
 		if modulate_alpha > 1.0:
 			modulate_alpha = 1.0
+		
 		particle_child.modulate = Color(1, 1, 1, modulate_alpha)  # Adjust the alpha of child 1
 
 		# Wait for the timer to finish before the next increment

@@ -98,6 +98,10 @@ func _on_dynamite_toggled(button_pressed: bool) -> void:
 
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
+	var hovertiles = get_tree().get_nodes_in_group("hovertile")
+	for hovertile in hovertiles:
+		hovertile.clear_action_tiles()
+		
 	turn_manager.on_player_action_completed()
 
 # Access and update HUD elements based on the selected player unit

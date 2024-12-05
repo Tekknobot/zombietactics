@@ -35,3 +35,8 @@ func reset_global_manager():
 	GlobalManager.secret_item_found = false
 	GlobalManager.zombies_cleared = false
 	GlobalManager.players_killed = false	
+	
+	# Reset has attacked
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:	
+		player.has_attacked = false

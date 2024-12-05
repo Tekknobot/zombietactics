@@ -141,6 +141,9 @@ func _process(delta: float) -> void:
 				#print("Death animation finished, destroying zombie.")
 				self.remove_from_group("zombies")				
 				self.visible = false
+				
+				zombie_queue.pop_front()
+				
 				if self.zombie_type == "Radioactive":
 					self.get_child(4).active_particle_instances.clear()
 				

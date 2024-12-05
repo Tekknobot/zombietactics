@@ -117,6 +117,7 @@ func _ready():
 func _process(delta):
 	# Check if the Space key is pressed
 	if Input.is_action_just_pressed("space"):
+		GlobalManager.reset_global_manager()		
 		reset_level()
 
 # Reload the current scene to reset the level

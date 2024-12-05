@@ -165,8 +165,8 @@ func _process(delta: float) -> void:
 
 			# Camera focuses on the active zombie
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_position(active_zombie.position)    
-
+			camera.focus_on_position(active_zombie.position)   
+			
 			# Update facing direction
 			if direction.x > 0:
 				active_zombie.scale.x = -1  # Facing right
@@ -210,12 +210,6 @@ func process_zombie_queue() -> void:
 		reset_player_units()
 		zombies_processed = 0  # Reset the counter for the next turn
 
-		# Get the next zombie in the queue
-		active_zombie = zombie_queue.pop_front()
-		active_zombie.is_moving = false  # Reset moving state
-		active_zombie.path_index = 0    # Reset path index
-		active_zombie.current_path = PackedVector2Array()  # Clear path
-
 		print("Processing Zombie ID:", active_zombie.zombie_id)
 		
 		#Handle radioactive zombie
@@ -226,7 +220,11 @@ func process_zombie_queue() -> void:
 				zombie.get_child(4).update_particles()		
 		return
 
+	# Get the next zombie in the queue
 	active_zombie = zombie_queue.pop_front()
+	active_zombie.is_moving = false  # Reset moving state
+	active_zombie.path_index = 0    # Reset path index
+	active_zombie.current_path = PackedVector2Array()  # Clear path
 	print("Processing Zombie ID:", active_zombie.zombie_id)
 
 	# Find the closest player and calculate the path

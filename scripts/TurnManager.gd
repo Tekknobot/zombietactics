@@ -25,8 +25,6 @@ func _ready() -> void:
 		print("No player units available to start.")
 
 func start_current_unit_turn() -> void:
-	trigger_zombies = false
-
 	# Ensure there are valid player units
 	if player_units.size() == 0:
 		print("No player units left.")
@@ -45,6 +43,8 @@ func start_current_unit_turn() -> void:
 
 
 func end_current_turn() -> void:
+	trigger_zombies = false
+	
 	# Get all player units
 	var all_player_units = get_tree().get_nodes_in_group("player_units")
 	

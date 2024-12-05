@@ -19,6 +19,8 @@ var is_dragging = false
 var drag_start_mouse_position: Vector2 = Vector2.ZERO
 var drag_start_camera_position: Vector2 = Vector2.ZERO
 
+signal zoom_completed
+
 func _ready():
 	# Initialize the return timer
 	return_to_default_timer = Timer.new()
@@ -45,6 +47,7 @@ func _process(delta):
 		# Check if the zoom and position are close enough
 		if position.distance_to(target_tile_pos) < 0.1 and zoom.distance_to(zoom_focus) < 0.01:
 			is_zooming_in = false
+			emit_signal("zoom_completed")  # Notify that zooming in is complete
 			return_to_default_timer.start(focus_duration)  # Start the timer to return to default
 
 	elif is_zooming_out:
@@ -53,6 +56,7 @@ func _process(delta):
 		zoom = zoom.lerp(original_zoom, zoom_speed * delta)
 		if position.distance_to(original_position) < 0.1 and zoom.distance_to(original_zoom) < 0.01:
 			is_zooming_out = false
+			emit_signal("zoom_completed")  # Notify that zooming in is complete
 
 	# Handle dragging mechanic
 	if is_dragging:

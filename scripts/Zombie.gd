@@ -74,16 +74,12 @@ var player_unit_is_selected = false
 @onready var mission_manager = get_parent().get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
 
 var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
-var target_reach_threshold = 2  # Set a tolerance threshold to determine if the zombie reached the target tile
 var zombies: Array  # This will store the zombies sorted by zombie_id
 
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
 
 @onready var health_ui = $HealthUI
 @onready var xp_ui = $XPUI
-
-# Define a limit for the number of zombies processed per turn
-var zombie_limit = 9
 
 signal astar_setup_complete
 signal movement_completed
@@ -190,8 +186,8 @@ func _process(delta: float) -> void:
 					await check_for_attack(self)
 
 					# Update AStar grid after movement
-					self.update_astar_grid()
-					self.process_zombie_queue()
+					update_astar_grid()
+					process_zombie_queue()
 					emit_signal("movement_completed")  # Notify main loop
 		else:
 			# If out of range or no path
@@ -201,34 +197,43 @@ func _process(delta: float) -> void:
 			
 			# Check for adjacent attacks
 			await check_for_attack(self)
-			self.update_astar_grid()
-			self.process_zombie_queue()
+			update_astar_grid()
+			process_zombie_queue()
 			emit_signal("movement_completed")  # Notify main loop
 											
 	update_tile_position()
 	update_unit_ui()
 	
-func process_zombie_queue() -> void:
-	print("Checking if zombie processing should stop...")
-	print("zombies_processed:", GlobalManager.zombies_processed, "zombie_limit:", zombie_limit, "zombie_queue size:", zombie_queue.size())
-
-	if GlobalManager.zombies_processed >= zombie_limit or zombie_queue.is_empty():
-		print("Processed", GlobalManager.zombies_processed, "zombies. Turn complete.")
-		var all_zombies = get_tree().get_nodes_in_group("zombies")	
-		# Handle radioactive zombies
-		for zombie in all_zombies:				
+func process_zombie_queue() -> void:		
+	print("Debug: zombies_processed =", GlobalManager.zombies_processed, "zombie_limit =", GlobalManager.zombie_limit)
+	print("Debug: zombie_queue size =", zombie_queue.size())
+	
+	if GlobalManager.zombies_processed >= GlobalManager.zombie_limit or zombie_queue.is_empty():
+		print("Processed ", GlobalManager.zombies_processed, " zombies. Turn complete.")
+		
+		var all_zombies = get_tree().get_nodes_in_group("zombies")
+		
+		# Reset zombie movement flags
+		for zombie in all_zombies:
 			zombie.is_moving = false
 			zombie.has_moved = false
 			
-		reset_player_units()
-		GlobalManager.zombies_processed = 0  # Reset the counter for the next turn
-
 		# Handle radioactive zombies
 		for zombie in all_zombies:
 			if zombie.zombie_type == "Radioactive":
 				zombie.get_child(4).particles_need_update = true
 				zombie.get_child(4).update_particles()
+				
+		reset_player_units()
+		GlobalManager.zombies_processed = 0  # Reset the counter for the next turn
 		return
+	
+	# Process the next zombie
+	if not zombie_queue.is_empty():
+		var active_zombie = zombie_queue.pop_front()
+		GlobalManager.active_zombie = active_zombie
+		active_zombie.has_moved = true
+		print("Processing Zombie ID:", active_zombie.zombie_id)	
 
 	# Get the next zombie that has not moved
 	while not zombie_queue.is_empty():
@@ -240,7 +245,7 @@ func process_zombie_queue() -> void:
 	# If all zombies have moved, stop processing
 	if GlobalManager.active_zombie.has_moved:
 		print("All zombies have moved. Ending turn.")
-		self.process_zombie_queue()  # Recursive call to clean up
+		process_zombie_queue()  # Recursive call to clean up
 		return
 
 	# Reset path and movement state for the current zombie
@@ -290,15 +295,16 @@ func process_zombie_queue() -> void:
 			print("Zombie ID:", GlobalManager.active_zombie.zombie_id, "assigned path:", GlobalManager.active_zombie.current_path)
 		else:
 			print("No valid path for Zombie ID:", GlobalManager.active_zombie.zombie_id)
-			self.process_zombie_queue()  # Process the next zombie
+			process_zombie_queue()  # Process the next zombie
 			return
 	else:
 		print("No target for Zombie ID:", GlobalManager.active_zombie.zombie_id)
-		self.process_zombie_queue()  # Process the next zombie
+		process_zombie_queue()  # Process the next zombie
 		return
-
+		
 	# Increment the processed zombies counter
-	GlobalManager.zombies_processed += 1
+	GlobalManager.zombies_processed += 1	
+			
 
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
@@ -311,11 +317,11 @@ func _on_player_action_completed() -> void:
 	zombie_queue.sort_custom(func(a, b):
 		return zombie_sort_function(a, b, get_tree().get_nodes_in_group("player_units"))
 	)
-	self.process_zombie_queue()
+	process_zombie_queue()
 
 # Setup the AStarGrid2D with walkable tiles
 func setup_astar() -> void:
-	await self.update_astar_grid()  # Update AStar grid to reflect current map state
+	await update_astar_grid()  # Update AStar grid to reflect current map state
 	print("AStar grid setup completed.")
 	
 	# Emit the signal when setup is complete

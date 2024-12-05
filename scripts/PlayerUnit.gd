@@ -67,8 +67,9 @@ var max_xp: int = 100
 var current_xp: int = 25
 var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
-
 var attack_damage: int = 25
+
+var facing_dir: int 
 
 var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
@@ -366,6 +367,7 @@ func move_along_path(delta: float) -> void:
 			scale.x = -1  # Facing right (East)
 		elif direction.x < 0:
 			scale.x = 1  # Facing left (West)	
+		
 			
 		# Move the soldier in the direction of the target position, adjusted by delta
 		position += direction * move_speed * delta

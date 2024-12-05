@@ -153,7 +153,7 @@ func _process(delta: float) -> void:
 				#queue_free()  # Destroy the zombie once the death animation ends
 
 	# Zombie movement
-	if active_zombie and active_zombie.is_moving:
+	if active_zombie and active_zombie.is_moving:							
 		if active_zombie.path_index < min(active_zombie.current_path.size(), active_zombie.movement_range + 1):
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var target_tile_pos = active_zombie.current_path[active_zombie.path_index]

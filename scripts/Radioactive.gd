@@ -49,6 +49,7 @@ func update_particles():
 		await remove_out_of_range_radiation(zombie.tile_pos, zombie.movement_range)
 		await remove_overlapping_particles_for_all_zombies()	
 	
+	damaged_units_this_turn.clear()
 	show_all_radiation()	
 	
 func spawn_particles_based_on_manhattan_distance():

@@ -27,6 +27,9 @@ var laser_deployed: bool = false
 var pulsing_segments: Array = []  # Array to track which segments are pulsing
 var explosion_target
 
+# Create the timer for the pulse effect
+var pulse_timer = Timer.new()
+	
 func _ready():
 	# Initialize color cycle
 	color_cycle = [laser_color_1, laser_color_2, laser_color_3]
@@ -36,8 +39,6 @@ func _ready():
 	line.default_color = laser_color_1  # Start with the first color
 	line.visible = false  # Hide laser initially
 
-	# Create the timer for the pulse effect
-	var pulse_timer = Timer.new()
 	pulse_timer.wait_time = pulse_duration
 	pulse_timer.one_shot = false
 	pulse_timer.connect("timeout", Callable(self, "_on_pulse_timer_timeout"))
@@ -172,6 +173,14 @@ func _on_pulse_timer_timeout():
 			var last_point = to_global(current_segment.get_point_position(1))  # Get the endpoint of the last segment
 			_trigger_explosion(explosion_target)
 
+			# Clear previous laser segments
+			laser_segments.clear()  # Clear the list of segments
+			for child in get_children():
+				if child is Line2D:
+					child.queue_free()	
+					
+			current_segment_index = 0				
+
 	# Move to the next segment
 	current_segment_index += 1
 
@@ -204,11 +213,12 @@ func _trigger_explosion(last_point: Vector2):
 	# Instantiate the explosion effect at the target's position
 	var explosion_instance = explosion_scene.instantiate()
 	get_parent().add_child(explosion_instance)
+	last_point.y += 8
 	explosion_instance.global_position = last_point
 	print("Explosion instance added to scene at:", last_point)
 
 	# Explosion radius (adjust this as needed)
-	var explosion_radius = 10.0
+	var explosion_radius = 8
 
 	# Variable to track if XP should be added (only once per explosion)
 	var xp_awarded = false
@@ -247,7 +257,7 @@ func _trigger_explosion(last_point: Vector2):
 	# Add XP if at least one target was hit
 	if xp_awarded:
 		await get_tree().create_timer(1).timeout
-		add_xp()
+		add_xp()	
 
 func add_xp():
 	# Add XP

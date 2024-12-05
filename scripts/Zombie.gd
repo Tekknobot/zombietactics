@@ -25,7 +25,7 @@ var layer: int
 var astar: AStarGrid2D = AStarGrid2D.new()
 var current_path: PackedVector2Array
 var path_index: int = 0
-@onready var move_speed: float = 100.0
+@onready var move_speed: float = 75.0
 
 var WATER_TILE_ID = 0
 
@@ -84,7 +84,6 @@ var is_attacking = false  # Flag to check if the zombie is already attacking in 
 
 # Define a limit for the number of zombies processed per turn
 var zombie_limit = 9
-var zombies_processed = 0  # Counter for zombies processed
 
 signal astar_setup_complete
 signal movement_completed
@@ -93,6 +92,8 @@ var active_zombie: Area2D = null
 var zombie_queue: Array = []  # Queue of zombies to move
 var closest_player: Area2D = null
 var best_adjacent_tile: Vector2i = Vector2i()
+
+var has_moved: bool = false
 
 func _ready() -> void:
 	# Possible values for health and XP
@@ -121,9 +122,9 @@ func _ready() -> void:
 	update_tile_position()
 
 	turn_manager.connect("player_action_completed", Callable(self, "_on_player_action_completed"))
+	turn_manager.connect("movement_completed", Callable(self, "_movement_completed"))
 
 	update_unit_ui()
-
 	setup_astar()
 
 # Called every frame
@@ -142,8 +143,6 @@ func _process(delta: float) -> void:
 				self.remove_from_group("zombies")				
 				self.visible = false
 				
-				zombie_queue.pop_front()
-				
 				if self.zombie_type == "Radioactive":
 					self.get_child(4).active_particle_instances.clear()
 				
@@ -156,87 +155,106 @@ func _process(delta: float) -> void:
 				#queue_free()  # Destroy the zombie once the death animation ends
 
 	# Zombie movement
-	if active_zombie and active_zombie.is_moving:							
-		if active_zombie.path_index < min(active_zombie.current_path.size(), active_zombie.movement_range + 1):
+	if self and self.is_moving:		
+		# Camera focuses on the active zombie
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		camera.focus_on_position(self.position) 
+		if self.path_index < min(self.current_path.size(), self.movement_range + 1):
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-			var target_tile_pos = active_zombie.current_path[active_zombie.path_index]
+			var target_tile_pos = self.current_path[self.path_index]
 			var target_world_pos = tilemap.map_to_local(target_tile_pos)
-
+				
 			# Calculate direction and move toward the target
-			var direction = (target_world_pos - active_zombie.position).normalized()
-			active_zombie.position += direction * move_speed * delta
-
-			# Camera focuses on the active zombie
-			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_position(active_zombie.position)   
+			var direction = (target_world_pos - self.position).normalized()
+			self.position += direction * move_speed * delta  
 			
 			# Update facing direction
 			if direction.x > 0:
-				active_zombie.scale.x = -1  # Facing right
+				self.scale.x = -1  # Facing right
 			elif direction.x < 0:
-				active_zombie.scale.x = 1  # Facing left
+				self.scale.x = 1  # Facing left
 
 			# Check if the zombie has reached the target position
-			if active_zombie.position.distance_to(target_world_pos) <= 1:
-				active_zombie.path_index += 1  # Move to the next point in the path
+			if self.position.distance_to(target_world_pos) <= 1:
+				self.path_index += 1  # Move to the next point in the path
 
 				# Check if the zombie has moved the maximum range or completed the path
-				if active_zombie.path_index >= min(active_zombie.current_path.size(), active_zombie.movement_range + 1):
-					print("Zombie ID:", active_zombie.zombie_id, "completed movement.")
-					active_zombie.is_moving = false
+				if self.path_index >= min(self.current_path.size(), self.movement_range + 1):
+					print("Zombie ID:", self.zombie_id, "completed movement.")
+					self.is_moving = false
+					self.has_moved = true
 					
-					active_zombie.emit_signal("movement_completed")  # Notify main loop
-					active_zombie.get_child(0).play("default")
+					self.get_child(0).play("default")
 				
 					# Check for adjacent attacks
-					await check_for_attack(active_zombie)
+					await check_for_attack(self)
 
 					# Update AStar grid after movement
-					update_astar_grid()
-					process_zombie_queue()
+					self.update_astar_grid()
+					self.process_zombie_queue()
+					emit_signal("movement_completed")  # Notify main loop
 		else:
 			# If out of range or no path
-			active_zombie.is_moving = false
-			active_zombie.get_child(0).play("default")
+			self.is_moving = false
+			self.has_moved = true
+			self.get_child(0).play("default")
 			
 			# Check for adjacent attacks
-			check_for_attack(active_zombie)
-			process_zombie_queue()
+			await check_for_attack(self)
+			self.update_astar_grid()
+			self.process_zombie_queue()
+			emit_signal("movement_completed")  # Notify main loop
 											
 	update_tile_position()
 	update_unit_ui()
-
+	
 func process_zombie_queue() -> void:
-	if zombies_processed >= zombie_limit or zombie_queue.is_empty():
-		print("Processed", zombies_processed, "zombies. Turn complete.")
-		is_moving = false
-		reset_player_units()
-		zombies_processed = 0  # Reset the counter for the next turn
+	print("Checking if zombie processing should stop...")
+	print("zombies_processed:", GlobalManager.zombies_processed, "zombie_limit:", zombie_limit, "zombie_queue size:", zombie_queue.size())
 
-		print("Processing Zombie ID:", active_zombie.zombie_id)
-		
-		#Handle radioactive zombie
-		var all_zombies = get_tree().get_nodes_in_group("zombies")
+	if GlobalManager.zombies_processed >= zombie_limit or zombie_queue.is_empty():
+		print("Processed", GlobalManager.zombies_processed, "zombies. Turn complete.")
+		var all_zombies = get_tree().get_nodes_in_group("zombies")	
+		# Handle radioactive zombies
+		for zombie in all_zombies:				
+			zombie.is_moving = false
+			zombie.has_moved = false
+			
+		reset_player_units()
+		GlobalManager.zombies_processed = 0  # Reset the counter for the next turn
+
+		# Handle radioactive zombies
 		for zombie in all_zombies:
 			if zombie.zombie_type == "Radioactive":
 				zombie.get_child(4).particles_need_update = true
-				zombie.get_child(4).update_particles()		
+				zombie.get_child(4).update_particles()
 		return
 
-	# Get the next zombie in the queue
-	active_zombie = zombie_queue.pop_front()
-	active_zombie.is_moving = false  # Reset moving state
-	active_zombie.path_index = 0    # Reset path index
-	active_zombie.current_path = PackedVector2Array()  # Clear path
-	print("Processing Zombie ID:", active_zombie.zombie_id)
+	# Get the next zombie that has not moved
+	while not zombie_queue.is_empty():
+		GlobalManager.active_zombie = zombie_queue.pop_front()
+		if not GlobalManager.active_zombie.has_moved:
+			break
+		print("Skipping Zombie ID:", GlobalManager.active_zombie.zombie_id, "as it has already moved.")
+	
+	# If all zombies have moved, stop processing
+	if GlobalManager.active_zombie.has_moved:
+		print("All zombies have moved. Ending turn.")
+		self.process_zombie_queue()  # Recursive call to clean up
+		return
+
+	# Reset path and movement state for the current zombie
+	GlobalManager.active_zombie.path_index = 0
+	GlobalManager.active_zombie.current_path = PackedVector2Array()
+	print("Processing Zombie ID:", GlobalManager.active_zombie.zombie_id)
 
 	# Find the closest player and calculate the path
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var players = get_tree().get_nodes_in_group("player_units")
 
 	var min_distance = INF
-	closest_player = null
-	best_adjacent_tile = Vector2i()
+	var closest_player = null
+	var best_adjacent_tile = Vector2i()
 
 	for player in players:
 		if not player.is_in_group("player_units"):
@@ -246,41 +264,41 @@ func process_zombie_queue() -> void:
 		var adjacent_tiles = get_adjacent_walkable_tiles(player_tile_pos)
 
 		for adj_tile in adjacent_tiles:
-			var distance = active_zombie.tile_pos.distance_to(adj_tile)
+			var distance = GlobalManager.active_zombie.tile_pos.distance_to(adj_tile)
 			if distance < min_distance:
 				min_distance = distance
 				closest_player = player
 				best_adjacent_tile = adj_tile
 
 	if closest_player and best_adjacent_tile != Vector2i():
-		active_zombie.current_path = astar.get_point_path(active_zombie.tile_pos, best_adjacent_tile)
-		if active_zombie.current_path.size() > 0:
+		GlobalManager.active_zombie.current_path = astar.get_point_path(GlobalManager.active_zombie.tile_pos, best_adjacent_tile)
+		if GlobalManager.active_zombie.current_path.size() > 0:
 			# Limit the path length to the zombie's movement range
-			active_zombie.current_path = active_zombie.current_path.slice(0, active_zombie.movement_range + 1)
-			active_zombie.path_index = 0
-			active_zombie.is_moving = true
-			active_zombie.get_child(0).play("move")
-			
-			#Play SFX
-			active_zombie.audio_player.stream = active_zombie.zombie_audio
-			active_zombie.audio_player.play()			
-			
-			#Handle radioactive zombie
-			var all_zombies = get_tree().get_nodes_in_group("zombies")
-			for zombie in all_zombies:
+			GlobalManager.active_zombie.current_path = GlobalManager.active_zombie.current_path.slice(0, GlobalManager.active_zombie.movement_range + 1)
+			GlobalManager.active_zombie.is_moving = true
+			GlobalManager.active_zombie.get_child(0).play("move")
+
+			# Play SFX
+			GlobalManager.active_zombie.audio_player.stream = GlobalManager.active_zombie.zombie_audio
+			GlobalManager.active_zombie.audio_player.play()
+
+			# Handle radioactive zombies
+			for zombie in get_tree().get_nodes_in_group("zombies"):
 				if zombie.zombie_type == "Radioactive":
 					zombie.get_child(4).hide_all_radiation()
-			
-			print("Zombie ID:", active_zombie.zombie_id, "assigned path:", active_zombie.current_path)
+
+			print("Zombie ID:", GlobalManager.active_zombie.zombie_id, "assigned path:", GlobalManager.active_zombie.current_path)
 		else:
-			print("No valid path for Zombie ID:", active_zombie.zombie_id)
-			process_zombie_queue()  # Move to the next zombie if no path found
+			print("No valid path for Zombie ID:", GlobalManager.active_zombie.zombie_id)
+			self.process_zombie_queue()  # Process the next zombie
+			return
 	else:
-		print("No target for Zombie ID:", active_zombie.zombie_id)
-		process_zombie_queue()  # Move to the next zombie if no target found
+		print("No target for Zombie ID:", GlobalManager.active_zombie.zombie_id)
+		self.process_zombie_queue()  # Process the next zombie
+		return
 
 	# Increment the processed zombies counter
-	zombies_processed += 1
+	GlobalManager.zombies_processed += 1
 
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
@@ -293,12 +311,11 @@ func _on_player_action_completed() -> void:
 	zombie_queue.sort_custom(func(a, b):
 		return zombie_sort_function(a, b, get_tree().get_nodes_in_group("player_units"))
 	)
-	process_zombie_queue()
-
+	self.process_zombie_queue()
 
 # Setup the AStarGrid2D with walkable tiles
 func setup_astar() -> void:
-	await update_astar_grid()  # Update AStar grid to reflect current map state
+	await self.update_astar_grid()  # Update AStar grid to reflect current map state
 	print("AStar grid setup completed.")
 	
 	# Emit the signal when setup is complete

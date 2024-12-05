@@ -735,6 +735,8 @@ func die() -> void:
 	
 	if self.player_name == "Yoshida. Boi":
 		_create_explosion()
+	elif !self.player_name == "Dutch. Major" or !self.player_name == "Logan. Raines":
+		_create_explosion()
 		
 	self.remove_from_group("player_units")
 		

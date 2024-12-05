@@ -16,6 +16,9 @@ var current_map_index: int = 3 # Level
 var gameover: bool = false
 var map_cleared: bool = false
 
+var active_zombie: Area2D = null
+var zombies_processed = 0  # Counter for zombies processed
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.

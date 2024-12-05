@@ -500,7 +500,6 @@ func display_attack_range_tiles() -> void:
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.show_special_buttons(self)	
 	
-			
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # First, clear previous attack range tiles
 	
@@ -735,7 +734,8 @@ func die() -> void:
 	
 	if self.player_name == "Yoshida. Boi":
 		_create_explosion()
-	elif !self.player_name == "Dutch. Major" or !self.player_name == "Logan. Raines":
+	
+	if !self.player_name == "Dutch. Major" or !self.player_name == "Logan. Raines":
 		_create_explosion()
 		
 	self.remove_from_group("player_units")

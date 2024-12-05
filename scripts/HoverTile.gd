@@ -116,6 +116,9 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos and player.can_start_turn == true:
+			if GlobalManager.missile_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.landmine_toggle_active:
+				return
+							
 			hud_manager.dynamite.button_pressed = false	
 			hud_manager.landmine.button_pressed = false	
 			hud_manager.mek.button_pressed = false	
@@ -147,6 +150,9 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
+			if GlobalManager.missile_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.landmine_toggle_active:
+				return
+				
 			hud_manager.dynamite.button_pressed = false	
 			hud_manager.landmine.button_pressed = false	
 			hud_manager.mek.button_pressed = false	
@@ -232,8 +238,11 @@ func clear_action_tiles() -> void:
 		selected_player.clear_movement_tiles()
 		selected_player.clear_attack_range_tiles()
 		selected_player.selected = false
+
 	if selected_zombie:
-		selected_zombie.selected = false	
+		selected_zombie.clear_movement_tiles()
+		selected_zombie.selected = false
+		
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()
 
@@ -243,11 +252,6 @@ func clear_action_tiles_zombie() -> void:
 	for zombie in zombies:
 		zombie.selected = false
 		zombie.clear_movement_tiles()
-
-	var players = get_tree().get_nodes_in_group("player_units")
-	for player in players:
-		player.selected = false
-		player.clear_movement_tiles()		
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position

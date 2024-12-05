@@ -182,9 +182,6 @@ func _process(delta: float) -> void:
 					print("Zombie ID:", active_zombie.zombie_id, "completed movement.")
 					active_zombie.is_moving = false
 					
-					active_zombie.audio_player.stream = active_zombie.zombie_audio
-					active_zombie.audio_player.play()
-					
 					active_zombie.emit_signal("movement_completed")  # Notify main loop
 					active_zombie.get_child(0).play("default")
 				
@@ -211,9 +208,17 @@ func process_zombie_queue() -> void:
 		print("Processed", zombies_processed, "zombies. Turn complete.")
 		is_moving = false
 		reset_player_units()
-		turn_manager.start_current_unit_turn()
 		zombies_processed = 0  # Reset the counter for the next turn
+
+		# Get the next zombie in the queue
+		active_zombie = zombie_queue.pop_front()
+		active_zombie.is_moving = false  # Reset moving state
+		active_zombie.path_index = 0    # Reset path index
+		active_zombie.current_path = PackedVector2Array()  # Clear path
+
+		print("Processing Zombie ID:", active_zombie.zombie_id)
 		
+		#Handle radioactive zombie
 		var all_zombies = get_tree().get_nodes_in_group("zombies")
 		for zombie in all_zombies:
 			if zombie.zombie_type == "Radioactive":
@@ -255,6 +260,11 @@ func process_zombie_queue() -> void:
 			active_zombie.is_moving = true
 			active_zombie.get_child(0).play("move")
 			
+			#Play SFX
+			active_zombie.audio_player.stream = active_zombie.zombie_audio
+			active_zombie.audio_player.play()			
+			
+			#Handle radioactive zombie
 			var all_zombies = get_tree().get_nodes_in_group("zombies")
 			for zombie in all_zombies:
 				if zombie.zombie_type == "Radioactive":
@@ -274,7 +284,7 @@ func process_zombie_queue() -> void:
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	print("Player action completed. Starting zombie movement.")
-	await get_tree().create_timer(0.5).timeout 
+	await get_tree().create_timer(1).timeout 
 	mission_manager.check_mission_manager()
 
 	# Populate the zombie queue

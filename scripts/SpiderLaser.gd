@@ -12,6 +12,8 @@ extends Node2D
 @onready var line = $Line2D  # Line2D node for the laser
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 
+var explosion_scene = preload("res://assets/scenes/vfx/explosion.tscn")
+
 # Animation state variables
 var color_timer: Timer
 var width_pulse_up: bool = true
@@ -23,6 +25,7 @@ var current_segment_index: int = 0  # Tracks the segment being animated
 
 var laser_deployed: bool = false
 var pulsing_segments: Array = []  # Array to track which segments are pulsing
+var explosion_target
 
 func _ready():
 	# Initialize color cycle
@@ -43,19 +46,20 @@ func _ready():
 
 func _process(delta):
 	for segment in pulsing_segments:
-		# Check if width is expanding or contracting
-		if segment.width < laser_width * 3 and width_pulse_up:
+		if not is_instance_valid(segment):
+			continue  # Skip invalid segments
+
+		# Handle pulsing logic
+		if segment.width < laser_width * 1 and width_pulse_up:
 			segment.width += pulse_speed * delta
-			if segment.width >= laser_width * 3:
-				width_pulse_up = false  # Switch to contracting
+			if segment.width >= laser_width * 2:
+				width_pulse_up = false
 		elif segment.width > laser_width and not width_pulse_up:
 			segment.width -= pulse_speed * delta
 			if segment.width <= laser_width:
 				segment.width = laser_width
-				width_pulse_up = true  # Reset for next pulse
-
-				# Remove the segment from pulsing_segments once pulsing is complete
-				pulsing_segments.erase(segment)
+				width_pulse_up = true
+				pulsing_segments.erase(segment)  # Remove after pulse
 
 func _input(event):
 	# Check for mouse click
@@ -68,6 +72,7 @@ func _input(event):
 			var mouse_pos = tilemap.local_to_map(mouse_position)
 			var laser_target = tilemap.map_to_local(mouse_pos)
 			laser_target.y -= 8
+			explosion_target = laser_target
 			deploy_laser(laser_target)
 
 func deploy_laser(target_position: Vector2):
@@ -104,7 +109,7 @@ func deploy_laser(target_position: Vector2):
 		var tile_pos = tiles[i]
 		var segment_start = tilemap.map_to_local(tile_pos) + cell_size / 2
 		var segment_end = tilemap.map_to_local(tiles[i + 1]) + cell_size / 2
-
+		
 		var height_offset = 0
 		var segment_color = color_cycle[current_color_index]  # Default color from cycle
 
@@ -155,15 +160,20 @@ func _on_pulse_timer_timeout():
 
 	# Apply the pulse effect to the current segment
 	var current_segment = laser_segments[current_segment_index]
-	current_segment.width = laser_width * 2  # Start with increased width
+	current_segment.width = laser_width * 1  # Start with increased width
 	current_segment.default_color = laser_color_3  # Use the third color for the pulse
 
 	# Add the current segment to the pulsing_segments array
 	pulsing_segments.append(current_segment)
 
+	# Check if the current segment is the last one
+	if current_segment_index == laser_segments.size() - 1:  # Last segment
+		if current_segment.get_point_count() >= 2:
+			var last_point = to_global(current_segment.get_point_position(1))  # Get the endpoint of the last segment
+			_trigger_explosion(explosion_target)
+
 	# Move to the next segment
 	current_segment_index += 1
-
 
 func get_line_tiles(start: Vector2i, end: Vector2i) -> Array:
 	var tiles = []
@@ -186,3 +196,83 @@ func get_line_tiles(start: Vector2i, end: Vector2i) -> Array:
 
 	tiles.append(end)  # Include the last tile
 	return tiles
+
+# Trigger explosion at the target position after the missile reaches it
+func _trigger_explosion(last_point: Vector2):
+	print("Explosion triggered at position:", last_point)
+	
+	# Instantiate the explosion effect at the target's position
+	var explosion_instance = explosion_scene.instantiate()
+	get_parent().add_child(explosion_instance)
+	explosion_instance.global_position = last_point
+	print("Explosion instance added to scene at:", last_point)
+
+	# Explosion radius (adjust this as needed)
+	var explosion_radius = 10.0
+
+	# Variable to track if XP should be added (only once per explosion)
+	var xp_awarded = false
+
+	# Check for PlayerUnit within explosion radius
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if player.position.distance_to(last_point) <= explosion_radius:	
+			player.flash_damage()
+			player.apply_damage(player.attack_damage)
+					
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			hud_manager.update_hud(player)
+
+	# Check for ZombieUnit within explosion radius
+	for zombie in get_tree().get_nodes_in_group("zombies"):
+		if zombie.position.distance_to(last_point) <= explosion_radius:	
+			zombie.flash_damage()
+			for player in get_tree().get_nodes_in_group("player_units"):
+				if player.player_name == "Yoshida. Boi":			
+					zombie.apply_damage(player.attack_damage)
+					
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			hud_manager.update_hud_zombie(zombie)
+			
+	# Check for Structures within explosion radius
+	for structure in get_tree().get_nodes_in_group("structures"):
+		if structure.position.distance_to(last_point) <= explosion_radius:
+			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
+			print("Structure removed from explosion")
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+	# Add XP if at least one target was hit
+	if xp_awarded:
+		await get_tree().create_timer(1).timeout
+		add_xp()
+
+func add_xp():
+	# Add XP
+	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
+	var hud_manager = get_node("/root/MapManager/HUDManager")  # Adjust the path if necessary
+	
+	# Access the 'special' button within HUDManager
+	var missile_button = hud_manager.get_node("HUD/Missile")
+	GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
+
+	# Get all nodes in the 'hovertile' group
+	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
+
+	# Iterate through the list and find the HoverTile node
+	for hover_tile in hover_tiles:
+		if hover_tile.name == "HoverTile":
+			# Check if 'last_selected_player' exists and has 'current_xp' property
+			if hover_tile.selected_player or hover_tile.selected_structure or hover_tile.selected_zombie:
+				hover_tile.selected_player.current_xp += 25
+				# Update the HUD to reflect new stats
+				hud_manager.update_hud(hover_tile.selected_player)	
+				print("Added 25 XP to", hover_tile.selected_player, "new XP:", hover_tile.selected_player.current_xp)		
+
+				# Optional: Check for level up, if applicable
+				if hover_tile.selected_player.current_xp >= hover_tile.selected_player.xp_for_next_level:
+					hover_tile.selected_player.level_up()			
+			else:
+				print("last_selected_player does not exist.")

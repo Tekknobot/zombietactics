@@ -45,7 +45,7 @@ func _process(delta):
 		# Smoothly zoom in
 		zoom = zoom.lerp(zoom_focus, zoom_speed * delta)
 		# Check if the zoom and position are close enough
-		if position.distance_to(target_tile_pos) < 25 and zoom.distance_to(zoom_focus) < 25:
+		if position.distance_to(target_tile_pos) < 15 and zoom.distance_to(zoom_focus) < 15:
 			is_zooming_in = false
 			emit_signal("zoom_completed")  # Notify that zooming in is complete
 			return_to_default_timer.start(focus_duration)  # Start the timer to return to default

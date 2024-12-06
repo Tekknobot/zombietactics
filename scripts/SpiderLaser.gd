@@ -13,6 +13,7 @@ extends Node2D
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 
 var explosion_scene = preload("res://assets/scenes/vfx/explosion.tscn")
+var camera_flag: bool = true
 
 # Animation state variables
 var color_timer: Timer
@@ -77,6 +78,13 @@ func _input(event):
 			deploy_laser(laser_target)
 
 func deploy_laser(target_position: Vector2):
+	# Camera focus
+	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+	camera_flag = true
+	camera.zoom_speed = 5
+
+	get_parent().get_child(0).play("attack")
+	
 	# Get the current facing direction of the parent (1 for right, -1 for left)
 	var current_facing = 1 if get_parent().scale.x > 0 else -1
 
@@ -168,21 +176,24 @@ func _on_pulse_timer_timeout():
 
 	# Add the current segment to the pulsing_segments array
 	pulsing_segments.append(current_segment)
-
-	# Camera focuses on the active zombie
+	
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-	camera.focus_on_position(current_segment.global_position)
+	# Camera focus
+	if camera_flag:	
+		camera.focus_on_position(current_segment.global_position)
+		camera_flag = false
 	
 	await get_tree().create_timer(1).timeout	
-	camera.zoom_speed = 1
+	camera.zoom_speed = 2
 	camera.focus_on_position(explosion_target)
-	
+		
 	# Check if the current segment is the last one
 	if current_segment_index == laser_segments.size() - 1:  # Last segment
 		if current_segment.get_point_count() >= 2:
 			var last_point = to_global(current_segment.get_point_position(1))  # Get the endpoint of the last segment
 			_trigger_explosion(explosion_target)
-
+			get_parent().get_child(0).play("default")
+			
 			# Clear previous laser segments
 			laser_segments.clear()  # Clear the list of segments
 			for child in get_children():
@@ -190,7 +201,6 @@ func _on_pulse_timer_timeout():
 					child.queue_free()	
 					
 			current_segment_index = 0	
-			camera.zoom_speed = 5	
 			
 	# Move to the next segment
 	current_segment_index += 1
@@ -227,7 +237,7 @@ func _trigger_explosion(last_point: Vector2):
 	last_point.y += 8
 	explosion_instance.global_position = last_point
 	print("Explosion instance added to scene at:", last_point)
-
+	
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 8
 

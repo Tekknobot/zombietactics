@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://ckk52cmwd64vj"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8fnew"]
+particle_flag_disable_z = true
+radial_velocity_min = 3.99998
+radial_velocity_max = 16.0
+gravity = Vector3(0, -110, 0)
+radial_accel_min = -2.23517e-06
+radial_accel_max = -2.23517e-06
+damping_min = 100.0
+damping_max = 100.0
+
+[node name="Sparks" type="GPUParticles2D"]
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_8fnew")
+lifetime = 2.0
+speed_scale = 1.5
+randomness = 1.0

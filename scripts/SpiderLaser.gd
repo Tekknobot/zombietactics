@@ -7,7 +7,7 @@ extends Node2D
 @export var laser_width: float = 5.0  # Default width of the laser
 @export var laser_length: float = 300.0  # Max length of the laser
 @export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
-@export var pulse_duration: float = 0.1  # Time between pulses
+@export var pulse_duration: float = 0.15  # Time between pulses
 
 @onready var line = $Line2D  # Line2D node for the laser
 @onready var hover_tile = get_node_or_null(hover_tile_path)
@@ -30,7 +30,11 @@ var explosion_target
 
 # Create the timer for the pulse effect
 var pulse_timer = Timer.new()
-	
+var spark_emitter = preload("res://assets/scenes/vfx/sparks.tscn")  # Reference to the particle emitter
+var spark_scene
+var segment
+var current_segment
+
 func _ready():
 	# Initialize color cycle
 	color_cycle = [laser_color_1, laser_color_2, laser_color_3]
@@ -45,24 +49,15 @@ func _ready():
 	pulse_timer.connect("timeout", Callable(self, "_on_pulse_timer_timeout"))
 	add_child(pulse_timer)
 	pulse_timer.start()
-
+	
+	if spark_emitter:
+		spark_scene = spark_emitter.instantiate()
+		add_child(spark_scene)
+		spark_scene.emitting = false  # Start with no particles
+		
 func _process(delta):
-	for segment in pulsing_segments:
-		if not is_instance_valid(segment):
-			continue  # Skip invalid segments
-
-		# Handle pulsing logic
-		if segment.width < laser_width * 1 and width_pulse_up:
-			segment.width += pulse_speed * delta
-			if segment.width >= laser_width * 2:
-				width_pulse_up = false
-		elif segment.width > laser_width and not width_pulse_up:
-			segment.width -= pulse_speed * delta
-			if segment.width <= laser_width:
-				segment.width = laser_width
-				width_pulse_up = true
-				pulsing_segments.erase(segment)  # Remove after pulse
-
+	pass
+	
 func _input(event):
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -78,6 +73,12 @@ func _input(event):
 			deploy_laser(laser_target)
 
 func deploy_laser(target_position: Vector2):
+	# Clear previous laser segments
+	laser_segments.clear()  # Clear the list of segments
+	for child in get_children():
+		if child is Line2D:
+			child.queue_free()	
+			
 	# Camera focus
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 	camera_flag = true
@@ -107,11 +108,6 @@ func deploy_laser(target_position: Vector2):
 	# Use a Bresenham line algorithm to get all tiles along the laser path
 	var tiles = get_line_tiles(start, end)
 	
-	# Clear previous laser segments
-	laser_segments.clear()  # Clear the list of segments
-	for child in get_children():
-		if child is Line2D:
-			child.queue_free()
 
 	# Create a Line2D for each tile, layered correctly
 	for i in range(tiles.size() - 1):
@@ -123,7 +119,7 @@ func deploy_laser(target_position: Vector2):
 		var segment_color = color_cycle[current_color_index]  # Default color from cycle
 
 		# Create a Line2D node for this segment
-		var segment = Line2D.new()
+		segment = Line2D.new()
 		add_child(segment)
 		laser_segments.append(segment)  # Store the segment reference
 
@@ -152,10 +148,12 @@ func deploy_laser(target_position: Vector2):
 		# Add points to the Line2D
 		segment.add_point(to_local(segment_start))
 		segment.add_point(to_local(segment_end))
-		
-		await get_tree().create_timer(0.05).timeout	
 
 	laser_deployed = true
+	#Play SFX
+	get_parent().get_child(2).stream = get_parent().spider_strand_audio
+	get_parent().get_child(2).play()
+	
 
 func _on_pulse_timer_timeout():
 	if laser_segments.is_empty():
@@ -174,37 +172,34 @@ func _on_pulse_timer_timeout():
 	current_segment.width = laser_width * 1  # Start with increased width
 	current_segment.default_color = laser_color_3  # Use the third color for the pulse
 
-	# Add the current segment to the pulsing_segments array
-	pulsing_segments.append(current_segment)
-	
-	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-	# Camera focus
-	if camera_flag:	
-		camera.focus_on_position(current_segment.global_position)
-		camera_flag = false
-	
-	await get_tree().create_timer(1).timeout	
-	camera.zoom_speed = 2
-	camera.focus_on_position(explosion_target)
-		
+	# Move the spark emitter to the current segment
+	if spark_scene:  # Ensure the spark emitter exists
+		get_parent().get_child(0).play("attack")
+		var spark_position = current_segment.to_global(current_segment.get_point_position(0))  # Get start of the segment
+		spark_scene.global_position = spark_position
+		spark_scene.emitting = true  # Start emitting particles
+
+		# Camera focuses on the active zombie
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		camera.focus_on_position(spark_position) 	
+
 	# Check if the current segment is the last one
 	if current_segment_index == laser_segments.size() - 1:  # Last segment
-		if current_segment.get_point_count() >= 2:
-			var last_point = to_global(current_segment.get_point_position(1))  # Get the endpoint of the last segment
-			_trigger_explosion(explosion_target)
-			get_parent().get_child(0).play("default")
-			
-			# Clear previous laser segments
-			laser_segments.clear()  # Clear the list of segments
-			for child in get_children():
-				if child is Line2D:
-					child.queue_free()	
-					
-			current_segment_index = 0	
-			
+		# Get the endpoint of the last segment and trigger the explosion
+		var last_point = current_segment.to_global(current_segment.get_point_position(1))
+		_trigger_explosion(explosion_target)
+		get_parent().get_child(0).play("default")
+
+		# Reset spark emitter after finishing
+		if spark_scene:
+			spark_scene.emitting = false  # Stop emitting particles
+
+		# Reset the segment index
+		current_segment_index = 0
+
 	# Move to the next segment
 	current_segment_index += 1
-
+	
 func get_line_tiles(start: Vector2i, end: Vector2i) -> Array:
 	var tiles = []
 	var dx = abs(end.x - start.x)
@@ -249,24 +244,28 @@ func _trigger_explosion(last_point: Vector2):
 		if player.position.distance_to(last_point) <= explosion_radius:	
 			player.flash_damage()
 			player.apply_damage(player.attack_damage)
+			player.clear_movement_tiles()
 					
 			xp_awarded = true  # Mark XP as earned for this explosion
 
 			var hud_manager = get_node("/root/MapManager/HUDManager")
 			hud_manager.update_hud(player)
+			clear_segments()
 
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:	
 			zombie.flash_damage()
 			for player in get_tree().get_nodes_in_group("player_units"):
-				if player.player_name == "Yoshida. Boi":			
+				if player.player_name == "Sarah. Reese":
 					zombie.apply_damage(player.attack_damage)
+					zombie.clear_movement_tiles()
 					
 			xp_awarded = true  # Mark XP as earned for this explosion
 
 			var hud_manager = get_node("/root/MapManager/HUDManager")
 			hud_manager.update_hud_zombie(zombie)
+			clear_segments()
 			
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
@@ -274,12 +273,15 @@ func _trigger_explosion(last_point: Vector2):
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
 			print("Structure removed from explosion")
 			xp_awarded = true  # Mark XP as earned for this explosion
-
+			clear_segments()
+			
 	# Add XP if at least one target was hit
 	if xp_awarded:
 		await get_tree().create_timer(1).timeout
 		add_xp()	
-
+				
+	clear_segments()			
+				
 func add_xp():
 	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
@@ -307,3 +309,11 @@ func add_xp():
 					hover_tile.selected_player.level_up()			
 			else:
 				print("last_selected_player does not exist.")
+
+
+func clear_segments():
+	# Clear previous laser segments
+	laser_segments.clear()  # Clear the list of segments
+	for child in get_children():
+		if child is Line2D:
+			child.queue_free()		

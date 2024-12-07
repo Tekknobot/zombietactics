@@ -47,6 +47,7 @@ func focus_camera_on_player():
 				var hovertiles = get_tree().get_nodes_in_group("hovertile")
 				for hovertile in hovertiles:
 					if hovertile and hovertile.has_method("select_unit_at_tile") and hovertile.has_method("show_movement_tiles"):
+						hovertile.clear_action_tiles_for_all_players()
 						hovertile.select_unit_at_tile(player.tile_pos)
 						hovertile.show_movement_tiles(player)
 				

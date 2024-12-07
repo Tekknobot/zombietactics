@@ -237,6 +237,12 @@ func clear_action_tiles() -> void:
 	movement_range_tiles.clear()
 	attack_range_tiles.clear()
 
+func clear_action_tiles_for_all_players():
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		player.selected = false
+		player.clear_movement_tiles()
+
 # Clears all action tiles (movement and attack) when the selection changes
 func clear_action_tiles_zombie() -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")

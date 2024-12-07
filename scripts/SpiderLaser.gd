@@ -293,8 +293,8 @@ func _trigger_explosion(last_point: Vector2):
 	# Access the 'special' button within HUDManager
 	GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
 	hud_manager.thread.button_pressed = false
-	get_parent().has_attacked = true
-	get_parent().has_moved = true
+	self.get_parent().has_attacked = true
+	self.get_parent().has_moved = true
 	get_parent().check_end_turn_conditions()		
 				
 func add_xp():

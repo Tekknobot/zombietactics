@@ -61,6 +61,11 @@ func _process(delta):
 func _input(event):
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		# Block gameplay input if the mouse is over GUI
+		if is_mouse_over_gui():
+			print("Input blocked by GUI.")
+			return  # Prevent further input handling
+			
 		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and 	GlobalManager.thread_toggle_active == true:
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -326,3 +331,20 @@ func clear_segments():
 	for child in get_children():
 		if child is Line2D:
 			child.queue_free()		
+
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is Button:
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any button.")
+	return false

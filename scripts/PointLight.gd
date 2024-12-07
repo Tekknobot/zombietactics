@@ -12,7 +12,8 @@ var timer: float = 0.0  # Internal timer to track the light's animation state
 @onready var tilemap = get_node("/root/MapManager/TileMap")
 
 func _ready() -> void:
-	pass
+	# Initialize the energy to 0 at the start
+	energy = 0
 
 func _process(delta: float) -> void:
 	# Update tile position based on the sprite's world position
@@ -27,7 +28,10 @@ func _process(delta: float) -> void:
 		# Handle explosion lighting animation
 		if timer < energy_duration:
 			timer += delta
-			# Increase energy to peak and then fade out over time
-			energy = max_energy * (1.0 - abs((2.0 * timer / energy_duration) - 1.0))
+			# Calculate normalized progress (0 to 1)
+			var progress = timer / energy_duration
+			# Increase energy to the peak and then decrease it symmetrically
+			energy = max_energy * (1.0 - abs((2.0 * progress) - 1.0))
 		else:
-			energy = 0  # Reset energy to 0 when animation is complete
+			# Reset energy to 0 after the animation completes
+			energy = 0

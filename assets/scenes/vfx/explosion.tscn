@@ -17,7 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://bevk2t4jsk0ry" path="res://assets/vfx/explosion/explosion14.png" id="14_jb0dr"]
 [ext_resource type="AudioStream" uid="uid://dogvi6q7030pk" path="res://audio/SFX/explosion_8bit.wav" id="16_x5mun"]
 [ext_resource type="Texture2D" uid="uid://bjtl5ic2e8xtm" path="res://assets/lighting/explosion_gradient.png" id="17_c2sxo"]
-[ext_resource type="Script" path="res://scripts/RadioactiveLight.gd" id="18_b0xn5"]
+[ext_resource type="Script" path="res://scripts/PointLight.gd" id="18_b0xn5"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tx7ot"]
 animations = [{

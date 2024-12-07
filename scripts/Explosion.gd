@@ -1,7 +1,7 @@
 extends Node2D
 
 # Adjustable lifespan in seconds for timing the effect duration
-@export var lifespan: float = 1.0
+@export var lifespan: float = 2.0
 
 # Declare member variables
 var tile_pos: Vector2i

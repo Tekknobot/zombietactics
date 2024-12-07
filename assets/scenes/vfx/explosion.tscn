@@ -91,5 +91,5 @@ range_z_min = -128
 range_z_max = 128
 shadow_enabled = true
 texture = ExtResource("17_c2sxo")
-texture_scale = 2.5
+texture_scale = 3.0
 script = ExtResource("18_b0xn5")

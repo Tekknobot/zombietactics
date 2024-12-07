@@ -62,7 +62,7 @@ func _input(event):
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese":
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and 	GlobalManager.thread_toggle_active == true:
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
@@ -150,11 +150,11 @@ func deploy_laser(target_position: Vector2):
 		segment.add_point(to_local(segment_end))
 
 	laser_deployed = true
+	
 	#Play SFX
 	get_parent().get_child(2).stream = get_parent().spider_strand_audio
 	get_parent().get_child(2).play()
 	
-
 func _on_pulse_timer_timeout():
 	if laser_segments.is_empty():
 		return  # Skip if there are no laser segments
@@ -280,20 +280,28 @@ func _trigger_explosion(last_point: Vector2):
 		await get_tree().create_timer(1).timeout
 		add_xp()	
 				
-	clear_segments()			
+	clear_segments()	
+
+	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	hud_manager.hide_special_buttons()	
+	
+	# Access the 'special' button within HUDManager
+	GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
+	hud_manager.thread.button_pressed = false
+	get_parent().has_attacked = true
+	get_parent().has_moved = true
+	get_parent().check_end_turn_conditions()		
 				
 func add_xp():
 	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
 	var hud_manager = get_node("/root/MapManager/HUDManager")  # Adjust the path if necessary
-	
+
 	# Access the 'special' button within HUDManager
-	var missile_button = hud_manager.get_node("HUD/Missile")
-	GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
+	GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
 
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
-
 	# Iterate through the list and find the HoverTile node
 	for hover_tile in hover_tiles:
 		if hover_tile.name == "HoverTile":
@@ -310,6 +318,7 @@ func add_xp():
 			else:
 				print("last_selected_player does not exist.")
 
+	hud_manager.update_hud(hover_tile.selected_player)
 
 func clear_segments():
 	# Clear previous laser segments

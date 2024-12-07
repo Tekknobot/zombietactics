@@ -6,15 +6,15 @@ extends CanvasLayer
 @onready var xp_bar = $HUD/XPBar
 @onready var level = $HUD/LevelStatName/Level
 
-@onready var missile = $HUD/Missile 
-@onready var landmine = $HUD/Landmine
-
 @onready var hp = $HUD/StatContainer/HP
 @onready var xp = $HUD/StatContainer/XP
 @onready var atk = $HUD/StatContainer/ATK
 
+@onready var missile = $HUD/Missile 
+@onready var landmine = $HUD/Landmine
 @onready var mek = $HUD/Mek
 @onready var dynamite = $HUD/Dynamite
+@onready var thread = $HUD/Thread
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -42,6 +42,10 @@ func _ready():
 		dynamite.connect("toggled", Callable(self, "_on_dynamite_toggled"))
 		print("Dynamite connected")
 
+	if thread:
+		thread.connect("toggled", Callable(self, "_on_thread_toggled"))
+		print("Thread connected")
+		
 	if end_turn:
 		end_turn.connect("pressed", Callable(self, "_on_endturn_pressed"))
 		print("EndTurn connected")
@@ -95,6 +99,19 @@ func _on_dynamite_toggled(button_pressed: bool) -> void:
 	else:
 		GlobalManager.dynamite_toggle_active = false  # Set the flag to false
 		print("Dynamite toggle deactivated!")
+
+func _on_thread_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.thread_toggle_active = true  # Set the flag to true
+		print("Thread toggle activated!")	
+
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.thread_toggle_active = false  # Set the flag to false
+		print("Thread toggle deactivated!")
+
 
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -273,6 +290,9 @@ func show_special_buttons(character: PlayerUnit):
 		
 	if character.player_name == "Dutch. Major":
 		dynamite.visible = true
+		
+	if character.player_name == "Sarah. Reese":
+		thread.visible = true		
 				
 
 func hide_special_buttons():
@@ -282,3 +302,4 @@ func hide_special_buttons():
 	landmine.visible = false
 	mek.visible = false
 	dynamite.visible = false
+	thread.visible = false

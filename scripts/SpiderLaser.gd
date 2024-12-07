@@ -301,10 +301,7 @@ func add_xp():
 	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
 	var hud_manager = get_node("/root/MapManager/HUDManager")  # Adjust the path if necessary
-
-	# Access the 'special' button within HUDManager
-	GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
-
+	
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
 	# Iterate through the list and find the HoverTile node

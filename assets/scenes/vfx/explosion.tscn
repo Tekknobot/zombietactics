@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bofv1wx4so130"]
+[gd_scene load_steps=20 format=3 uid="uid://bofv1wx4so130"]
 
 [ext_resource type="Script" path="res://scripts/Explosion.gd" id="1_7ono1"]
 [ext_resource type="Texture2D" uid="uid://bkylv8dfqnkcg" path="res://assets/vfx/explosion/explosion1.png" id="1_g65nu"]
@@ -16,6 +16,8 @@
 [ext_resource type="Texture2D" uid="uid://ohqnd0ucje5w" path="res://assets/vfx/explosion/explosion13.png" id="13_6n6p4"]
 [ext_resource type="Texture2D" uid="uid://bevk2t4jsk0ry" path="res://assets/vfx/explosion/explosion14.png" id="14_jb0dr"]
 [ext_resource type="AudioStream" uid="uid://dogvi6q7030pk" path="res://audio/SFX/explosion_8bit.wav" id="16_x5mun"]
+[ext_resource type="Texture2D" uid="uid://bjtl5ic2e8xtm" path="res://assets/lighting/explosion_gradient.png" id="17_c2sxo"]
+[ext_resource type="Script" path="res://scripts/RadioactiveLight.gd" id="18_b0xn5"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tx7ot"]
 animations = [{
@@ -81,3 +83,13 @@ frame_progress = 1.0
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("16_x5mun")
 autoplay = true
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(0, -16)
+color = Color(1, 0.756863, 0, 1)
+range_z_min = -128
+range_z_max = 128
+shadow_enabled = true
+texture = ExtResource("17_c2sxo")
+texture_scale = 2.5
+script = ExtResource("18_b0xn5")

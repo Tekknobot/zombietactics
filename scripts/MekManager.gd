@@ -88,7 +88,6 @@ func _input(event: InputEvent) -> void:
 
 				var camera: Camera2D = get_node("/root/MapManager/Camera2D")				
 				camera.focus_on_tile(tilemap, tile_pos)	
-				camera.zoom_focus = Vector2i(3, 3)	
 				
 				# Get the selected attacker from the "player_units" group
 				var selected_unit = get_selected_unit()
@@ -168,8 +167,7 @@ func animate_fade_in_out(instance: Node2D) -> void:
 	await get_tree().create_timer(4).timeout
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	camera.focus_on_tile(tilemap, instance.tile_pos)
-	camera.zoom_focus = Vector2i(2, 2)		
+	camera.focus_on_tile(tilemap, instance.tile_pos)	
 	
 # Function to play mek_call audio
 func _play_mek_call_audio() -> void:

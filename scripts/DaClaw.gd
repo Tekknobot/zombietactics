@@ -136,6 +136,11 @@ func dash_to_target(delta: float) -> void:
 
 		# Move incrementally to each position
 		while position.distance_to(world_pos) > 1:
+			# Break the loop if the node is no longer in the scene tree
+			if not is_inside_tree():
+				print("Node is no longer in the scene tree. Exiting loop.")
+				return
+				
 			# Call the movement function
 			move_along_path(delta)
 			

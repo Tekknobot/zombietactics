@@ -12,14 +12,15 @@ var timer: float = 0.0  # Internal timer to track the light's animation state
 @onready var tilemap = get_node("/root/MapManager/TileMap")
 
 func _ready() -> void:
-	# Initialize the energy to 0 at the start
-	energy = 0
+	if get_parent().name == "Explosion":
+		# Initialize the energy to 0 at the start
+		energy = 0
 
 func _process(delta: float) -> void:
 	# Update tile position based on the sprite's world position
 	tile_pos = tilemap.local_to_map(position)
 	coord = tile_pos
-	layer = (tile_pos.x + tile_pos.y) - 2
+	layer = get_parent().layer - 1
 
 	# Set the z-index of the sprite to reflect its "layer" for rendering order
 	z_index = layer

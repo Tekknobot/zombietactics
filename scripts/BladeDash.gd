@@ -77,7 +77,7 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 		return
 
 	# If the sprite is already fully visible, do nothing
-	if sprite.modulate.a >= 0.8:
+	if sprite.modulate.a >= 0.2:
 		return
 
 	# Create a new tween for the fade-in animation
@@ -263,6 +263,7 @@ func check_and_attack_adjacent_zombies() -> void:
 	print("No adjacent zombies to attack.")
 
 	await fade_in(get_parent())
+	await get_tree().create_timer(1.5).timeout
 	
 	# Mark this unit's action as complete
 	get_parent().has_attacked = true

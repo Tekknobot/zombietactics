@@ -698,15 +698,13 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	if current_xp >= xp_for_next_level:
 		level_up()
 	
-	#item_manager.check_item_destroyed()
-	await get_tree().create_timer(0.1).timeout
-	#mission_manager.check_mission_manager()
+	#await get_tree().create_timer(0.1).timeout
 			
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.update_hud(self)	
 	hud_manager.hide_special_buttons()				
-	check_end_turn_conditions()
+	#check_end_turn_conditions()
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:

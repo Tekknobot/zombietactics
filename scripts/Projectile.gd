@@ -101,6 +101,10 @@ func _create_explosion() -> void:
 	_check_for_zombies_at_target()
 	_check_for_players_at_target()
 	_check_for_structure_at_target()
+	
+	attacker.has_attacked = true
+	attacker.has_moved = true
+	attacker.check_end_turn_conditions()
 
 func _check_for_zombies_at_target() -> void:
 	# Ensure `attacker` is valid

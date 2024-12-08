@@ -56,7 +56,7 @@ func fade_out(sprite: Node, duration: float = 1.5) -> void:
 	var tween = create_tween()
 
 	#Play SFX
-	get_parent().get_child(2).stream = get_parent().mek_attack_audio
+	get_parent().get_child(2).stream = get_parent().invisibility_audio
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 0
@@ -77,11 +77,15 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 		return
 
 	# If the sprite is already fully visible, do nothing
-	if sprite.modulate.a >= 1.0:
+	if sprite.modulate.a >= 0.8:
 		return
 
 	# Create a new tween for the fade-in animation
 	var tween = create_tween()
+
+	#Play SFX
+	get_parent().get_child(2).stream = get_parent().invisibility_audio
+	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 1
 	tween.tween_property(sprite, "modulate:a", 1.0, duration)
@@ -238,7 +242,7 @@ func check_and_attack_adjacent_zombies() -> void:
 			get_parent().get_child(0).play("attack")
 
 			# Play audio effect (blade attack)
-			get_parent().audio_player.stream = get_parent().invisibility_audio
+			get_parent().audio_player.stream = get_parent().mek_attack_audio
 			get_parent().audio_player.play()
 
 			# Apply damage to the zombie

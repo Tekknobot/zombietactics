@@ -77,6 +77,7 @@ var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
 var zombies: Array  # This will store the zombies sorted by zombie_id
 
 var is_attacking = false  # Flag to check if the zombie is already attacking in this cycle
+var is_being_attacked = false
 
 @onready var health_ui = $HealthUI
 @onready var xp_ui = $XPUI
@@ -90,6 +91,7 @@ var closest_player: Area2D = null
 var best_adjacent_tile: Vector2i = Vector2i()
 
 var has_moved: bool = false
+var been_attacked: bool = false
 
 func _ready() -> void:
 	# Possible values for health and XP

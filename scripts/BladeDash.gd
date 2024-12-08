@@ -10,6 +10,8 @@ var is_active = false
 @export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 
+var attacked: bool = false
+
 func _physics_process(delta: float) -> void:
 	if is_active:  # Assuming you toggle `is_active` during the dash
 		dash_to_target(delta)
@@ -59,6 +61,9 @@ func dash_to_target(delta: float) -> void:
 	# Get the TileMap
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
+	get_parent().is_moving = true
+	get_parent().get_child(0).play("move")
+	
 	# Iterate over each tile in the current path
 	for tile in get_parent().current_path:
 		var world_pos = tilemap.map_to_local(tile)
@@ -91,7 +96,7 @@ func move_along_path(delta: float) -> void:
 		return  # No path, so don't move
 
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-
+		
 	while get_parent().path_index < get_parent().current_path.size():
 		var target_tile_pos = get_parent().current_path[get_parent().path_index]  # Get the current tile position in the path
 		var target_world_pos = tilemap.map_to_local(target_tile_pos) + Vector2(0, 0)  # Adjust if needed for tile center
@@ -99,9 +104,6 @@ func move_along_path(delta: float) -> void:
 		# Move incrementally towards the target tile
 		var direction = (target_world_pos - get_parent().position).normalized()
 		get_parent().position += get_parent().direction * get_parent().move_speed * delta
-		
-		get_parent().is_moving = true
-		get_parent().get_child(0).play("move")
 		
 		# Camera focuses on the active zombie
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
@@ -181,10 +183,19 @@ func check_and_attack_adjacent_zombies() -> void:
 			get_parent().audio_player.play()
 
 			# Apply damage to the zombie
-			target.flash_damage()
-			target.apply_damage(get_parent().attack_damage)
+			if not target.has_meta("been_attacked") or target.get_meta("been_attacked") == false:
+				target.flash_damage()
+				target.apply_damage(get_parent().attack_damage)
+				target.set_meta("been_attacked", true)  # Mark this zombie as been_attacked
+				print("Blade damage applied")
 
 			await get_tree().create_timer(0.5).timeout
+
+	# Reset the "been_attacked" state for all zombies in the group after the loop
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	for zombie in zombies:
+		if zombie.has_meta("been_attacked"):
+			zombie.set_meta("been_attacked", false)  # Reset been_attacked flag
 
 	# Mark this unit's action as complete
 	get_parent().has_attacked = true
@@ -202,7 +213,7 @@ func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var units = get_tree().get_nodes_in_group("zombies")
 
 	for unit in units:
-		if unit.position.distance_to(world_pos) < 16:  # Adjust distance threshold as needed
+		if unit.tile_pos == tile_pos:
 			return unit
 	return null
 

@@ -16,6 +16,7 @@ extends CanvasLayer
 @onready var dynamite = $HUD/Dynamite
 @onready var thread = $HUD/Thread
 @onready var dash = $HUD/Dash
+@onready var claw = $HUD/Claw
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -50,7 +51,11 @@ func _ready():
 	if dash:
 		dash.connect("toggled", Callable(self, "_on_dash_toggled"))
 		print("Dash connected")
-				
+
+	if claw:
+		claw.connect("toggled", Callable(self, "_on_claw_toggled"))
+		print("Claw connected")
+						
 	if end_turn:
 		end_turn.connect("pressed", Callable(self, "_on_endturn_pressed"))
 		print("EndTurn connected")
@@ -127,6 +132,18 @@ func _on_dash_toggled(button_pressed: bool) -> void:
 			player.clear_attack_range_tiles()	
 	else:
 		GlobalManager.dash_toggle_active = false  # Set the flag to false
+		print("Dash toggle deactivated!")
+
+func _on_claw_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.claw_toggle_active = true  # Set the flag to true
+		print("Dash toggle activated!")	
+
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.claw_toggle_active = false  # Set the flag to false
 		print("Dash toggle deactivated!")
 
 func _on_endturn_pressed() -> void:
@@ -313,6 +330,9 @@ func show_special_buttons(character: PlayerUnit):
 	if character.player_name == "Chuck. Genius":
 		dash.visible = true					
 
+	if character.player_name == "Aleks. Ducat":
+		claw.visible = true	
+		
 func hide_special_buttons():
 	end_turn.visible = false
 	
@@ -322,3 +342,6 @@ func hide_special_buttons():
 	dynamite.visible = false
 	thread.visible = false
 	dash.visible = false
+	dash.visible = false
+	claw.visible = false
+	

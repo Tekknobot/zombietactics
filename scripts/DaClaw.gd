@@ -19,7 +19,7 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta):
 	is_mouse_over_gui()
-	
+
 func _input(event):
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -29,7 +29,7 @@ func _input(event):
 			return  # Prevent further input handling
 			
 		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active == true:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Aleks. Ducat" and GlobalManager.claw_toggle_active == true:
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
@@ -38,8 +38,8 @@ func _input(event):
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			camera.focus_on_position(get_parent().position) 
 						
-			await fade_out(get_parent())
-			blade_dash_strike(mouse_pos)
+			#await fade_out(get_parent())
+			claw_dash_strike(mouse_pos)
 	
 func fade_out(sprite: Node, duration: float = 1.5) -> void:
 	"""
@@ -96,7 +96,7 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 	await tween.finished
 
 # Blade Dash Strike ability
-func blade_dash_strike(target_tile: Vector2i) -> void:
+func claw_dash_strike(target_tile: Vector2i) -> void:
 	if not can_use_ability():  # Check if the unit is eligible to use the ability
 		print("Ability cannot be used right now!")
 		return
@@ -248,7 +248,7 @@ func check_and_attack_adjacent_zombies() -> void:
 			get_parent().get_child(0).play("attack")
 
 			# Play audio effect (blade attack)
-			get_parent().audio_player.stream = get_parent().mek_attack_audio
+			get_parent().audio_player.stream = get_parent().claw_audio
 			get_parent().audio_player.play()
 
 			# Apply damage to the zombie
@@ -274,7 +274,7 @@ func check_and_attack_adjacent_zombies() -> void:
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
 
-	GlobalManager.dash_toggle_active = false
+	GlobalManager.claw_toggle_active = false
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()
 	

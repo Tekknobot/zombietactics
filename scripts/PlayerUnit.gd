@@ -89,6 +89,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var spider_strand_audio = preload("res://audio/SFX/spider_strand.wav")
 @export var invisibility_audio = preload("res://audio/SFX/call_mek.wav")
 @export var footstep_audio = preload("res://audio/SFX/blade_dash.wav")
+@export var claw_audio = preload("res://audio/SFX/panther_growl.wav")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
@@ -111,6 +112,8 @@ var attack_range_visible: bool = false  # Variable to track if attack range is v
 @onready var xp_ui = $XPUI
 
 @export var is_mek: bool
+
+var is_animation_playing = false  # Tracks whether the "move" animation is currently playing
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -154,10 +157,7 @@ func _process(delta: float) -> void:
 			zombies_moving = true
 			#print("Zombie is moving, skipping player input.")
 			break  # Exit early once we know a zombie is moving
-	
-	if is_moving:
-		get_child(0).play("move")  # Play the "move" animation
-
+			
 	if zombies_moving:
 		# Prevent tile display or any other player action
 		return
@@ -347,6 +347,10 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 	calculate_path(target_tile)  # Now calculate the path
 	
 	self.is_moving = true
+	
+	if is_moving:
+		get_child(0).play("move")  # Play the "move" animation
+			
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
 	# Do not clear selection here. We keep selected_player intact.
@@ -381,7 +385,7 @@ func move_along_path(delta: float) -> void:
 		# If the soldier has reached the target tile (within a small threshold)
 		if position.distance_to(target_world_pos) <= 1:  # Threshold to determine if we reached the target
 			path_index += 1  # Move to the next tile in the path
-			get_child(0).play("default")
+			
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
 			has_moved = true
 			item_manager.check_for_item_discovery(self)

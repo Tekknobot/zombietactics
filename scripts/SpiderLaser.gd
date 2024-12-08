@@ -56,7 +56,7 @@ func _ready():
 		spark_scene.emitting = false  # Start with no particles
 		
 func _process(delta):
-	pass
+	is_mouse_over_gui()
 	
 func _input(event):
 	# Check for mouse click

@@ -110,6 +110,10 @@ func blade_dash_strike(target_tile: Vector2i) -> void:
 		print("No valid path to the target.")
 		return
 
+	#Play SFX
+	get_parent().get_child(2).stream = get_parent().footstep_audio
+	get_parent().get_child(2).play()
+
 	# Dash to the target position along the path
 	dash_to_target(get_process_delta_time())
 
@@ -137,7 +141,7 @@ func dash_to_target(delta: float) -> void:
 
 			# Check if close enough to the target
 			if position.distance_to(world_pos) <= 1:
-				position = world_pos  # Snap to the target position
+				position = world_pos  # Snap to the target position				
 				break  # Exit the loop for this tile
 
 	# Ensure the sprite is back to default state and the path is cleared

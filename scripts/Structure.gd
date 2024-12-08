@@ -122,7 +122,7 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 			var zombie_tile_pos = tilemap.local_to_map(zombie.position)
 			if adj_tile == zombie_tile_pos:
 				print("Zombie found adjacent to demolished structure, triggering explosion.")
-				_create_explosion_at_tile(adj_tile)  # Create explosion at the zombie's tile
+				_create_explosion_at_tile(adj_tile, zombie)  # Create explosion at the zombie's tile
 				_remove_unit_from_group(zombie, "zombies")
 				
 				if zombies.size() <= 0:
@@ -137,7 +137,7 @@ func _check_for_adjacent_units_and_trigger_explosion() -> void:
 			var player_tile_pos = tilemap.local_to_map(player.position)
 			if adj_tile == player_tile_pos:
 				print("Player unit found adjacent to demolished structure, triggering explosion.")
-				_create_explosion_at_tile(adj_tile)  # Create explosion at the player's tile
+				_create_explosion_at_tile(adj_tile, player)  # Create explosion at the player's tile
 				_remove_unit_from_group(player, "player_units")
 				player.update_astar_grid()
 				
@@ -162,7 +162,7 @@ func get_adjacent_tiles(tile_pos: Vector2i) -> Array:
 	return adjacent_tiles
 
 # Create the explosion effect at a specific tile position
-func _create_explosion_at_tile(explosion_position: Vector2i) -> void:
+func _create_explosion_at_tile(explosion_position: Vector2i, unit: Node) -> void:
 	# Check if explosion_scene is assigned
 	if explosion_scene == null:
 		print("Error: Explosion scene is not assigned!")
@@ -180,14 +180,15 @@ func _create_explosion_at_tile(explosion_position: Vector2i) -> void:
 	
 	# Set the explosion's position to the target tile's world position
 	explosion.position = world_position
-	explosion.z_index = self.z_index  # Ensure explosion is layered correctly
-	
+
 	# Add explosion to the parent scene
 	get_parent().add_child(explosion)
 	print("Explosion created at position: ", explosion.position)
 
 # Remove the unit from its group and make it invisible
 func _remove_unit_from_group(unit: Node, group_name: String) -> void:
+	unit.get_child(0).play("death")
+	await get_tree().create_timer(1).timeout
 	unit.visible = false  # Hide the unit
 	unit.remove_from_group(group_name)  # Remove it from its group
 	print("Unit removed from group: ", group_name)

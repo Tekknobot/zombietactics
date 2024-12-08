@@ -99,7 +99,10 @@ func move_along_path(delta: float) -> void:
 		# Move incrementally towards the target tile
 		var direction = (target_world_pos - get_parent().position).normalized()
 		get_parent().position += get_parent().direction * get_parent().move_speed * delta
-
+		
+		get_parent().is_moving = true
+		get_parent().get_child(0).play("move")
+		
 		# Camera focuses on the active zombie
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 		camera.focus_on_position(get_parent().position) 
@@ -129,10 +132,20 @@ func move_along_path(delta: float) -> void:
 
 # Updates the facing direction based on movement direction
 func update_facing_direction(target_pos: Vector2) -> void:
-	if target_pos.x > get_parent().position.x:
-		scale.x = -1  # Facing right
-	elif target_pos.x < get_parent().position.x:
-		scale.x = 1  # Facing left
+	# Get the world position of the zombie (target)
+	var zombie_world_pos = target_pos
+	print("Zombie world position: ", zombie_world_pos)
+	
+	# Determine the direction to the target
+	var direction_to_target = zombie_world_pos.x - get_parent().position.x
+	
+	# Flip the sprite based on the target's relative position (left or right)
+	if direction_to_target > 0 and get_parent().scale.x != -1:
+		# Zombie is to the right, flip the mek to face right
+		get_parent().scale.x = -1
+	elif direction_to_target < 0 and get_parent().scale.x != 1:
+		# Zombie is to the left, flip the mek to face left
+		get_parent().scale.x = 1
 
 func check_and_attack_adjacent_zombies() -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -154,12 +167,13 @@ func check_and_attack_adjacent_zombies() -> void:
 			print("Zombie found at tile:", adjacent_tile)
 			
 			# Attack the zombie
-			var target_world_pos = tilemap.map_to_local(adjacent_tile)
+			var target_world_pos = tilemap.map_to_local(target.tile_pos)
 
 			# Flip to face the target
 			update_facing_direction(target_world_pos)
 
 			# Play attack animation
+			get_parent().is_moving = false
 			get_parent().get_child(0).play("attack")
 
 			# Play audio effect (blade attack)

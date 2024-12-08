@@ -69,8 +69,9 @@ var xp_for_next_level: int = 100  # Example threshold for level-up, if relevant
 var current_level: int = 1
 var attack_damage: int = 25
 
-var facing_dir: int 
+var is_moving: bool = false
 
+var facing_dir: int 
 var can_display_tiles = true  # Global flag to track if tiles can be displayed
 
 # Optional: Scene to instantiate for explosion effect
@@ -152,6 +153,9 @@ func _process(delta: float) -> void:
 			#print("Zombie is moving, skipping player input.")
 			break  # Exit early once we know a zombie is moving
 	
+	if is_moving:
+		get_child(0).play("move")  # Play the "move" animation
+
 	if zombies_moving:
 		# Prevent tile display or any other player action
 		return
@@ -339,21 +343,20 @@ func calculate_path(target_tile: Vector2i) -> void:
 func move_player_to_target(target_tile: Vector2i) -> void:
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
-
+	
+	self.is_moving = true
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
 	# Do not clear selection here. We keep selected_player intact.
-
+		
 # Function to move the soldier along the path
 func move_along_path(delta: float) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	
 	if current_path.is_empty():
-		return  # No path, so don't move
-
+		return  # No path, so don't move	
+	
 	if path_index < current_path.size():
-		get_child(0).play("move")
-		
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
 		
 		# Convert the target position to world position (center of the tile)
@@ -382,6 +385,11 @@ func move_along_path(delta: float) -> void:
 			item_manager.check_for_item_discovery(self)
 			update_astar_grid()
 			check_end_turn_conditions()
+	else:
+		# Path is complete, no more tiles to move to
+		is_moving = false
+		get_child(0).play("default")
+		print("No more tiles to move to.")	
 	
 # Visualize all walkable (non-solid) tiles in the A* grid
 func visualize_walkable_tiles() -> void:

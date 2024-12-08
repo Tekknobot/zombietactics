@@ -364,7 +364,7 @@ func update_tile_position() -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	tile_pos = tilemap.local_to_map(position)
 	coord = tile_pos
-	layer = (tile_pos.x + tile_pos.y) + 1
+	layer = tile_pos.x + tile_pos.y
 	self.z_index = layer
 	astar.set_point_solid(position, true)
 

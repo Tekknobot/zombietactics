@@ -1,7 +1,7 @@
 extends Node2D
 
 # Configuration variables
-var dash_speed = 75
+var dash_speed = 125
 var damage = 50
 var aoe_radius = 32
 var cooldown = 3.0
@@ -11,6 +11,7 @@ var is_active = false
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 
 var attacked: bool = false
+var pos_before_dash: Vector2i
 
 func _physics_process(delta: float) -> void:
 	if is_active:  # Assuming you toggle `is_active` during the dash
@@ -30,7 +31,63 @@ func _input(event):
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
+			# Camera focuses on the active zombie
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			camera.focus_on_position(get_parent().position) 
+						
+			await fade_out(get_parent())
 			blade_dash_strike(mouse_pos)
+	
+func fade_out(sprite: Node, duration: float = 1.5) -> void:
+	"""
+	Fades the sprite out over the specified duration.
+	:param sprite: The sprite to fade out.
+	:param duration: The time it takes to fade out.
+	"""
+	if not sprite:
+		print("Error: Sprite is null!")
+		return
+
+	# If the sprite is already faded out, do nothing
+	if sprite.modulate.a <= 0.0:
+		return
+
+	# Create a new tween for the fade-out animation
+	var tween = create_tween()
+
+	#Play SFX
+	get_parent().get_child(2).stream = get_parent().mek_attack_audio
+	get_parent().get_child(2).play()
+
+	# Tween the alpha value of the sprite's modulate property to 0
+	tween.tween_property(sprite, "modulate:a", 0.2, duration)
+
+	# Wait for the tween to finish
+	await tween.finished
+
+
+func fade_in(sprite: Node, duration: float = 1.5) -> void:
+	"""
+	Fades the sprite in over the specified duration.
+	:param sprite: The sprite to fade in.
+	:param duration: The time it takes to fade in.
+	"""
+	if not sprite:
+		print("Error: Sprite is null!")
+		return
+
+	# If the sprite is already fully visible, do nothing
+	if sprite.modulate.a >= 1.0:
+		return
+
+	# Create a new tween for the fade-in animation
+	var tween = create_tween()
+
+	# Tween the alpha value of the sprite's modulate property to 1
+	tween.tween_property(sprite, "modulate:a", 1.0, duration)
+
+	# Wait for the tween to finish
+	await tween.finished
 
 # Blade Dash Strike ability
 func blade_dash_strike(target_tile: Vector2i) -> void:
@@ -42,7 +99,7 @@ func blade_dash_strike(target_tile: Vector2i) -> void:
 	
 	# Update the AStar grid to ensure accurate pathfinding
 	get_parent().update_astar_grid()
-
+	
 	# Calculate the path to the target's adjacent tile
 	get_parent().calculate_path(target_tile)
 
@@ -60,9 +117,6 @@ func can_use_ability() -> bool:
 func dash_to_target(delta: float) -> void:
 	# Get the TileMap
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-
-	get_parent().is_moving = true
-	get_parent().get_child(0).play("move")
 	
 	# Iterate over each tile in the current path
 	for tile in get_parent().current_path:
@@ -96,6 +150,9 @@ func move_along_path(delta: float) -> void:
 		return  # No path, so don't move
 
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
+	get_parent().is_moving = true
+	get_parent().get_child(0).play("move")
 		
 	while get_parent().path_index < get_parent().current_path.size():
 		var target_tile_pos = get_parent().current_path[get_parent().path_index]  # Get the current tile position in the path
@@ -127,8 +184,10 @@ func move_along_path(delta: float) -> void:
 	# Clear the path once the unit reaches the final tile
 	print("Path traversal completed.")
 	get_parent().current_path.clear()
-
+	
+	get_parent().is_moving = false
 	get_parent().get_child(0).play("default")
+	
 	# Perform attack once the dash is complete
 	check_and_attack_adjacent_zombies()
 
@@ -179,7 +238,7 @@ func check_and_attack_adjacent_zombies() -> void:
 			get_parent().get_child(0).play("attack")
 
 			# Play audio effect (blade attack)
-			get_parent().audio_player.stream = get_parent().mek_attack_audio
+			get_parent().audio_player.stream = get_parent().invisibility_audio
 			get_parent().audio_player.play()
 
 			# Apply damage to the zombie
@@ -196,16 +255,22 @@ func check_and_attack_adjacent_zombies() -> void:
 	for zombie in zombies:
 		if zombie.has_meta("been_attacked"):
 			zombie.set_meta("been_attacked", false)  # Reset been_attacked flag
+	
+	print("No adjacent zombies to attack.")
 
+	await fade_in(get_parent())
+	
 	# Mark this unit's action as complete
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
 
+	GlobalManager.dash_toggle_active = false
+	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	hud_manager.hide_special_buttons()
+	
 	# Check if the turn should end
 	get_parent().check_end_turn_conditions()
-	
-	print("No adjacent zombies to attack.")
-
+		
 # Returns the unit present at a given tile (if any)
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

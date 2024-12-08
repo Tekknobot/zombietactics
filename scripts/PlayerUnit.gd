@@ -87,6 +87,8 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var dog_hurt_audio: AudioStream
 @export var mek_attack_audio = preload("res://audio/SFX/mek_attack.wav")
 @export var spider_strand_audio = preload("res://audio/SFX/spider_strand.wav")
+@export var invisibility_audio = preload("res://audio/SFX/call_mek.wav")
+
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
@@ -322,7 +324,7 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 # Function to calculate the path
 func calculate_path(target_tile: Vector2i) -> void:
 	# Make sure the start tile (soldier's current position) is valid
-	var start_tile = tile_pos
+	var start_tile = self.tile_pos
 	
 	# Check if target tile is walkable
 	if is_tile_movable(target_tile):

@@ -5,6 +5,7 @@ var landmine_toggle_active: bool = false
 var mek_toggle_active: bool = false
 var dynamite_toggle_active: bool = false
 var thread_toggle_active: bool = false
+var dash_toggle_active: bool = false
 
 var secret_item_destroyed: bool = false
 var secret_item_found: bool = false
@@ -34,7 +35,8 @@ func reset_global_manager():
 	GlobalManager.landmine_toggle_active = false
 	GlobalManager.mek_toggle_active = false
 	GlobalManager.dynamite_toggle_active = false
-	GlobalManager.thread_toggle_active = false	
+	GlobalManager.thread_toggle_active = false
+	GlobalManager.dash_toggle_active = false	
 
 	GlobalManager.secret_item_destroyed = false
 	GlobalManager.secret_item_found = false

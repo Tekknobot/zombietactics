@@ -6,10 +6,10 @@ extends Node2D
 
 @export var laser_width: float = 5.0  # Default width of the laser
 @export var laser_length: float = 300.0  # Max length of the laser
-@export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
 @export var pulse_duration: float = 0.15  # Time between pulses
 
 @onready var line = $Line2D  # Line2D node for the laser
+@export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 
 var explosion_scene = preload("res://assets/scenes/vfx/explosion.tscn")

@@ -631,7 +631,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_63cqt")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_v731d")
 theme_override_styles/normal = SubResource("StyleBoxFlat_arpbt")
 toggle_mode = true
-text = "Blazepath"
+text = "Blaze"
 
 [node name="Claw" type="Button" parent="." groups=["hud_controls"]]
 visible = false

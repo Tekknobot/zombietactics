@@ -17,13 +17,23 @@ func check_player_status():
 	var player_in_group = false
 
 	for player in players:
-		# Check if a player with the matching name is still in the group
+		# Check if the current unit is in the group
 		if player_name == player.player_name:
 			player_in_group = true
-			break
+			
+			# Check if this specific player has moved and attacked
+			if player.has_moved and player.has_attacked:
+				self.modulate = Color(0.35, 0.35, 0.35, 1)  # Dim color for completed action
+			else:
+				self.modulate = Color(1, 1, 1, 1)  # Normal color for active players
+			
+			return  # Exit the function after processing this player
 
-	# Update the modulation based on group membership
-	modulate = Color(1, 1, 1) if player_in_group else Color(0.35, 0.35, 0.35)
+	# If the loop completes without finding the player, they are not in the group
+	if not player_in_group:
+		self.modulate = Color(1, 0, 0, 1)  # Red for players not in the group
+
+			 
 
 # Detect when this TextureRect is clicked
 func _gui_input(event: InputEvent) -> void:

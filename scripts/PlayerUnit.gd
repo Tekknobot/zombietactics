@@ -348,8 +348,8 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 	
 	self.is_moving = true
 	
-	if is_moving:
-		get_child(0).play("move")  # Play the "move" animation
+	if self.is_moving:
+		self.get_child(0).play("move")  # Play the "move" animation
 			
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
@@ -393,8 +393,9 @@ func move_along_path(delta: float) -> void:
 			check_end_turn_conditions()
 	else:
 		# Path is complete, no more tiles to move to
-		is_moving = false
-		get_child(0).play("default")
+		self.is_moving = false
+		if self.is_moving == false:
+			self.get_child(0).play("default")
 		print("No more tiles to move to.")	
 	
 # Visualize all walkable (non-solid) tiles in the A* grid
@@ -929,7 +930,7 @@ func check_end_turn_conditions() -> void:
 		# Darken the unit to visually indicate its turn is over
 		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
 					
-		get_child(0).play("default")
+		#self.get_child(0).play("default")
 		end_turn()
 
 func end_turn() -> void:

@@ -13,9 +13,37 @@ var is_active = false
 var attacked: bool = false
 var pos_before_dash: Vector2i
 
+# Exported variables for customization in the editor
+@export var attack_damage: int = 50 # Damage per explosion
+@export var explosion_radius: float = 1.5 # Radius of each explosion effect
+@export var explosion_delay: float = 0.2 # Delay between explosions
+@export var explosion_effect_scene: PackedScene # Path to explosion effect scene
+
+var path_for_explosions
+
+# Flags to track action completion and explosions
+var action_completed = false
+var explosions_triggered = false
+
+# Explosion control flag
+var explosion_spawned = false
+var path_completed: bool = false
+		
 func _process(delta):
+	# Check if the action (e.g., movement or attack) is completed
+	if action_completed and not explosions_triggered:
+		print("Action completed. Triggering explosions.")
+		trigger_explosions_along_path(path_for_explosions, 0.2)
+		explosions_triggered = true  # Ensure this runs only once
+
+	if path_completed:
+		check_and_attack_adjacent_zombies()
+		get_parent().get_child(0).play("default")
+		path_completed = false
+			
 	is_mouse_over_gui()
 	
+			
 func _input(event):
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -44,11 +72,10 @@ func _input(event):
 			var mouse_pos = tilemap.local_to_map(mouse_position)
 			# Camera focuses on the active zombie
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_position(get_parent().position) 
-						
+			camera.focus_on_position(get_parent().position) 	
 			await fade_out(get_parent())
 			blade_dash_strike(mouse_pos)
-	
+			
 func fade_out(sprite: Node, duration: float = 1.5) -> void:
 	"""
 	Fades the sprite out over the specified duration.
@@ -102,7 +129,8 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 
 	# Wait for the tween to finish
 	await tween.finished
-
+	action_completed = true
+	
 # Blade Dash Strike ability
 func blade_dash_strike(target_tile: Vector2i) -> void:
 	if not can_use_ability():  # Check if the unit is eligible to use the ability
@@ -113,6 +141,8 @@ func blade_dash_strike(target_tile: Vector2i) -> void:
 	
 	# Update the AStar grid to ensure accurate pathfinding
 	get_parent().update_astar_grid()
+	
+	path_completed = false
 	
 	# Calculate the path to the target's adjacent tile
 	get_parent().calculate_path(target_tile)
@@ -150,7 +180,7 @@ func dash_to_target(delta: float) -> void:
 				return
 							
 			# Call the movement function
-			move_along_path(delta)
+			move_along_path()
 			
 			# Wait for the next frame to allow other processing
 			await get_tree().process_frame
@@ -162,29 +192,29 @@ func dash_to_target(delta: float) -> void:
 
 	# Ensure the sprite is back to default state and the path is cleared
 	print("Dash completed to target path.")
-	get_parent().current_path.clear()
 	get_parent().move_speed = 75.0  # Reset movement speed
 
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
 	
-func move_along_path(delta: float) -> void:
+func move_along_path() -> void:
 	if get_parent().current_path.is_empty():
 		return  # No path, so don't move
 
+	path_for_explosions = get_parent().current_path
+
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-	get_parent().is_moving = true
 	get_parent().get_child(0).play("move")
 		
 	while get_parent().path_index < get_parent().current_path.size():
 		var target_tile_pos = get_parent().current_path[get_parent().path_index]  # Get the current tile position in the path
 		var target_world_pos = tilemap.map_to_local(target_tile_pos) + Vector2(0, 0)  # Adjust if needed for tile center
-
+			
 		# Move incrementally towards the target tile
 		var direction = (target_world_pos - get_parent().position).normalized()
-		get_parent().position += get_parent().direction * get_parent().move_speed * delta
-		
+		get_parent().position += get_parent().direction * get_parent().move_speed * get_process_delta_time()
+				
 		# Camera focuses on the active zombie
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 		camera.focus_on_position(get_parent().position) 
@@ -194,26 +224,25 @@ func move_along_path(delta: float) -> void:
 			get_parent().position = target_world_pos  # Snap to the exact tile position
 			get_parent().path_index += 1  # Move to the next tile in the path
 			print("Reached tile:", target_tile_pos)
-
+			
 			# Optionally update facing direction
 			if direction.x > 0:
 				scale.x = -1  # Facing right
 			elif direction.x < 0:
 				scale.x = 1  # Facing left
-
+			
+			if get_parent().path_index >= 1:
+				action_completed = true
+				path_completed = true
+				
 		# Wait for the next frame before continuing
 		await get_tree().process_frame
-
+		
 	# Clear the path once the unit reaches the final tile
 	print("Path traversal completed.")
-	get_parent().current_path.clear()
 	
-	get_parent().is_moving = false
-	get_parent().get_child(0).play("default")
-	
-	# Perform attack once the dash is complete
-	check_and_attack_adjacent_zombies()
-
+	path_completed = true  # Mark path as completed
+		
 # Updates the facing direction based on movement direction
 func update_facing_direction(target_pos: Vector2) -> void:
 	# Get the world position of the zombie (target)
@@ -230,6 +259,8 @@ func update_facing_direction(target_pos: Vector2) -> void:
 	elif direction_to_target < 0 and get_parent().scale.x != 1:
 		# Zombie is to the left, flip the mek to face left
 		get_parent().scale.x = 1
+
+var is_attacking = false
 
 func check_and_attack_adjacent_zombies() -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -261,7 +292,7 @@ func check_and_attack_adjacent_zombies() -> void:
 			get_parent().get_child(0).play("attack")
 
 			# Play audio effect (blade attack)
-			get_parent().audio_player.stream = get_parent().mek_attack_audio
+			get_parent().audio_player.stream = get_parent().claw_audio
 			get_parent().audio_player.play()
 
 			# Apply damage to the zombie
@@ -272,12 +303,6 @@ func check_and_attack_adjacent_zombies() -> void:
 				print("Blade damage applied")
 
 			await get_tree().create_timer(0.5).timeout
-
-	# Reset the "been_attacked" state for all zombies in the group after the loop
-	var zombies = get_tree().get_nodes_in_group("zombies")
-	for zombie in zombies:
-		if zombie.has_meta("been_attacked"):
-			zombie.set_meta("been_attacked", false)  # Reset been_attacked flag
 	
 	print("No adjacent zombies to attack.")
 
@@ -287,13 +312,13 @@ func check_and_attack_adjacent_zombies() -> void:
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
 
-	GlobalManager.dash_toggle_active = false
+	GlobalManager.claw_toggle_active = false
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()
 	
 	# Check if the turn should end
 	get_parent().check_end_turn_conditions()
-		
+			
 # Returns the unit present at a given tile (if any)
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -304,6 +329,75 @@ func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 		if unit.tile_pos == tile_pos:
 			return unit
 	return null
+
+# Spawn an explosion at the specified position
+func spawn_explosion(position):
+	if explosion_effect_scene:
+		var explosion_instance = explosion_effect_scene.instantiate()
+		explosion_instance.global_position = get_tree().get_root().get_child(0).to_local(position)
+		get_tree().get_root().get_child(0).add_child(explosion_instance)
+		# Damage any units in the area
+		damage_units_in_area(position)		
+
+func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.5) -> void:
+	if path_for_explosions.is_empty():
+		print("Path is empty. No explosions to trigger.")
+		return
+
+	# Assuming the TileMap node is accessible
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
+	print("Triggering explosions along the path...")
+	
+	# Iterate through the path except for the last tile
+	for i in range(path_for_explosions.size() - 1):  # Exclude the last index
+		var tile_pos = path_for_explosions[i]
+		var world_pos = tilemap.map_to_local(tile_pos)  # Convert to world position
+
+		# Spawn explosion
+		spawn_explosion(world_pos)
+		
+		# Camera focuses on the active zombie
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		camera.focus_on_position(world_pos) 		
+		
+		print("Explosion triggered at:", world_pos)
+
+		# Wait for a delay between explosions
+		await get_tree().create_timer(delay).timeout
+	
+	print("All explosions triggered.")
+
+	action_completed = false  # Reset for the next action
+	explosions_triggered = false  # Reset for the next action
+	
+	# Mark this unit's action as complete
+	get_parent().has_attacked = true
+	get_parent().has_moved = true
+
+	GlobalManager.dash_toggle_active = false
+	
+	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	hud_manager.hide_special_buttons()
+		
+	get_parent().current_path.clear()
+		
+	# Check if the turn should end
+	get_parent().check_end_turn_conditions()
+
+
+# Deal damage to units within the area of effect
+func damage_units_in_area(center_position):
+	# Find units in the area (adapt to your collision system)
+	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("structures")
+	for unit in units:
+		if unit.global_position.distance_to(center_position) <= explosion_radius:
+			if unit.has_method("apply_damage"):
+				unit.flash_damage()
+				unit.apply_damage(get_parent().attack_damage)
+			elif unit.structure_type == "Building" or unit.structure_type == "Tower" or unit.structure_type == "District" or unit.structure_type == "Stadium":
+				unit.is_demolished = true
+				unit.get_child(0).play("demolished")
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position

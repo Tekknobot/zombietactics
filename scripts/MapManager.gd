@@ -52,7 +52,6 @@ var water_coordinates = []
 # Add properties for maximum and minimum spacing between structures
 @export var min_distance_between_structures: int = 3  # Minimum distance between structures
 
-
 # Counters for spawned structures
 var district_count: int = 0
 var stadium_count: int = 0

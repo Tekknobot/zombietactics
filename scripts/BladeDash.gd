@@ -13,10 +13,6 @@ var is_active = false
 var attacked: bool = false
 var pos_before_dash: Vector2i
 
-func _physics_process(delta: float) -> void:
-	if is_active:  # Assuming you toggle `is_active` during the dash
-		dash_to_target(delta)
-
 func _process(delta):
 	is_mouse_over_gui()
 	

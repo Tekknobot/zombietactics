@@ -393,9 +393,9 @@ func move_along_path(delta: float) -> void:
 			check_end_turn_conditions()
 	else:
 		# Path is complete, no more tiles to move to
-		self.is_moving = false
-		if self.is_moving == false:
+		if not self.get_child(0).is_playing and not self.is_moving:
 			self.get_child(0).play("default")
+		
 		print("No more tiles to move to.")	
 	
 # Visualize all walkable (non-solid) tiles in the A* grid

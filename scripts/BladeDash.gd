@@ -1,7 +1,7 @@
 extends Node2D
 
 # Configuration variables
-var dash_speed = 125
+var dash_speed = 75
 var damage = 50
 var aoe_radius = 32
 var cooldown = 3.0
@@ -9,6 +9,7 @@ var is_active = false
 
 @export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
 @onready var hover_tile = get_node_or_null(hover_tile_path)
+@export var hover_tile_scene: PackedScene
 
 var attacked: bool = false
 var pos_before_dash: Vector2i
@@ -28,23 +29,33 @@ var explosions_triggered = false
 # Explosion control flag
 var explosion_spawned = false
 var path_completed: bool = false
-		
+
+var hover_tiles = []  # Store references to instantiated hover tiles
+var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
+
 func _process(delta):
 	# Check if the action (e.g., movement or attack) is completed
 	if action_completed and not explosions_triggered:
 		print("Action completed. Triggering explosions.")
-		trigger_explosions_along_path(path_for_explosions, 0.2)
+		trigger_explosions_along_path(path_for_explosions, explosion_delay)
 		explosions_triggered = true  # Ensure this runs only once
 
 	if path_completed:
-		check_and_attack_adjacent_zombies()
+		#check_and_attack_adjacent_zombies()
 		get_parent().get_child(0).play("default")
 		path_completed = false
-			
+
+	if GlobalManager.dash_toggle_active:
+		update_hover_tiles()
+								
 	is_mouse_over_gui()
 	
-			
 func _input(event):
+	# Check for mouse motion or click
+	if event is InputEventMouseMotion:
+		if GlobalManager.dash_toggle_active:
+			update_hover_tiles()	
+				
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		# Block gameplay input if the mouse is over GUI
@@ -73,9 +84,51 @@ func _input(event):
 			# Camera focuses on the active zombie
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			camera.focus_on_position(get_parent().position) 	
+			GlobalManager.dash_toggle_active = false
+			clear_hover_tiles()	
+						
 			await fade_out(get_parent())
-			blade_dash_strike(mouse_pos)
-			
+			blade_dash_strike(mouse_pos)	
+
+func update_hover_tiles():
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var start_tile = get_parent().tile_pos  # Unit's current tile position
+	var end_tile = hover_tile.tile_pos  # Hover tile position
+
+	# Avoid redundant updates if the end tile hasn't changed
+	if end_tile == last_hovered_tile:
+		return
+	
+	last_hovered_tile = end_tile
+
+	# Clear existing hover tiles
+	clear_hover_tiles()
+
+	# Ensure AStar is updated and calculate the path
+	get_parent().update_astar_grid()
+	var path = get_parent().astar.get_point_path(start_tile, end_tile)
+
+	if path.size() == 0:
+		print("No path found between start and end tile.")
+		return
+
+	# Iterate through the path and place hover tiles
+	for pos in path:
+		var tile_pos = Vector2i(pos)  # Ensure tile position is a Vector2i
+		var world_pos = tilemap.map_to_local(tile_pos)
+
+		# Create a hover tile
+		if hover_tile_scene:
+			var hover_tile_instance = hover_tile_scene.instantiate()
+			hover_tile_instance.position = world_pos
+			tilemap.add_child(hover_tile_instance)
+			hover_tiles.append(hover_tile_instance)
+
+func clear_hover_tiles():
+	for tile in hover_tiles:
+		tile.queue_free()
+	hover_tiles.clear()
+				
 func fade_out(sprite: Node, duration: float = 1.5) -> void:
 	"""
 	Fades the sprite out over the specified duration.
@@ -242,7 +295,7 @@ func move_along_path() -> void:
 	print("Path traversal completed.")
 	
 	path_completed = true  # Mark path as completed
-		
+
 # Updates the facing direction based on movement direction
 func update_facing_direction(target_pos: Vector2) -> void:
 	# Get the world position of the zombie (target)
@@ -348,6 +401,8 @@ func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
 	print("Triggering explosions along the path...")
+
+	await get_tree().create_timer(0.7).timeout
 	
 	# Iterate through the path except for the last tile
 	for i in range(path_for_explosions.size() - 1):  # Exclude the last index
@@ -386,18 +441,37 @@ func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.
 	get_parent().check_end_turn_conditions()
 
 
-# Deal damage to units within the area of effect
 func damage_units_in_area(center_position):
-	# Find units in the area (adapt to your collision system)
-	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("structures")
-	for unit in units:
+	# Find units, zombies, and structures in the area
+	var player_units = get_tree().get_nodes_in_group("player_units")
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var structures = get_tree().get_nodes_in_group("structures")
+	
+	# Process damage for player units
+	for unit in player_units:
+		# Skip damage if the unit has the player_name "Chuck. Genius"
 		if unit.global_position.distance_to(center_position) <= explosion_radius:
-			if unit.has_method("apply_damage"):
+			if unit.player_name == "Chuck. Genius":
+				return
+			elif unit.has_method("apply_damage"):
 				unit.flash_damage()
 				unit.apply_damage(get_parent().attack_damage)
-			elif unit.structure_type == "Building" or unit.structure_type == "Tower" or unit.structure_type == "District" or unit.structure_type == "Stadium":
-				unit.is_demolished = true
-				unit.get_child(0).play("demolished")
+
+	# Process damage for zombies
+	for zombie in zombies:
+		if zombie.global_position.distance_to(center_position) <= explosion_radius:
+			if zombie.has_method("apply_damage"):
+				zombie.flash_damage()
+				zombie.apply_damage(get_parent().attack_damage)
+	
+	# Process damage for structures
+	for structure in structures:
+		if structure.global_position.distance_to(center_position) <= explosion_radius:
+			if structure.structure_type in ["Building", "Tower", "District", "Stadium"]:
+				structure.is_demolished = true
+				structure.get_child(0).play("demolished")
+
+
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position

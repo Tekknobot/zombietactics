@@ -23,6 +23,8 @@ var attack_range_tiles: Array[Vector2i] = []
 @export var select_audio: AudioStream
 @export var arm_attack_audio: AudioStream
 
+var tile_pos
+
 # Initialization
 func _ready() -> void:
 	tilemap = get_node("/root/MapManager/TileMap")
@@ -34,7 +36,7 @@ func _process(delta: float) -> void:
 	
 	var mouse_pos: Vector2 = get_global_mouse_position()
 	mouse_pos.y += 8  # Optional offset to align tiles if necessary
-	var tile_pos: Vector2i = tilemap.local_to_map(tilemap.to_local(mouse_pos))
+	tile_pos = tilemap.local_to_map(tilemap.to_local(mouse_pos))
 		
 	# Update the hover tile to follow the mouse cursor
 	if is_within_bounds(tile_pos):

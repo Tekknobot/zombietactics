@@ -1,7 +1,7 @@
 extends Node2D
 
 # Configuration variables
-var dash_speed = 75
+var dash_speed = 100
 var damage = 50
 var aoe_radius = 32
 var cooldown = 3.0

@@ -40,7 +40,7 @@ func update_tile_position() -> void:
 	coord = tile_pos
 	
 	# Update z_index for layering based on tile position
-	layer = (tile_pos.x + tile_pos.y) - 1
+	layer = (tile_pos.x + tile_pos.y) + 1
 
 	# Optionally, set the z_index in the node to ensure proper rendering order
 	self.z_index = layer

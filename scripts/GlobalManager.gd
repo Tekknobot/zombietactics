@@ -7,6 +7,7 @@ var dynamite_toggle_active: bool = false
 var thread_toggle_active: bool = false
 var dash_toggle_active: bool = false
 var claw_toggle_active: bool = false
+var hellfire_toggle_active: bool = false
 
 var secret_item_destroyed: bool = false
 var secret_item_found: bool = false
@@ -39,7 +40,8 @@ func reset_global_manager():
 	GlobalManager.thread_toggle_active = false
 	GlobalManager.dash_toggle_active = false	
 	GlobalManager.claw_toggle_active = false
-
+	GlobalManager.hellfire_toggle_active = false
+	
 	GlobalManager.secret_item_destroyed = false
 	GlobalManager.secret_item_found = false
 	GlobalManager.zombies_cleared = false

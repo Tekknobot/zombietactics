@@ -17,6 +17,7 @@ extends CanvasLayer
 @onready var thread = $HUD/Thread
 @onready var dash = $HUD/Dash
 @onready var claw = $HUD/Claw
+@onready var hellfire = $HUD/Hellfire
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -28,6 +29,10 @@ func _ready():
 		print("Portrait node not found!")
 
 	# Connect the toggled signal for special button
+	if end_turn:
+		end_turn.connect("pressed", Callable(self, "_on_endturn_pressed"))
+		print("EndTurn connected")
+			
 	if missile:
 		missile.connect("toggled", Callable(self, "_on_missile_toggled"))
 		print("Missile connected")
@@ -55,13 +60,19 @@ func _ready():
 	if claw:
 		claw.connect("toggled", Callable(self, "_on_claw_toggled"))
 		print("Claw connected")
-						
-	if end_turn:
-		end_turn.connect("pressed", Callable(self, "_on_endturn_pressed"))
-		print("EndTurn connected")
-
-						
+					
+	if hellfire:
+		hellfire.connect("toggled", Callable(self, "_on_hellfire_toggled"))
+		print("Hellfire connected")
+					
 # Method to handle the toggle state change
+func _on_endturn_pressed() -> void:
+	print("End Turn button pressed")
+	var hovertiles = get_tree().get_nodes_in_group("hovertile")
+	for hovertile in hovertiles:
+		hovertile.clear_action_tiles()
+	turn_manager.on_player_action_completed()
+
 func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.missile_toggle_active = true  # Set the flag to true
@@ -146,14 +157,18 @@ func _on_claw_toggled(button_pressed: bool) -> void:
 		GlobalManager.claw_toggle_active = false  # Set the flag to false
 		print("Dash toggle deactivated!")
 
-func _on_endturn_pressed() -> void:
-	print("End Turn button pressed")
-	var hovertiles = get_tree().get_nodes_in_group("hovertile")
-	for hovertile in hovertiles:
-		hovertile.clear_action_tiles()
-		
-	turn_manager.on_player_action_completed()
+func _on_hellfire_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.hellfire_toggle_active = true  # Set the flag to true
+		print("Hellfire toggle activated!")	
 
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.hellfire_toggle_active = false  # Set the flag to false
+		print("Hellfire toggle deactivated!")
+		
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
 	# Debugging: Check if the correct character is passed
@@ -332,7 +347,10 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "Aleks. Ducat":
 		claw.visible = true	
-		
+
+	if character.player_name == "John. Doom":
+		hellfire.visible = true	
+				
 func hide_special_buttons():
 	end_turn.visible = false
 	
@@ -344,4 +362,4 @@ func hide_special_buttons():
 	dash.visible = false
 	dash.visible = false
 	claw.visible = false
-	
+	hellfire.visible = false

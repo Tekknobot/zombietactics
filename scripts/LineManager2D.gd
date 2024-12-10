@@ -245,7 +245,7 @@ func _trigger_explosion(last_point: Vector2):
 	print("Explosion instance added to scene at:", last_point)
 
 	# Explosion radius (adjust this as needed)
-	var explosion_radius = 1.0
+	var explosion_radius = 8.0
 
 	# Variable to track if XP should be added (only once per explosion)
 	var xp_awarded = false

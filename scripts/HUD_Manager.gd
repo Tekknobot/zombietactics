@@ -18,6 +18,7 @@ extends CanvasLayer
 @onready var dash = $HUD/Dash
 @onready var claw = $HUD/Claw
 @onready var hellfire = $HUD/Hellfire
+@onready var barrage = $HUD/Barrage
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -64,7 +65,11 @@ func _ready():
 	if hellfire:
 		hellfire.connect("toggled", Callable(self, "_on_hellfire_toggled"))
 		print("Hellfire connected")
-					
+
+	if barrage:
+		barrage.connect("toggled", Callable(self, "_on_barrage_toggled"))
+		print("Barrage connected")
+							
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -168,7 +173,20 @@ func _on_hellfire_toggled(button_pressed: bool) -> void:
 	else:
 		GlobalManager.hellfire_toggle_active = false  # Set the flag to false
 		print("Hellfire toggle deactivated!")
+
+func _on_barrage_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.barrage_toggle_active = true  # Set the flag to true
+		print("Barrage toggle activated!")	
+
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.barrage_toggle_active = false  # Set the flag to false
+		print("Barrage toggle deactivated!")
 		
+				
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
 	# Debugging: Check if the correct character is passed
@@ -350,6 +368,9 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "John. Doom":
 		hellfire.visible = true	
+		
+	if character.player_name == "Seraphina. Halcyon":
+		barrage.visible = true			
 				
 func hide_special_buttons():
 	end_turn.visible = false
@@ -363,3 +384,4 @@ func hide_special_buttons():
 	dash.visible = false
 	claw.visible = false
 	hellfire.visible = false
+	barrage.visible = false

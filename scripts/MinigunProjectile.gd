@@ -18,7 +18,7 @@ var layer: int
 
 # Optional: Scene to instantiate for explosion effect
 @export var explosion_scene: PackedScene
-@export var explosion_radius: float = 1.0  # Radius to check for units at the target position
+@export var explosion_radius: float = 8.0  # Radius to check for units at the target position
 
 var projectile_hit: bool = false
 
@@ -39,7 +39,6 @@ func _process(delta: float):
 		snap_to_tile()
 		_create_explosion()  # Trigger the explosion effect
 		projectile_hit = true
-		await get_tree().create_timer(1).timeout		
 		return
 
 	# Adjust z_index to ensure layering as it moves
@@ -67,7 +66,7 @@ func snap_to_tile():
 	if tilemap:
 		# Snap the current position to the nearest tile center
 		var tile_pos = tilemap.local_to_map(position)
-		position = tilemap.map_to_local(tile_pos) + Vector2(32,32) / 2
+		position = tilemap.map_to_local(tile_pos) + Vector2(32, 32) / 2
 		print("Projectile snapped to tile: ", tile_pos)
 		target_position = position
 

@@ -55,27 +55,28 @@ func _input(event):
 			return  # Exit the function if the mouse is outside the map
 						
 		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Seraphina. Halcyon" and GlobalManager.barrage_toggle_active == true:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Angel. Charlie" and GlobalManager.barrage_toggle_active == true:
 			#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
+			var mouse_on_tile = tilemap.map_to_local(mouse_pos) + Vector2(32,32) / 2
 			
 			# Camera focuses on the active zombie
 			#var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			#camera.focus_on_position(get_parent().position) 
 						
 			#await fade_out(get_parent())
-			activate_ability(mouse_position)
+			activate_ability(mouse_on_tile)
 
-func activate_ability(mouse_position: Vector2):
+func activate_ability(mouse_on_tile: Vector2):
 	if is_on_cooldown or is_firing:
 		return # Exit if already firing or on cooldown
 
 	is_firing = true
 	firing_time = duration
 	emit_signal("ability_used")
-	start_firing(mouse_position)
+	start_firing(mouse_on_tile)
 
 	# Start cooldown after firing completes
 	await get_tree().create_timer(duration).timeout
@@ -85,9 +86,9 @@ func activate_ability(mouse_position: Vector2):
 	await get_tree().create_timer(duration).timeout
 	is_on_cooldown = false
 
-func start_firing(mouse_position: Vector2):
+func start_firing(mouse_on_tile: Vector2):
 	# Fire the barrage once
-	fire_bullets_in_cone(mouse_position)
+	fire_bullets_in_cone(mouse_on_tile)
 	
 	# Start cooldown after firing
 	is_firing = false
@@ -105,9 +106,9 @@ func start_firing(mouse_position: Vector2):
 	self.get_parent().has_moved = true
 	get_parent().check_end_turn_conditions()	
 	
-func fire_bullets_in_cone(mouse_position: Vector2):
+func fire_bullets_in_cone(mouse_on_tile: Vector2):
 	# Calculate the direction from the player to the mouse position
-	var direction_to_mouse = (mouse_position - global_position).normalized()
+	var direction_to_mouse = (mouse_on_tile - global_position).normalized()
 
 	# Define the cone's half-angle in radians
 	var half_angle = deg_to_rad(cone_angle / 2)
@@ -123,16 +124,16 @@ func fire_bullets_in_cone(mouse_position: Vector2):
 		var current_facing = 1 if get_parent().scale.x > 0 else -1
 
 		# Determine sprite flip based on target_position relative to the parent
-		if mouse_position.x > global_position.x and current_facing == 1:
+		if mouse_on_tile.x > global_position.x and current_facing == 1:
 			get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
-		elif mouse_position.x < global_position.x and current_facing == -1:
+		elif mouse_on_tile.x < global_position.x and current_facing == -1:
 			get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
 					
 		# Spawn a projectile in the determined direction
-		spawn_projectile(global_position, bullet_direction, mouse_position)
+		spawn_projectile(global_position, bullet_direction, mouse_on_tile)
 		await get_tree().create_timer(0.1).timeout
 
-func spawn_projectile(position: Vector2, direction: Vector2, mouse_position: Vector2):
+func spawn_projectile(position: Vector2, direction: Vector2, mouse_on_tile: Vector2):
 	if projectile_scene == null:
 		print("Error: Projectile scene is not assigned!")
 		return
@@ -141,8 +142,7 @@ func spawn_projectile(position: Vector2, direction: Vector2, mouse_position: Vec
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
 	# Snap mouse position to tile center
-	mouse_position.y -= 8  # Offset adjustment
-	var mouse_tile_pos = tilemap.local_to_map(mouse_position)
+	var mouse_tile_pos = tilemap.local_to_map(mouse_on_tile)
 	var snapped_target_position = tilemap.map_to_local(mouse_tile_pos) + Vector2(32,32) / 2
 
 	# Calculate the ability range dynamically

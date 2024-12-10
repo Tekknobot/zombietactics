@@ -46,6 +46,7 @@ animations = [{
 
 [node name="MinigunProjectile" type="Node2D"]
 script = ExtResource("1_yo0js")
+range = 0.0
 explosion_scene = ExtResource("2_5npqx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

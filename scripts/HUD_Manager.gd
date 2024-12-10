@@ -369,7 +369,7 @@ func show_special_buttons(character: PlayerUnit):
 	if character.player_name == "John. Doom":
 		hellfire.visible = true	
 		
-	if character.player_name == "Seraphina. Halcyon":
+	if character.player_name == "Angel. Charlie":
 		barrage.visible = true			
 				
 func hide_special_buttons():

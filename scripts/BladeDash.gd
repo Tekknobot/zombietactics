@@ -10,6 +10,7 @@ var is_active = false
 @export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 @export var hover_tile_scene: PackedScene
+var landmine_scene = preload("res://assets/scenes/prefab/mine.tscn")
 
 var attacked: bool = false
 var pos_before_dash: Vector2i
@@ -37,6 +38,7 @@ func _process(delta):
 	# Check if the action (e.g., movement or attack) is completed
 	if action_completed and not explosions_triggered:
 		print("Action completed. Triggering explosions.")
+		trigger_landmine_along_path(path_for_explosions, explosion_delay)
 		trigger_explosions_along_path(path_for_explosions, explosion_delay)
 		explosions_triggered = true  # Ensure this runs only once
 
@@ -62,19 +64,25 @@ func _input(event):
 		if is_mouse_over_gui():
 			print("Input blocked by GUI.")
 			return  # Prevent further input handling
-		# Ensure the mouse position is within map boundaries
+			
+		# Reference the TileMap node
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		var map_size = tilemap.get_used_rect()  # Get the map's used rectangle
-		var map_width = map_size.size.x
-		var map_height = map_size.size.y
 
-		# Convert the mouse global position to tile coordinates
+		# Get the boundaries of the map's used rectangle
+		var map_size = tilemap.get_used_rect()  # Rect2: position and size of the used tiles
+		var map_origin_x = map_size.position.x  # Starting x-coordinate of the used rectangle
+		var map_origin_y = map_size.position.y  # Starting y-coordinate of the used rectangle
+		var map_width = map_size.size.x         # Width of the map in tiles
+		var map_height = map_size.size.y        # Height of the map in tiles
+
+		# Convert the global mouse position to tile coordinates
 		var mouse_local = tilemap.local_to_map(get_global_mouse_position())
 
-		# Check if the mouse position is outside map bounds
-		if mouse_local.x < 0 or mouse_local.x >= map_width or mouse_local.y < 0 or mouse_local.y >= map_height:
+		# Check if the mouse is outside the bounds of the used rectangle
+		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
+		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
 			return  # Exit the function if the mouse is outside the map
-							
+									
 		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active == true:
 			#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -392,6 +400,45 @@ func spawn_explosion(position):
 		# Damage any units in the area
 		damage_units_in_area(position)		
 
+func spawn_landmine(position):
+	if landmine_scene:
+		var landmine_instance = landmine_scene.instantiate()
+		landmine_instance.global_position = get_tree().get_root().get_child(0).to_local(position)
+		get_tree().get_root().get_child(0).add_child(landmine_instance)
+		await get_tree().create_timer(0.1).timeout
+		landmine_instance.queue_free()	
+		
+func trigger_landmine_along_path(path_for_explosions: Array, delay: float = 0.5) -> void:
+	if path_for_explosions.is_empty():
+		print("Path is empty. No explosions to trigger.")
+		return
+
+	# Assuming the TileMap node is accessible
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
+	print("Spawning landmines along the path...")
+
+	await get_tree().create_timer(0.1).timeout
+	
+	# Iterate through the path except for the last tile
+	for i in range(path_for_explosions.size() - 1):  # Exclude the last index
+		var tile_pos = path_for_explosions[i]
+		var world_pos = tilemap.map_to_local(tile_pos)  # Convert to world position
+
+		# Spawn landmine
+		spawn_landmine(world_pos)
+				
+		# Camera focuses on the active zombie
+		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+		camera.focus_on_position(world_pos) 		
+		
+		print("Explosion triggered at:", world_pos)
+		
+		# Wait for a delay between explosions
+		await get_tree().create_timer(0.185).timeout		
+			
+	print("All landmines placed.")
+
 func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.5) -> void:
 	if path_for_explosions.is_empty():
 		print("Path is empty. No explosions to trigger.")
@@ -402,25 +449,25 @@ func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.
 
 	print("Triggering explosions along the path...")
 
-	await get_tree().create_timer(0.7).timeout
+	await get_tree().create_timer(0.1).timeout
 	
 	# Iterate through the path except for the last tile
 	for i in range(path_for_explosions.size() - 1):  # Exclude the last index
 		var tile_pos = path_for_explosions[i]
 		var world_pos = tilemap.map_to_local(tile_pos)  # Convert to world position
-
-		# Spawn explosion
-		spawn_explosion(world_pos)
 		
+		# Spawn landmine
+		spawn_explosion(world_pos)
+				
 		# Camera focuses on the active zombie
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 		camera.focus_on_position(world_pos) 		
 		
 		print("Explosion triggered at:", world_pos)
-
+		
 		# Wait for a delay between explosions
-		await get_tree().create_timer(delay).timeout
-	
+		await get_tree().create_timer(0.185).timeout		
+			
 	print("All explosions triggered.")
 
 	action_completed = false  # Reset for the next action
@@ -439,7 +486,6 @@ func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.
 		
 	# Check if the turn should end
 	get_parent().check_end_turn_conditions()
-
 
 func damage_units_in_area(center_position):
 	# Find units, zombies, and structures in the area

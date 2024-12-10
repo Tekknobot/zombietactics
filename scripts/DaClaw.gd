@@ -28,17 +28,22 @@ func _input(event):
 			print("Input blocked by GUI.")
 			return  # Prevent further input handling
 
-		# Ensure the mouse position is within map boundaries
+		# Reference the TileMap node
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		var map_size = tilemap.get_used_rect()  # Get the map's used rectangle
-		var map_width = map_size.size.x
-		var map_height = map_size.size.y
 
-		# Convert the mouse global position to tile coordinates
+		# Get the boundaries of the map's used rectangle
+		var map_size = tilemap.get_used_rect()  # Rect2: position and size of the used tiles
+		var map_origin_x = map_size.position.x  # Starting x-coordinate of the used rectangle
+		var map_origin_y = map_size.position.y  # Starting y-coordinate of the used rectangle
+		var map_width = map_size.size.x         # Width of the map in tiles
+		var map_height = map_size.size.y        # Height of the map in tiles
+
+		# Convert the global mouse position to tile coordinates
 		var mouse_local = tilemap.local_to_map(get_global_mouse_position())
 
-		# Check if the mouse position is outside map bounds
-		if mouse_local.x < 0 or mouse_local.x >= map_width or mouse_local.y < 0 or mouse_local.y >= map_height:
+		# Check if the mouse is outside the bounds of the used rectangle
+		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
+		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
 			return  # Exit the function if the mouse is outside the map
 						
 		# Ensure hover_tile exists and "Sarah Reese" is selected

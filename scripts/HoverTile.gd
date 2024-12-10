@@ -67,6 +67,9 @@ func is_within_bounds(tile_pos: Vector2i) -> bool:
 # Handles left-click input for selecting, moving, or attacking with the unit
 func handle_left_click(tile_pos: Vector2i) -> void:
 	if selected_player:
+		# Prevent movement if clicking the same tile the selected player is on
+		if tile_pos == selected_player.tile_pos:
+			return		
 		# If in attack mode and clicked a valid attack tile
 		if tile_pos in attack_range_tiles:
 			attack_selected_player(tile_pos)

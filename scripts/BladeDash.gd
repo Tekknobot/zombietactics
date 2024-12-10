@@ -471,8 +471,6 @@ func damage_units_in_area(center_position):
 				structure.is_demolished = true
 				structure.get_child(0).play("demolished")
 
-
-
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position
 	var mouse_pos = get_viewport().get_mouse_position()

@@ -76,6 +76,14 @@ func trigger_hellfire():
 		# Spawn the explosion at the calculated position
 		spawn_explosion(target_position)
 		await get_tree().create_timer(0.2).timeout
+		
+	GlobalManager.hellfire_toggle_active = false
+	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	hud_manager.hide_special_buttons()	
+	
+	get_parent().has_attacked = true
+	get_parent().has_moved = true
+	get_parent().check_end_turn_conditions()		
 
 # Spawn an explosion at the specified position
 func spawn_explosion(position):
@@ -102,14 +110,6 @@ func damage_units_in_area(center_position):
 			elif unit.structure_type == "Building" or unit.structure_type == "Tower" or unit.structure_type == "District" or unit.structure_type == "Stadium":
 				unit.is_demolished = true
 				unit.get_child(0).play("demolished")
-	
-	GlobalManager.hellfire_toggle_active = false
-	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
-	hud_manager.hide_special_buttons()	
-	
-	get_parent().has_attacked = true
-	get_parent().has_moved = true
-	get_parent().check_end_turn_conditions()
 				
 # Optional: Call this method to activate Hellfire from external scripts
 func activate_ability():

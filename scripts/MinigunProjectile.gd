@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var speed: float = 400.0
-@export var range: float = 200.0
+@export var range: float
 @export var tilemap_path: NodePath = "/root/MapManager/TileMap"  # Path to the TileMap
 
 var start_position: Vector2

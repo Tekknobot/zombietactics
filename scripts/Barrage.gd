@@ -169,7 +169,7 @@ func spawn_projectile(start_position: Vector2, direction: Vector2, target: Vecto
 	projectile_instance.position = start_position
 	projectile_instance.direction = direction.normalized()  # Set the direction vector
 	projectile_instance.range = ability_range  # Pass the calculated range
-	projectile_instance.speed = 400.0  # Adjust if needed
+	projectile_instance.speed = 200.0  # Adjust if needed
 	projectile_instance.attacker = self.get_parent()  # Set the firing unit as the attacker
 	
 	# Add projectile to the scene

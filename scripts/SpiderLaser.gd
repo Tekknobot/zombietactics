@@ -76,8 +76,11 @@ func _input(event):
 		var map_width = map_size.size.x         # Width of the map in tiles
 		var map_height = map_size.size.y        # Height of the map in tiles
 
+		var global_mouse_position = get_global_mouse_position() 
+		global_mouse_position.y += 8
+			
 		# Convert the global mouse position to tile coordinates
-		var mouse_local = tilemap.local_to_map(get_global_mouse_position())
+		var mouse_local = tilemap.local_to_map(global_mouse_position)
 
 		# Check if the mouse is outside the bounds of the used rectangle
 		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \

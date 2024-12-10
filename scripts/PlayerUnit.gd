@@ -903,7 +903,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 						
 				hud_manager.hide_special_buttons()				
 				#return  # Exit once a zombie is found
-
+		
 	# Update selected unit's state
 	selected_unit.has_attacked = true
 	selected_unit.has_moved = true
@@ -915,7 +915,10 @@ func mek_melee(selected_unit: Area2D) -> void:
 	
 	# No adjacent zombies found
 	print("No zombies adjacent.")
-	
+
+	await get_tree().create_timer(4).timeout
+	self.queue_free()
+		
 func check_end_turn_conditions() -> void:
 	# Check if the unit has completed its turn
 	if has_moved and has_attacked:

@@ -40,7 +40,7 @@ func _process(delta: float):
 		_create_explosion()  # Trigger the explosion effect
 		projectile_hit = true
 		return
-
+		
 	# Adjust z_index to ensure layering as it moves
 	update_tile_position()
 	
@@ -66,9 +66,10 @@ func snap_to_tile():
 	if tilemap:
 		# Snap the current position to the nearest tile center
 		var tile_pos = tilemap.local_to_map(position)
-		position = tilemap.map_to_local(tile_pos) + Vector2(32, 32) / 2
-		print("Projectile snapped to tile: ", tile_pos)
-		target_position = position
+		var snapped_position = tilemap.map_to_local(tile_pos) + Vector2(32, 32) / 2
+		position = snapped_position
+		target_position = snapped_position
+		print("Projectile snapped to tile center: ", tile_pos, " -> ", snapped_position)
 
 func _create_explosion() -> void:
 	# Check if explosion_scene is assigned

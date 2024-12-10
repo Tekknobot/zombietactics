@@ -60,13 +60,8 @@ func _input(event):
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
-			var mouse_on_tile = tilemap.map_to_local(mouse_pos) + Vector2(32,32) / 2
-			
-			# Camera focuses on the active zombie
-			#var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			#camera.focus_on_position(get_parent().position) 
+			var mouse_on_tile = tilemap.map_to_local(mouse_pos)
 						
-			#await fade_out(get_parent())
 			activate_ability(mouse_on_tile)
 
 func activate_ability(mouse_on_tile: Vector2):
@@ -88,7 +83,7 @@ func activate_ability(mouse_on_tile: Vector2):
 
 func start_firing(mouse_on_tile: Vector2):
 	# Fire the barrage once
-	fire_bullets_in_cone(mouse_on_tile)
+	fire_bullets_at_tile_and_surroundings(mouse_on_tile)
 	
 	# Start cooldown after firing
 	is_firing = false
@@ -103,23 +98,39 @@ func start_firing(mouse_on_tile: Vector2):
 	GlobalManager.barrage_toggle_active = false  # Deactivate the special toggle
 	hud_manager.barrage.button_pressed = false
 	self.get_parent().has_attacked = true
-	self.get_parent().has_moved = true
-	get_parent().check_end_turn_conditions()	
+	self.get_parent().has_moved = true	
 	
-func fire_bullets_in_cone(mouse_on_tile: Vector2):
-	# Calculate the direction from the player to the mouse position
-	var direction_to_mouse = (mouse_on_tile - global_position).normalized()
+func fire_bullets_at_tile_and_surroundings(mouse_on_tile: Vector2):
+	# Get the TileMap node
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-	# Define the cone's half-angle in radians
-	var half_angle = deg_to_rad(cone_angle / 2)
+	var global_mouse_position = get_global_mouse_position()
+	global_mouse_position.y += 8
 
-	# Emit multiple bullets within the cone
-	for i in range(bullets_per_second):
-		# Generate a random angle within the cone
-		var random_angle = randf_range(-half_angle, half_angle)
-		# Rotate the main direction by the random angle
-		var bullet_direction = direction_to_mouse.rotated(random_angle)
-		
+	# Get the center tile position in tilemap coordinates
+	var center_tile_pos = tilemap.local_to_map(global_mouse_position)
+
+	# Define relative positions for the 8 surrounding tiles + the center tile
+	var relative_positions = [
+		Vector2i(0, 0),   # Center
+		Vector2i(-1, 0),  # Left
+		Vector2i(1, 0),   # Right
+		Vector2i(0, -1),  # Up
+		Vector2i(0, 1),   # Down
+		Vector2i(-1, -1), # Top-left
+		Vector2i(1, -1),  # Top-right
+		Vector2i(-1, 1),  # Bottom-left
+		Vector2i(1, 1)    # Bottom-right
+	]
+
+	# Fire at each surrounding tile
+	for offset in relative_positions:
+		var target_tile_pos = center_tile_pos + offset
+		var target_world_pos = tilemap.map_to_local(target_tile_pos)
+
+		# Calculate direction to the target tile
+		var direction_to_tile = (target_world_pos - global_position).normalized()
+
 		# Get the current facing direction of the parent (1 for right, -1 for left)
 		var current_facing = 1 if get_parent().scale.x > 0 else -1
 
@@ -128,12 +139,17 @@ func fire_bullets_in_cone(mouse_on_tile: Vector2):
 			get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
 		elif mouse_on_tile.x < global_position.x and current_facing == -1:
 			get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
-					
-		# Spawn a projectile in the determined direction
-		spawn_projectile(global_position, bullet_direction, mouse_on_tile)
+			
+		# Spawn a projectile aimed at the tile
+		spawn_projectile(global_position, direction_to_tile, target_world_pos)
+
+		# Optional delay between shots for visual effect
 		await get_tree().create_timer(0.1).timeout
 
-func spawn_projectile(position: Vector2, direction: Vector2, mouse_on_tile: Vector2):
+	# Check end turn conditions after firing
+	get_parent().check_end_turn_conditions()
+
+func spawn_projectile(start_position: Vector2, direction: Vector2, target: Vector2):
 	if projectile_scene == null:
 		print("Error: Projectile scene is not assigned!")
 		return
@@ -142,15 +158,15 @@ func spawn_projectile(position: Vector2, direction: Vector2, mouse_on_tile: Vect
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
 	# Snap mouse position to tile center
-	var mouse_tile_pos = tilemap.local_to_map(mouse_on_tile)
-	var snapped_target_position = tilemap.map_to_local(mouse_tile_pos) + Vector2(32,32) / 2
+	var mouse_tile_pos = tilemap.local_to_map(target)
+	var snapped_target_position = tilemap.map_to_local(mouse_tile_pos)
 
 	# Calculate the ability range dynamically
-	var ability_range = position.distance_to(snapped_target_position)
+	var ability_range = start_position.distance_to(snapped_target_position)
 
 	# Instantiate and configure the projectile
 	var projectile_instance = projectile_scene.instantiate() as Node2D
-	projectile_instance.position = position
+	projectile_instance.position = start_position
 	projectile_instance.direction = direction.normalized()  # Set the direction vector
 	projectile_instance.range = ability_range  # Pass the calculated range
 	projectile_instance.speed = 400.0  # Adjust if needed

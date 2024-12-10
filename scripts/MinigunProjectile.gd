@@ -34,6 +34,10 @@ func _process(delta: float):
 	# Move the projectile
 	position += direction * speed * delta
 
+	# Camera focuses on the active projectile
+	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+	camera.focus_on_position(position)
+
 	# Check if the projectile has reached its range
 	if position.distance_to(start_position) >= range and projectile_hit == false:
 		snap_to_tile()
@@ -66,7 +70,7 @@ func snap_to_tile():
 	if tilemap:
 		# Snap the current position to the nearest tile center
 		var tile_pos = tilemap.local_to_map(position)
-		var snapped_position = tilemap.map_to_local(tile_pos) + Vector2(32, 32) / 2
+		var snapped_position = tilemap.map_to_local(tile_pos)
 		position = snapped_position
 		target_position = snapped_position
 		print("Projectile snapped to tile center: ", tile_pos, " -> ", snapped_position)

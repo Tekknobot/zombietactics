@@ -12,7 +12,7 @@ var item_handled: bool = false  # Prevents multiple checks once the outcome is d
 
 func _ready():
 	await get_tree().create_timer(0.1).timeout
-	assign_item_to_structure()
+	#assign_item_to_structure()
 
 func check_item_destroyed():
 	# Skip if the item has already been handled

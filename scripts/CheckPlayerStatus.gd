@@ -38,6 +38,8 @@ func check_player_status():
 
 # Detect when this TextureRect is clicked
 func _gui_input(event: InputEvent) -> void:
+	if GlobalManager.missile_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active:
+		return	
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		focus_camera_on_player()
 

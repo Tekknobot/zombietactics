@@ -355,9 +355,9 @@ func is_mouse_over_gui() -> bool:
 	var mouse_pos = get_viewport().get_mouse_position()
 
 	# Get all nodes in the "hud_controls" group
-	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
+	var hud_controls = get_tree().get_nodes_in_group("portrait_controls") + get_tree().get_nodes_in_group("hud_controls")
 	for control in hud_controls:
-		if control is Button:
+		if control is TextureRect or Button and control.is_visible_in_tree():
 			# Use global rect to check if mouse is over the button
 			var rect = control.get_global_rect()
 			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)

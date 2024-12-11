@@ -82,23 +82,6 @@ func _input(event: InputEvent) -> void:
 				else:
 					print("Tile is not walkable!")
 
-func is_mouse_over_gui() -> bool:
-	# Get global mouse position
-	var mouse_pos = get_viewport().get_mouse_position()
-
-	# Get all nodes in the "hud_controls" group
-	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
-	for control in hud_controls:
-		if control is Button:
-			# Use global rect to check if mouse is over the button
-			var rect = control.get_global_rect()
-			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
-			if rect.has_point(mouse_pos):
-				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
-				return true
-	print("Mouse is NOT over any button.")
-	return false
-	
 # Update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:
 	# Get the tilemap and determine its grid size
@@ -389,3 +372,20 @@ func add_xp():
 					hover_tile.selected_player.level_up()			
 			else:
 				print("last_selected_player does not exist.")
+
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var hud_controls = get_tree().get_nodes_in_group("portrait_controls") + get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is TextureRect or Button and control.is_visible_in_tree():
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any button.")
+	return false

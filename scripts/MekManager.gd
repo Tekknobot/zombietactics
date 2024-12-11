@@ -119,24 +119,6 @@ func _input(event: InputEvent) -> void:
 		else:
 			print("Tile is not movable:", tile_pos)
 
-func is_mouse_over_gui() -> bool:
-	# Get global mouse position
-	var mouse_pos = get_viewport().get_mouse_position()
-
-	# Get all nodes in the "hud_controls" group
-	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
-	for control in hud_controls:
-		if control is Button:
-			# Use global rect to check if mouse is over the button
-			var rect = control.get_global_rect()
-			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
-			if rect.has_point(mouse_pos):
-				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
-				return true
-	print("Mouse is NOT over any button.")
-	return false
-
-
 # Checks if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:
 	var map_rect: Rect2i = tilemap.get_used_rect()
@@ -239,3 +221,20 @@ func clear_tiles():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for unit in all_units:
 		unit.clear_movement_tiles()
+
+func is_mouse_over_gui() -> bool:
+	# Get global mouse position
+	var mouse_pos = get_viewport().get_mouse_position()
+
+	# Get all nodes in the "hud_controls" group
+	var hud_controls = get_tree().get_nodes_in_group("portrait_controls") + get_tree().get_nodes_in_group("hud_controls")
+	for control in hud_controls:
+		if control is TextureRect or Button and control.is_visible_in_tree():
+			# Use global rect to check if mouse is over the button
+			var rect = control.get_global_rect()
+			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			if rect.has_point(mouse_pos):
+				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				return true
+	print("Mouse is NOT over any button.")
+	return false

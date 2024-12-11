@@ -364,6 +364,9 @@ func add_xp():
 				hud_manager.update_hud(hover_tile.selected_player)	
 				print("Added 25 XP to", hover_tile.selected_player, "new XP:", hover_tile.selected_player.current_xp)		
 
+				if hover_tile.selected_player.current_xp >= hover_tile.selected_player.xp_for_next_level:
+					hover_tile.selected_player.level_up()	
+		
 				# Optional: Check for level up, if applicable
 				if hover_tile.selected_player.current_xp >= hover_tile.selected_player.xp_for_next_level:
 					hover_tile.selected_player.level_up()			

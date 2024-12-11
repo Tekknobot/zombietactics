@@ -61,6 +61,10 @@ func _input(event):
 						
 			#await fade_out(get_parent())
 			claw_dash_strike(mouse_pos)
+			
+			get_parent().current_xp += 25
+			if get_parent().current_xp >= get_parent().xp_for_next_level:
+				get_parent().level_up()				
 	
 func fade_out(sprite: Node, duration: float = 1.5) -> void:
 	"""
@@ -303,9 +307,7 @@ func check_and_attack_adjacent_zombies() -> void:
 	GlobalManager.claw_toggle_active = false
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()
-	
-	get_parent().current_xp += 25
-	
+			
 	# Check if the turn should end
 	get_parent().check_end_turn_conditions()
 		

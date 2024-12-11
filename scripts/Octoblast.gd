@@ -95,7 +95,11 @@ func trigger_octoblast():
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
 	await get_tree().create_timer(5).timeout
+	
 	get_parent().current_xp += 25
+	if get_parent().current_xp >= get_parent().xp_for_next_level:
+		get_parent().level_up()	
+		
 	get_parent().check_end_turn_conditions()
 	
 # Helper function to get all zombies on the map

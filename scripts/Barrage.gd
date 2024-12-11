@@ -149,6 +149,9 @@ func fire_bullets_at_tile_and_surroundings(mouse_on_tile: Vector2):
 		await get_tree().create_timer(0.1).timeout
 
 	get_parent().current_xp += 25
+	if get_parent().current_xp >= get_parent().xp_for_next_level:
+		get_parent().level_up()	
+		
 	# Check end turn conditions after firing
 	get_parent().check_end_turn_conditions()
 

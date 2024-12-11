@@ -92,7 +92,7 @@ func _input(event):
 			return  # Exit the function if the mouse is outside the map
 				
 		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and 	GlobalManager.thread_toggle_active == true:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.thread_toggle_active == true:
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
@@ -101,10 +101,6 @@ func _input(event):
 
 			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 			hud_manager.hide_special_buttons()	
-			
-			# Access the 'special' button within HUDManager
-			GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
-			hud_manager.thread.button_pressed = false
 						
 			# Find zombies in the vicinity
 			closest_zombies = get_zombies_in_scene() # Assume this is a function returning all zombies in the scene
@@ -116,25 +112,33 @@ func _input(event):
 			get_zombie_in_area()
 
 func get_zombie_in_area():
-	if zombie_index >= 6:
+	if zombie_index >= min(closest_zombies.size() - 1, 7):
 		zombie_index = -1
-		closest_zombies.clear()	
+		closest_zombies.clear()
 
 		# Add XP if at least one target was hit
 		if xp_awarded:
 			await get_tree().create_timer(1).timeout
 			add_xp()
-			
+
 		self.get_parent().has_attacked = true
 		self.get_parent().has_moved = true
 		xp_awarded = false
-		get_parent().check_end_turn_conditions()			
-		return
 		
+		var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary	
+		
+		# Access the 'special' button within HUDManager
+		GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
+		hud_manager.thread.button_pressed = false		
+			
+		get_parent().check_end_turn_conditions()
+		return
+
 	zombie_index += 1
-	# Deploy lasers to the 7 nearest zombies
-	var zombie_target = closest_zombies[zombie_index].position
-	deploy_laser(zombie_target)	
+	# Deploy lasers to the nearest zombies
+	if zombie_index < closest_zombies.size():
+		var zombie_target = closest_zombies[zombie_index].position
+		deploy_laser(zombie_target, closest_zombies[zombie_index])
 
 func get_zombies_in_scene() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)
@@ -144,7 +148,7 @@ func get_zombies_in_scene() -> Array:
 			zombies.append(node)
 	return zombies			
 
-func deploy_laser(target_position: Vector2):
+func deploy_laser(target_position: Vector2, zombie):
 	# Camera focus
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 	camera_flag = true

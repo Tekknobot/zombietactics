@@ -56,6 +56,15 @@ func trigger_octoblast():
 	# Get the current position in tile coordinates
 	var current_position = mouse_pos
 
+	# Get the current facing direction of the parent (1 for right, -1 for left)
+	var current_facing = 1 if get_parent().scale.x > 0 else -1
+
+	# Determine sprite flip based on target_position relative to the parent
+	if get_global_mouse_position().x > global_position.x and current_facing == 1:
+		get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
+	elif get_global_mouse_position().x < global_position.x and current_facing == -1:
+		get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
+		
 	# Trigger trajectory to the initial position
 	missile_manager.start_trajectory(mouse_position, get_parent().position)
 
@@ -77,6 +86,7 @@ func trigger_octoblast():
 
 	# Trigger trajectories towards the closest zombies sequentially
 	for zombie_pos in closest_zombies:
+		get_parent().get_child(0).play("attack")		
 		await get_tree().create_timer(0.2).timeout
 		missile_manager.start_trajectory(zombie_pos, get_parent().position)
 

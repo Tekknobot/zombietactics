@@ -236,7 +236,7 @@ func process_zombie_queue() -> void:
 	if not zombie_queue.is_empty():
 		var active_zombie = zombie_queue.pop_front()
 		GlobalManager.active_zombie = active_zombie
-		active_zombie.has_moved = true
+		GlobalManager.active_zombie.has_moved = true
 		print("Processing Zombie ID:", active_zombie.zombie_id)	
 
 	# Get the next zombie that has not moved
@@ -312,7 +312,7 @@ func process_zombie_queue() -> void:
 
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
-	#update_astar_grid()
+	update_astar_grid()
 	
 	print("Player action completed. Starting zombie movement.")
 	await get_tree().create_timer(1).timeout 

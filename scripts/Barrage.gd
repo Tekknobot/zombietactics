@@ -19,10 +19,22 @@ var firing_time: float = 0.0
 # Signals
 signal ability_used
 
+var barrage_completed: bool = false
+
 func _ready():
 	pass
 
 func _process(delta):
+	# Check if the barrage is complete and the turn has not ended
+	if barrage_completed:
+		get_parent().current_xp += 25
+		if get_parent().current_xp >= get_parent().xp_for_next_level:
+			get_parent().level_up()	
+				
+		# Check end turn conditions after firing
+		get_parent().check_end_turn_conditions()
+		barrage_completed = false  # Reset the flag to prevent multiple triggers
+			
 	is_mouse_over_gui()
 
 func _input(event):
@@ -70,6 +82,8 @@ func activate_ability(mouse_on_tile: Vector2):
 
 	is_firing = true
 	firing_time = duration
+	barrage_completed = false  # Reset the flag
+	
 	emit_signal("ability_used")
 	start_firing(mouse_on_tile)
 
@@ -81,6 +95,10 @@ func activate_ability(mouse_on_tile: Vector2):
 	await get_tree().create_timer(duration).timeout
 	is_on_cooldown = false
 
+	# Mark the barrage as completed
+	barrage_completed = true
+	print("Barrage completed.")
+	
 func start_firing(mouse_on_tile: Vector2):
 	# Fire the barrage once
 	fire_bullets_at_tile_and_surroundings(mouse_on_tile)
@@ -147,14 +165,6 @@ func fire_bullets_at_tile_and_surroundings(mouse_on_tile: Vector2):
 		
 		# Optional delay between shots for visual effect
 		await get_tree().create_timer(0.1).timeout
-
-	get_parent().current_xp += 25
-	if get_parent().current_xp >= get_parent().xp_for_next_level:
-		get_parent().level_up()	
-		
-	# Check end turn conditions after firing
-	get_parent().check_end_turn_conditions()
-
 
 func play_attack_animation():
 	for i in 9:

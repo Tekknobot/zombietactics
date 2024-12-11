@@ -13,11 +13,32 @@ var is_active = false
 var attacked: bool = false
 var pos_before_dash: Vector2i
 
+var claw_completed: bool = false
+
 func _physics_process(delta: float) -> void:
 	if is_active:  # Assuming you toggle `is_active` during the dash
 		dash_to_target(delta)
 
 func _process(delta):
+	# Check if the barrage is complete and the turn has not ended
+	if claw_completed:
+		get_parent().current_xp += 25
+		if get_parent().current_xp >= get_parent().xp_for_next_level:
+			get_parent().level_up()	
+			
+		# Mark this unit's action as complete
+		get_parent().has_attacked = true
+		get_parent().has_moved = true
+
+		GlobalManager.claw_toggle_active = false
+		var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+		hud_manager.hide_special_buttons()
+				
+		# Check if the turn should end
+		get_parent().check_end_turn_conditions()
+			
+		claw_completed = false  # Reset the flag to prevent multiple triggers
+				
 	is_mouse_over_gui()
 
 func _input(event):
@@ -59,67 +80,8 @@ func _input(event):
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			camera.focus_on_position(get_parent().position) 
 						
-			#await fade_out(get_parent())
-			claw_dash_strike(mouse_pos)
-			
-			get_parent().current_xp += 25
-			if get_parent().current_xp >= get_parent().xp_for_next_level:
-				get_parent().level_up()				
+			claw_dash_strike(mouse_pos)		
 	
-func fade_out(sprite: Node, duration: float = 1.5) -> void:
-	"""
-	Fades the sprite out over the specified duration.
-	:param sprite: The sprite to fade out.
-	:param duration: The time it takes to fade out.
-	"""
-	if not sprite:
-		print("Error: Sprite is null!")
-		return
-
-	# If the sprite is already faded out, do nothing
-	if sprite.modulate.a <= 0.0:
-		return
-
-	# Create a new tween for the fade-out animation
-	var tween = create_tween()
-
-	#Play SFX
-	get_parent().get_child(2).stream = get_parent().invisibility_audio
-	get_parent().get_child(2).play()
-
-	# Tween the alpha value of the sprite's modulate property to 0
-	tween.tween_property(sprite, "modulate:a", 0.2, duration)
-
-	# Wait for the tween to finish
-	await tween.finished
-
-func fade_in(sprite: Node, duration: float = 1.5) -> void:
-	"""
-	Fades the sprite in over the specified duration.
-	:param sprite: The sprite to fade in.
-	:param duration: The time it takes to fade in.
-	"""
-	if not sprite:
-		print("Error: Sprite is null!")
-		return
-
-	# If the sprite is already fully visible, do nothing
-	if sprite.modulate.a >= 1:
-		return
-
-	# Create a new tween for the fade-in animation
-	var tween = create_tween()
-
-	#Play SFX
-	get_parent().get_child(2).stream = get_parent().invisibility_audio
-	get_parent().get_child(2).play()
-
-	# Tween the alpha value of the sprite's modulate property to 1
-	tween.tween_property(sprite, "modulate:a", 1.0, duration)
-
-	# Wait for the tween to finish
-	await tween.finished
-
 # Blade Dash Strike ability
 func claw_dash_strike(target_tile: Vector2i) -> void:
 	get_parent().move_speed = dash_speed
@@ -289,19 +251,8 @@ func check_and_attack_adjacent_zombies() -> void:
 			zombie.set_meta("been_attacked", false)  # Reset been_attacked flag
 	
 	print("No adjacent zombies to attack.")
-
-	await fade_in(get_parent())
 	
-	# Mark this unit's action as complete
-	get_parent().has_attacked = true
-	get_parent().has_moved = true
-
-	GlobalManager.claw_toggle_active = false
-	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
-	hud_manager.hide_special_buttons()
-			
-	# Check if the turn should end
-	get_parent().check_end_turn_conditions()
+	claw_completed = true
 		
 # Returns the unit present at a given tile (if any)
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:

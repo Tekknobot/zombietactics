@@ -119,7 +119,7 @@ func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 
 # Spawn zombies randomly on the opposite half of the map
 func spawn_zombies():
-	var zombie_count = 64
+	var zombie_count = 32
 	var spawn_attempts = 0
 	
 	# Shuffle zombie names to ensure uniqueness
@@ -143,11 +143,11 @@ func spawn_zombies():
 			elif GlobalManager.current_map_index == 3:
 				# Mixed spawning: crusher zombies, radioactive zombies, and normal zombies
 				var roll = randi() % 10  # Random roll (0 to 9)
-				if roll < 3:  # 30% chance for radioactive zombie
+				if roll < 2:  # 30% chance for radioactive zombie
 					zombie_instance = unit_radioactive_zombie.instantiate()
-				elif roll < 6:  # 60% chance for crusher zombie
+				elif roll < 6:  # 70% chance for crusher zombie
 					zombie_instance = unit_crusher_zombie.instantiate()
-				else:  # 30% chance for normal zombie
+				else:  # 20% chance for normal zombie
 					zombie_instance = unit_zombie.instantiate()
 			else:
 				# Only spawn normal zombies on other maps

@@ -67,10 +67,7 @@ func trigger_octoblast():
 		
 	# Trigger trajectory to the initial position
 	missile_manager.start_trajectory(mouse_position, get_parent().position)
-
-	# Trigger explosion on the center tile immediately
-	spawn_explosion(tilemap.map_to_local(current_position))
-
+	
 	# Get all zombie positions
 	var zombies = get_zombies_on_map()  # Custom function to fetch all zombies on the map
 	var zombie_positions = []
@@ -96,6 +93,7 @@ func trigger_octoblast():
 	
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
+	await get_tree().create_timer(5).timeout
 	get_parent().check_end_turn_conditions()
 	
 # Helper function to get all zombies on the map
@@ -105,20 +103,7 @@ func get_zombies_on_map() -> Array:
 	for entity in all_entities:
 		if entity.is_in_group("zombies"):  # Check if the entity is a zombie
 			zombies.append(entity)
-	return zombies
-
-# Spawn an explosion at the specified position
-func spawn_explosion(position):
-	if explosion_effect_scene:
-		var explosion_instance = explosion_effect_scene.instantiate()
-		explosion_instance.global_position = get_parent().to_local(position)
-		get_parent().add_child(explosion_instance)
-		# Damage any units in the area
-		damage_units_in_area(position)
-		
-		# Camera focuses on the active zombie
-		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-		camera.focus_on_position(position) 		
+	return zombies	
 
 # Deal damage to units within the area of effect
 func damage_units_in_area(center_position):

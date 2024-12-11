@@ -90,19 +90,21 @@ func _input(event):
 									
 		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active == true:
-			#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
+			
 			# Camera focuses on the active zombie
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			camera.focus_on_position(get_parent().position) 	
+			
 			GlobalManager.dash_toggle_active = false
 			clear_hover_tiles()	
-						
+					
 			await fade_out(get_parent())
 			blade_dash_strike(mouse_pos)	
-
+	
 func update_hover_tiles():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var start_tile = get_parent().tile_pos  # Unit's current tile position
@@ -199,10 +201,6 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 	
 # Blade Dash Strike ability
 func blade_dash_strike(target_tile: Vector2i) -> void:
-	if not can_use_ability():  # Check if the unit is eligible to use the ability
-		print("Ability cannot be used right now!")
-		return
-	
 	get_parent().move_speed = dash_speed
 	
 	# Update the AStar grid to ensure accurate pathfinding
@@ -223,10 +221,6 @@ func blade_dash_strike(target_tile: Vector2i) -> void:
 
 	# Dash to the target position along the path
 	dash_to_target(get_process_delta_time())
-
-# Checks if the unit can use the ability
-func can_use_ability() -> bool:
-	return not get_parent().has_moved and not get_parent().has_attacked and get_parent().can_start_turn
 
 func dash_to_target(delta: float) -> void:
 	# Get the TileMap
@@ -378,7 +372,7 @@ func check_and_attack_adjacent_zombies() -> void:
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
 
-	GlobalManager.claw_toggle_active = false
+	GlobalManager.dash_toggle_active = false
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()
 	

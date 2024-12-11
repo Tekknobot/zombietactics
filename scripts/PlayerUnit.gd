@@ -386,9 +386,14 @@ func move_along_path(delta: float) -> void:
 			path_index += 1  # Move to the next tile in the path
 			
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
-			has_moved = true
+			self.has_moved = true
 			item_manager.check_for_item_discovery(self)
 			update_astar_grid()
+			
+			var hovertiles = get_tree().get_nodes_in_group("hovertile")
+			for hovertile in hovertiles:
+				hovertile.selected_player = self
+				
 			check_end_turn_conditions()
 	else:
 		# Path is complete, no more tiles to move to

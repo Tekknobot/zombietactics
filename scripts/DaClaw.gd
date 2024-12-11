@@ -122,10 +122,6 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 
 # Blade Dash Strike ability
 func claw_dash_strike(target_tile: Vector2i) -> void:
-	if not can_use_ability():  # Check if the unit is eligible to use the ability
-		print("Ability cannot be used right now!")
-		return
-	
 	get_parent().move_speed = dash_speed
 	
 	# Update the AStar grid to ensure accurate pathfinding
@@ -144,10 +140,6 @@ func claw_dash_strike(target_tile: Vector2i) -> void:
 
 	# Dash to the target position along the path
 	dash_to_target(get_process_delta_time())
-
-# Checks if the unit can use the ability
-func can_use_ability() -> bool:
-	return not get_parent().has_moved and not get_parent().has_attacked and get_parent().can_start_turn
 
 func dash_to_target(delta: float) -> void:
 	# Get the TileMap

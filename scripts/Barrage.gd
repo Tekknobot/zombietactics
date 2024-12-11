@@ -140,15 +140,23 @@ func fire_bullets_at_tile_and_surroundings(mouse_on_tile: Vector2):
 		elif mouse_on_tile.x < global_position.x and current_facing == -1:
 			get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
 			
+		play_attack_animation()	
+		
 		# Spawn a projectile aimed at the tile
 		spawn_projectile(global_position, direction_to_tile, target_world_pos)
-
+		
 		# Optional delay between shots for visual effect
 		await get_tree().create_timer(0.1).timeout
 
 	# Check end turn conditions after firing
 	get_parent().check_end_turn_conditions()
 
+
+func play_attack_animation():
+	for i in 9:
+		get_parent().get_child(0).play("attack")
+		await get_tree().create_timer(0.5)
+		
 func spawn_projectile(start_position: Vector2, direction: Vector2, target: Vector2):
 	if projectile_scene == null:
 		print("Error: Projectile scene is not assigned!")

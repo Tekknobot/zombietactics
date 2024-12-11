@@ -19,6 +19,7 @@ extends CanvasLayer
 @onready var claw = $HUD/Claw
 @onready var hellfire = $HUD/Hellfire
 @onready var barrage = $HUD/Barrage
+@onready var octoblast = $HUD/Octoblast
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -69,7 +70,11 @@ func _ready():
 	if barrage:
 		barrage.connect("toggled", Callable(self, "_on_barrage_toggled"))
 		print("Barrage connected")
-							
+
+	if octoblast:
+		octoblast.connect("toggled", Callable(self, "_on_octoblast_toggled"))
+		print("Octoblast connected")
+									
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -186,7 +191,18 @@ func _on_barrage_toggled(button_pressed: bool) -> void:
 		GlobalManager.barrage_toggle_active = false  # Set the flag to false
 		print("Barrage toggle deactivated!")
 		
-				
+func _on_octoblast_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.octoblast_toggle_active = true  # Set the flag to true
+		print("Octoblast toggle activated!")	
+
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.octoblast_toggle_active = false  # Set the flag to false
+		print("Octoblast toggle deactivated!")
+						
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
 	# Debugging: Check if the correct character is passed
@@ -371,7 +387,10 @@ func show_special_buttons(character: PlayerUnit):
 		
 	if character.player_name == "Angel. Charlie":
 		barrage.visible = true			
-				
+
+	if character.player_name == "Annie. Switch":
+		octoblast.visible = true	
+						
 func hide_special_buttons():
 	end_turn.visible = false
 	
@@ -385,3 +404,4 @@ func hide_special_buttons():
 	claw.visible = false
 	hellfire.visible = false
 	barrage.visible = false
+	octoblast.visible = false

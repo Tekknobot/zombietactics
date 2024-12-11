@@ -98,7 +98,7 @@ func attack_selected_player(tile_pos: Vector2i) -> void:
 
 # Moves the selected player to the specified tile
 func move_selected_player(tile_pos: Vector2i) -> void:
-	if GlobalManager.missile_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active:
+	if GlobalManager.missile_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active or GlobalManager.octoblast_toggle_active:
 		return
 	
 	var zombies = get_tree().get_nodes_in_group("zombies")
@@ -121,7 +121,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
 		if tilemap.local_to_map(player.global_position) == tile_pos and player.can_start_turn == true:
-			if GlobalManager.missile_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active:
+			if GlobalManager.missile_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active or GlobalManager.octoblast_toggle_active:
 				return
 							
 			set_special_button_pressed()	
@@ -152,7 +152,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	for zombie in zombies:
 		if tilemap.local_to_map(zombie.global_position) == tile_pos:
-			if GlobalManager.missile_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active:
+			if GlobalManager.missile_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active or GlobalManager.octoblast_toggle_active:
 				return
 				
 			set_special_button_pressed()	
@@ -291,3 +291,4 @@ func set_special_button_pressed():
 	hud_manager.claw.button_pressed = false
 	hud_manager.hellfire.button_pressed = false
 	hud_manager.barrage.button_pressed = false
+	hud_manager.octoblast.button_pressed = false

@@ -25,9 +25,13 @@ var laser_segments: Array = []  # Store references to all laser segments
 var current_segment_index: int = 0  # Tracks the segment being animated
 
 var laser_deployed: bool = false
+var laser_target
 var pulsing_segments: Array = []  # Array to track which segments are pulsing
 var explosion_target
-
+var closest_zombies
+var zombie_index = -1
+var xp_awarded = false
+	
 # Create the timer for the pulse effect
 var pulse_timer = Timer.new()
 var spark_emitter = preload("res://assets/scenes/vfx/sparks.tscn")  # Reference to the particle emitter
@@ -89,22 +93,58 @@ func _input(event):
 				
 		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and 	GlobalManager.thread_toggle_active == true:
-			#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
-			var laser_target = tilemap.map_to_local(mouse_pos)
-			laser_target.y -= 8
+			laser_target = tilemap.map_to_local(mouse_pos)
 			explosion_target = laser_target
-			deploy_laser(laser_target)
+
+			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+			hud_manager.hide_special_buttons()	
+			
+			# Access the 'special' button within HUDManager
+			GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
+			hud_manager.thread.button_pressed = false
+						
+			# Find zombies in the vicinity
+			closest_zombies = get_zombies_in_scene() # Assume this is a function returning all zombies in the scene
+
+			# Sort zombies by distance to the initial target
+			closest_zombies.sort_custom(func(a, b):
+				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
+			
+			get_zombie_in_area()
+
+func get_zombie_in_area():
+	if zombie_index >= 6:
+		zombie_index = -1
+		closest_zombies.clear()	
+
+		# Add XP if at least one target was hit
+		if xp_awarded:
+			await get_tree().create_timer(1).timeout
+			add_xp()
+			
+		self.get_parent().has_attacked = true
+		self.get_parent().has_moved = true
+		xp_awarded = false
+		get_parent().check_end_turn_conditions()			
+		return
+		
+	zombie_index += 1
+	# Deploy lasers to the 7 nearest zombies
+	var zombie_target = closest_zombies[zombie_index].position
+	deploy_laser(zombie_target)	
+
+func get_zombies_in_scene() -> Array:
+	# Returns a list of zombies in the scene (to be implemented)
+	var zombies = []
+	for node in get_tree().get_nodes_in_group("zombies"):
+		if node.is_inside_tree():
+			zombies.append(node)
+	return zombies			
 
 func deploy_laser(target_position: Vector2):
-	# Clear previous laser segments
-	laser_segments.clear()  # Clear the list of segments
-	for child in get_children():
-		if child is Line2D:
-			child.queue_free()	
-			
 	# Camera focus
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 	camera_flag = true
@@ -127,19 +167,18 @@ func deploy_laser(target_position: Vector2):
 	# Get cell size from the tilemap
 	var cell_size = Vector2(32, 32)
 	
-	var start = tilemap.local_to_map(Vector2(global_position.x, global_position.y - 16))
+	var start = tilemap.local_to_map(Vector2(global_position.x, global_position.y))
 	start = Vector2i(start.x - 1, start.y)
-	var end = tilemap.local_to_map(Vector2(target_position.x, target_position.y - 16))
+	var end = tilemap.local_to_map(Vector2(target_position.x, target_position.y))
 
 	# Use a Bresenham line algorithm to get all tiles along the laser path
 	var tiles = get_line_tiles(start, end)
 	
-
 	# Create a Line2D for each tile, layered correctly
 	for i in range(tiles.size() - 1):
 		var tile_pos = tiles[i]
-		var segment_start = tilemap.map_to_local(tile_pos) + cell_size / 2
-		var segment_end = tilemap.map_to_local(tiles[i + 1]) + cell_size / 2
+		var segment_start = tilemap.map_to_local(tile_pos)
+		var segment_end = tilemap.map_to_local(tiles[i + 1])
 		
 		var height_offset = 0
 		var segment_color = color_cycle[current_color_index]  # Default color from cycle
@@ -171,6 +210,9 @@ func deploy_laser(target_position: Vector2):
 		segment.width = laser_width
 		segment.default_color = segment_color  # Apply the determined color
 
+		segment_start.y -= 8
+		segment_end.y -= 8
+		
 		# Add points to the Line2D
 		segment.add_point(to_local(segment_start))
 		segment.add_point(to_local(segment_end))
@@ -213,7 +255,7 @@ func _on_pulse_timer_timeout():
 	if current_segment_index == laser_segments.size() - 1:  # Last segment
 		# Get the endpoint of the last segment and trigger the explosion
 		var last_point = current_segment.to_global(current_segment.get_point_position(1))
-		_trigger_explosion(explosion_target)
+		_trigger_explosion(last_point)
 		get_parent().get_child(0).play("default")
 
 		# Reset spark emitter after finishing
@@ -262,9 +304,6 @@ func _trigger_explosion(last_point: Vector2):
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 8
 
-	# Variable to track if XP should be added (only once per explosion)
-	var xp_awarded = false
-
 	# Check for PlayerUnit within explosion radius
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.position.distance_to(last_point) <= explosion_radius:	
@@ -300,23 +339,9 @@ func _trigger_explosion(last_point: Vector2):
 			print("Structure removed from explosion")
 			xp_awarded = true  # Mark XP as earned for this explosion
 			clear_segments()
-			
-	# Add XP if at least one target was hit
-	if xp_awarded:
-		await get_tree().create_timer(1).timeout
-		add_xp()	
-				
+		
 	clear_segments()	
-
-	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
-	hud_manager.hide_special_buttons()	
-	
-	# Access the 'special' button within HUDManager
-	GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
-	hud_manager.thread.button_pressed = false
-	self.get_parent().has_attacked = true
-	self.get_parent().has_moved = true
-	get_parent().check_end_turn_conditions()		
+	get_zombie_in_area()			
 				
 func add_xp():
 	# Add XP

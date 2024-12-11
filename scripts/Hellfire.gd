@@ -94,6 +94,9 @@ func trigger_hellfire():
 	
 	get_parent().has_attacked = true
 	get_parent().has_moved = true
+	
+	get_parent().current_xp += 25
+	
 	get_parent().check_end_turn_conditions()		
 
 # Spawn an explosion at the specified position

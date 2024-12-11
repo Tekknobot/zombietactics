@@ -304,6 +304,8 @@ func check_and_attack_adjacent_zombies() -> void:
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()
 	
+	get_parent().current_xp += 25
+	
 	# Check if the turn should end
 	get_parent().check_end_turn_conditions()
 		

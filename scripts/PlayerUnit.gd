@@ -252,8 +252,7 @@ func display_movement_tiles() -> void:
 	# Update the HUD to reflect new stats
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.hide_special_buttons()	
-		
-			
+					
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
 
@@ -931,6 +930,10 @@ func check_end_turn_conditions() -> void:
 		
 		# Darken the unit to visually indicate its turn is over
 		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
+
+		# Update the HUD to reflect new stats
+		var hud_manager = get_parent().get_parent().get_node("HUDManager")
+		hud_manager.update_hud(self)
 					
 		#self.get_child(0).play("default")
 		end_turn()

@@ -491,6 +491,7 @@ func trigger_explosions_along_path(path_for_explosions: Array, delay: float = 0.
 		
 	# Check if the turn should end
 	await get_tree().create_timer(1).timeout
+	get_parent().current_xp += 25
 	get_parent().check_end_turn_conditions()
 
 func damage_units_in_area(center_position):

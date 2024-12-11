@@ -49,6 +49,8 @@ func _process(delta):
 
 	if GlobalManager.dash_toggle_active:
 		update_hover_tiles()
+	else:
+		clear_hover_tiles()	
 								
 	is_mouse_over_gui()
 	

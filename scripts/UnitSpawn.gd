@@ -140,15 +140,17 @@ func spawn_zombies():
 					zombie_instance = unit_radioactive_zombie.instantiate()
 				else:
 					zombie_instance = unit_zombie.instantiate()
+					
 			elif GlobalManager.current_map_index == 3:
 				# Mixed spawning: crusher zombies, radioactive zombies, and normal zombies
 				var roll = randi() % 10  # Random roll (0 to 9)
-				if roll < 2:  # 30% chance for radioactive zombie
+				if roll < 1:  # 10% chance for radioactive zombie (0)
 					zombie_instance = unit_radioactive_zombie.instantiate()
-				elif roll < 6:  # 70% chance for crusher zombie
+				elif roll < 6:  # 50% chance for crusher zombie (1 to 5)
 					zombie_instance = unit_crusher_zombie.instantiate()
-				else:  # 20% chance for normal zombie
+				else:  # 40% chance for normal zombie (6 to 9)
 					zombie_instance = unit_zombie.instantiate()
+
 			else:
 				# Only spawn normal zombies on other maps
 				zombie_instance = unit_zombie.instantiate()

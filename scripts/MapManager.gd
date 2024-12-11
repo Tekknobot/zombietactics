@@ -15,6 +15,8 @@ const DOWN_RIGHT_ROAD = 8
 
 # Preload PackedScenes for structures
 @onready var BUILDING_SCENE = preload("res://assets/scenes/prefab/building_c.tscn")
+@onready var BUILDING_SCENE_D = preload("res://assets/scenes/prefab/building_d.tscn")
+@onready var BUILDING_SCENE_E = preload("res://assets/scenes/prefab/building_e.tscn")
 @onready var DISTRICT_SCENE = preload("res://assets/scenes/prefab/district.tscn")
 @onready var STADIUM_SCENE = preload("res://assets/scenes/prefab/stadium.tscn")
 @onready var TOWER_SCENE = preload("res://assets/scenes/prefab/tower.tscn")
@@ -262,41 +264,56 @@ func spawn_structures():
 	# Store positions of spawned structures for distance checks
 	var spawned_positions: Array = []
 
+	# Create a list of all possible positions on the map
+	var all_positions: Array = []
 	for x in range(grid_width):
 		for y in range(grid_height):
-			# Get the tile ID based on the noise value for this position
-			var tile_id = $TileMap.get_cell_source_id(0, Vector2i(x, y))
+			# Exclude perimeter tiles (x == 0, y == 0, x == grid_width - 1, y == grid_height - 1)
+			if x > 0 and x < grid_width - 1 and y > 0 and y < grid_height - 1:
+				all_positions.append(Vector2i(x, y))
 
-			# Only spawn on DIRT or GRASS and make sure the tile is not a road or already occupied
-			if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id) and not is_occupied(Vector2i(x, y)):
-				if rng.randi_range(0, 100) < 100:  # 100% chance (you may want to adjust this)
-					var structure_type = rng.randi_range(0, 4)
+	# Shuffle the positions to randomize spawning order
+	all_positions.shuffle()
 
-					match structure_type:
-						0:
-							if building_count < max_buildings:  # Check building limit
-								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [1, 2, 3]):  # Check against districts, stadiums, and towers
-									spawn_structure(BUILDING_SCENE, x, y)  # Allow multiple buildings
-									building_count += 1
-									spawned_positions.append(Vector2i(x, y))  # Track this position
-						1:
-							if district_count < max_districts:  # Only spawn up to max districts
-								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [0, 2, 3]):  # Check against buildings, stadiums, and towers
-									spawn_structure(DISTRICT_SCENE, x, y)
-									district_count += 1
-									spawned_positions.append(Vector2i(x, y))  # Track this position
-						2:
-							if stadium_count < max_stadiums:  # Only spawn up to max stadiums
-								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [0, 1, 3]):  # Check against buildings, districts, and towers
-									spawn_structure(STADIUM_SCENE, x, y)
-									stadium_count += 1
-									spawned_positions.append(Vector2i(x, y))  # Track this position
-						3:
-							if tower_count < max_towers:  # Only spawn up to max towers
-								if can_spawn(Vector2i(x, y), spawned_positions, min_distance_between_structures, [0, 1, 2]):  # Check against buildings, districts, and stadiums
-									spawn_structure(TOWER_SCENE, x, y)
-									tower_count += 1
-									spawned_positions.append(Vector2i(x, y))  # Track this position
+	# Iterate over the randomized positions
+	for position in all_positions:
+		var x = position.x
+		var y = position.y
+
+		# Get the tile ID based on the noise value for this position
+		var tile_id = $TileMap.get_cell_source_id(0, position)
+
+		# Only spawn on DIRT or GRASS and make sure the tile is not a road or already occupied
+		if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id) and not is_occupied(position):
+			if rng.randi_range(0, 100) < 100:  # 100% chance (you may want to adjust this)
+				var structure_type = rng.randi_range(0, 4)
+
+				match structure_type:
+					0:
+						if building_count < max_buildings:  # Check building limit
+							if can_spawn(position, spawned_positions, min_distance_between_structures, [1, 2, 3]):  # Check against districts, stadiums, and towers
+								var building = [BUILDING_SCENE, BUILDING_SCENE_D, BUILDING_SCENE_E]
+								spawn_structure(building[randi_range(0,1)], x, y)  # Allow multiple buildings
+								building_count += 1
+								spawned_positions.append(position)  # Track this position
+					1:
+						if district_count < max_districts:  # Only spawn up to max districts
+							if can_spawn(position, spawned_positions, 3, [0, 2, 3]):  # Check against buildings, stadiums, and towers
+								spawn_structure(DISTRICT_SCENE, x, y)
+								district_count += 1
+								spawned_positions.append(position)  # Track this position
+					2:
+						if stadium_count < max_stadiums:  # Only spawn up to max stadiums
+							if can_spawn(position, spawned_positions, 3, [0, 1, 3]):  # Check against buildings, districts, and towers
+								spawn_structure(STADIUM_SCENE, x, y)
+								stadium_count += 1
+								spawned_positions.append(position)  # Track this position
+					3:
+						if tower_count < max_towers:  # Only spawn up to max towers
+							if can_spawn(position, spawned_positions, 3, [0, 1, 2]):  # Check against buildings, districts, and stadiums
+								spawn_structure(TOWER_SCENE, x, y)
+								tower_count += 1
+								spawned_positions.append(position)  # Track this position
 
 	map_ready = true
 

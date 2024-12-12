@@ -23,8 +23,8 @@ var map_cleared: bool = false
 
 var active_zombie: Area2D = null
 
-var zombies_processed = -1  # Counter for zombies processed
-var zombie_limit = 9
+var zombies_processed = 0  # Counter for zombies processed
+var zombie_limit = 4
 
 
 

@@ -314,11 +314,11 @@ func process_zombie_queue() -> void:
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	update_astar_grid()
-	zombie_spawn_manager.spawn_zombies()
+	#zombie_spawn_manager.spawn_zombies()
 	
 	
 	print("Player action completed. Starting zombie movement.")
-	await get_tree().create_timer(2).timeout 
+	await get_tree().create_timer(1).timeout 
 	mission_manager.check_mission_manager()
 
 	# Populate the zombie queue

@@ -33,33 +33,30 @@ func spawn_zombies():
 		print("No player units or structures found.")
 		return
 
-	# Find the furthest structure from any player unit
+	# Find the furthest non-demolished structure from any player unit
 	var furthest_structure = null
 	var furthest_distance = 0  # Start with 0 as we're looking for the max distance
 
 	for structure in structures:
+		if structure.is_demolished:
+			continue  # Skip demolished structures
+
 		for player in player_units:
 			if not structure or not player:
 				continue  # Avoid null nodes
 			var distance = player.global_position.distance_to(structure.global_position)
-			if distance > furthest_distance:  # Change comparison to '>'
+			if distance > furthest_distance:
 				furthest_distance = distance
 				furthest_structure = structure
 
-	if furthest_structure:
-		print("Furthest structure: ", furthest_structure.name, " at ", furthest_structure.global_position)
-	else:
-		print("No valid furthest structure found.")
-
-
 	if not furthest_structure:
-		print("No valid closest structure found.")
+		print("No valid non-demolished structures found.")
 		return
 
-	# Debug: Closest structure found
+	# Debug: Furthest non-demolished structure found
 	print("Furthest structure: ", furthest_structure.name, " at ", furthest_structure.global_position)
 
-	# Spawn 4 zombies adjacent to the closest structure
+	# Spawn 4 zombies adjacent to the furthest structure
 	var structure_tile_pos = tilemap.local_to_map(furthest_structure.global_position)
 	var spawn_positions = get_adjacent_positions(structure_tile_pos)
 	var zombies_spawned = 0
@@ -87,8 +84,7 @@ func spawn_zombies():
 					camera.focus_on_position(zombie_instance.global_position)
 
 				zombies_spawned += 1
-				
-		await get_tree().create_timer(0.5).timeout
+				await get_tree().create_timer(0.5).timeout
 
 	if zombies_spawned == 0:
 		print("No zombies were spawned. Check spawn positions.")

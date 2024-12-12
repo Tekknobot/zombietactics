@@ -70,8 +70,9 @@ var player_unit_is_selected = false
 @export var levelup_audio: AudioStream
 @export var dog_hurt_audio: AudioStream
 
-@onready var turn_manager = get_parent().get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
-@onready var mission_manager = get_parent().get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
+@onready var turn_manager = get_parent().get_node("/root/MapManager/TurnManager")  
+@onready var mission_manager = get_parent().get_node("/root/MapManager/MissionManager")  
+@onready var zombie_spawn_manager = get_parent().get_node("/root/MapManager/SpawnZombies")  
 
 var active_zombie_id = 0  # Start with the first zombie's ID (0-indexed)
 var zombies: Array  # This will store the zombies sorted by zombie_id
@@ -313,6 +314,7 @@ func process_zombie_queue() -> void:
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	update_astar_grid()
+	zombie_spawn_manager.spawn_zombies()
 	
 	print("Player action completed. Starting zombie movement.")
 	await get_tree().create_timer(1).timeout 

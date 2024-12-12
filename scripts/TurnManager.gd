@@ -48,15 +48,15 @@ func end_current_turn() -> void:
 	# Get all player units
 	var all_player_units = get_tree().get_nodes_in_group("player_units")
 	
-	# Check if all player units have `has_used_turn = true`
-	var all_turns_used = true
+	# Count the number of players who have used their turn
+	var used_turns_count = 0
 	for player in all_player_units:
-		if not player.has_used_turn:  # If any player has not used their turn
-			all_turns_used = false
-			break  # No need to check further
+		if player.has_used_turn:
+			used_turns_count += 1
 	
-	# If all turns are used, fire `on_player_action_completed`
-	if all_turns_used and trigger_zombies == false:
+	# If 3 or more units have used their turns and zombies are not triggered, fire event
+	if used_turns_count >= 3 and trigger_zombies == false:
+		print("Three player units have used their turns. Ending player turn.")
 		on_player_action_completed()
 		trigger_zombies = true
 

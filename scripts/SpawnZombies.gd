@@ -80,8 +80,15 @@ func spawn_zombies():
 				
 				# Debug: Zombie spawned
 				print("Spawned zombie at position: ", tile_pos)
-				
+
+				# Camera focuses on the active zombie
+				var camera = get_node_or_null("/root/MapManager/Camera2D")
+				if camera:
+					camera.focus_on_position(zombie_instance.global_position)
+
 				zombies_spawned += 1
+				
+		await get_tree().create_timer(0.5).timeout
 
 	if zombies_spawned == 0:
 		print("No zombies were spawned. Check spawn positions.")

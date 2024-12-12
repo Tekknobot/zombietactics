@@ -286,13 +286,13 @@ func spawn_structures():
 		# Only spawn on DIRT or GRASS and make sure the tile is not a road or already occupied
 		if (tile_id == DIRT or tile_id == GRASS) and not is_road(tile_id) and not is_occupied(position):
 			if rng.randi_range(0, 100) < 100:  # 100% chance (you may want to adjust this)
-				var structure_type = rng.randi_range(0, 4)
+				var structure_type = rng.randi_range(0, 5)
 
 				match structure_type:
 					0:
 						if building_count < max_buildings:  # Check building limit
 							if can_spawn(position, spawned_positions, min_distance_between_structures, [1, 2, 3]):  # Check against districts, stadiums, and towers
-								var building = [BUILDING_SCENE, BUILDING_SCENE_D, BUILDING_SCENE_E]
+								var building = [BUILDING_SCENE, BUILDING_SCENE_D]
 								spawn_structure(building[randi_range(0,1)], x, y)  # Allow multiple buildings
 								building_count += 1
 								spawned_positions.append(position)  # Track this position
@@ -313,6 +313,12 @@ func spawn_structures():
 							if can_spawn(position, spawned_positions, 3, [0, 1, 2]):  # Check against buildings, districts, and stadiums
 								spawn_structure(TOWER_SCENE, x, y)
 								tower_count += 1
+								spawned_positions.append(position)  # Track this position
+					4:
+						if building_count < max_buildings:  # Only spawn up to max towers
+							if can_spawn(position, spawned_positions, 3, [0, 1, 2]):  # Check against buildings, districts, and stadiums
+								spawn_structure(BUILDING_SCENE_E, x, y)
+								building_count += 1
 								spawned_positions.append(position)  # Track this position
 
 	map_ready = true

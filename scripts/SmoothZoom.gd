@@ -10,6 +10,11 @@ var is_zooming_out = false
 var target_tile_pos: Vector2 = Vector2.ZERO  # Tile position to focus on
 var return_to_default_timer: Timer = null
 
+var is_mouse_wheel_down = false
+var is_mouse_wheel_up = false
+
+var target_zoom = Vector2.ONE
+
 # Variables to store the original camera settings
 var original_position: Vector2 = Vector2.ZERO
 var original_zoom: Vector2 = Vector2(2, 2)
@@ -40,6 +45,8 @@ func focus_on_tile(tilemap: TileMap, tile_coords: Vector2i):
 
 func _process(delta):
 	if is_zooming_in:
+		is_mouse_wheel_down = false
+		is_mouse_wheel_up = false
 		# Smoothly move the camera to the tile position
 		position = position.lerp(target_tile_pos, zoom_speed * delta)
 		# Smoothly zoom in
@@ -49,14 +56,20 @@ func _process(delta):
 			is_zooming_in = false
 			emit_signal("zoom_completed")  # Notify that zooming in is complete
 			return_to_default_timer.start(focus_duration)  # Start the timer to return to default
-
 	elif is_zooming_out:
+		is_mouse_wheel_down = false
+		is_mouse_wheel_up = false		
 		# Smoothly return to the original position and zoom
 		position = position.lerp(original_position, zoom_speed * delta)
 		zoom = zoom.lerp(original_zoom, zoom_speed * delta)
 		if position.distance_to(original_position) < 0.1 and zoom.distance_to(original_zoom) < 0.1:
 			is_zooming_out = false
 			emit_signal("zoom_completed")  # Notify that zooming in is complete
+
+	if is_mouse_wheel_up and is_zooming_in == false:
+		zoom = zoom.lerp(target_zoom, zoom_speed * delta)
+	elif is_mouse_wheel_down and is_zooming_in == false:
+		zoom = zoom.lerp(target_zoom, zoom_speed * delta)
 
 	# Handle dragging mechanic
 	if is_dragging:
@@ -75,6 +88,14 @@ func _input(event):
 			else:
 				# Stop dragging
 				is_dragging = false
+				
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:	
+			is_mouse_wheel_down = true
+			target_zoom = Vector2(1,1)
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			is_mouse_wheel_up = true	
+			target_zoom = Vector2(2,2)
+			
 
 func _on_return_to_default_timeout():
 	is_zooming_out = false

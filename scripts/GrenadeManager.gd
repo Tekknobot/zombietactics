@@ -76,6 +76,23 @@ func _input(event: InputEvent) -> void:
 			if event.pressed:
 				
 				explosions_triggered = 0
+
+				var mouse_position = get_global_mouse_position() 
+				mouse_position.y += 8
+				var mouse_pos = Map.local_to_map(mouse_position)
+					
+				# Get the current position in tile coordinates
+				var current_position = mouse_pos
+
+				# Get the current facing direction of the parent (1 for right, -1 for left)
+				var current_facing = 1 if get_parent().scale.x > 0 else -1
+
+				# Determine sprite flip based on target_position relative to the parent
+				if get_global_mouse_position().x > global_position.x and current_facing == 1:
+					get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
+				elif get_global_mouse_position().x < global_position.x and current_facing == -1:
+					get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
+					
 				
 				await find_closest_zombies(get_global_mouse_position())  # Find 2 closest zombies
 

@@ -689,7 +689,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	projectile.target_position = target_world_pos
 	projectile.speed = 200.0  # Adjust as needed
 	
-	clear_attack_range_tiles()
+	await clear_attack_range_tiles()
 	#on_player_action_completed()
 	has_attacked = true
 	has_moved = true
@@ -709,6 +709,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	hud_manager.update_hud(self)	
 	hud_manager.hide_special_buttons()				
 	#check_end_turn_conditions()
+	get_child(0).play("default")
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:

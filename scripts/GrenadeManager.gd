@@ -11,7 +11,7 @@ var onTrajectory = false  # Indicates if missile is currently on a trajectory
 var right_click_position: Vector2
 var target_position: Vector2
 
-var dynamite_launched : int = 0
+var genade_launched : int = 0
 
 var hud: Control
 
@@ -27,11 +27,12 @@ var layer: int
 var missiles_canceled = false
 
 # Declare necessary variables for attack
-@export var dynamite_scene: PackedScene  # Packed scene for the projectile
+@export var grenade_scene: PackedScene  # Packed scene for the projectile
 
 @onready var mission_manager = get_node("/root/MapManager/MissionManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
 
+var explosions_triggered: int = 0
 
 # Declare a flag to track if XP has been added
 var xp_added: bool = false
@@ -47,108 +48,87 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	is_mouse_over_gui()
 	
-func _input(event: InputEvent) -> void:			
+func _input(event: InputEvent) -> void:
 	# Only respond to clicks if the special toggle is active
-	if not GlobalManager.dynamite_toggle_active:
+	if not GlobalManager.grenade_toggle_active:
 		print("Special toggle is off, ignoring mouse clicks.")
 		return
-		
-	if dynamite_launched >= 1:
+
+	if genade_launched >= 1:
 		return
-			
+
 	# Handle mouse button events (right and left-click)
 	if event is InputEventMouseButton:
 		# Block gameplay input if the mouse is over GUI
 		if is_mouse_over_gui():
 			print("Input blocked by GUI.")
 			return  # Prevent further input handling
-			
+
 		# Right-click to set the target position
 		if event.button_index == MOUSE_BUTTON_RIGHT and not onTrajectory:
 			if event.pressed:
 				# Set the position of the right-click as the target position
 				right_click_position = get_global_mouse_position()
 				print("Right-click position set to:", right_click_position)
-					
+
 		# Left-click to launch missile trajectory (only if right-click has been used to set target)
-		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory and dynamite_launched < 3:
-			if event.pressed:													
-				# Get all nodes in the 'hovertile' group
-				var hover_tiles = get_tree().get_nodes_in_group("hovertile")
+		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory and genade_launched < 1:
+			if event.pressed:
+				
+				explosions_triggered = 0
+				
+				await find_closest_zombies(get_global_mouse_position())  # Find 2 closest zombies
 
-				# Iterate through the list and find the HoverTile node
-				for hover_tile in hover_tiles:
-					if hover_tile.name == "HoverTile":
-						# Check if 'selected_player' exists on the hover_tile
-						if hover_tile.selected_player:
-							# Access the selected player's position and assign it to 'tile_pos'
-							var selected_player = hover_tile.selected_player
-							var selected_player_position = selected_player.position  # Assuming position is a Vector2
-							
-							player_to_act = selected_player
-							
-							# Convert the world position of the player to the tile's position
-							var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-							tile_pos = tilemap.local_to_map(selected_player_position)  # Convert to map coordinates (tile position)
-							
-							print("Selected player's tile position:", tile_pos)  # Optional: Debug log to confirm the position
-				
-				print("Left-click detected, initiating trajectory.")
-				
-				# Ensure the selected player has not already attacked
-				if player_to_act.has_attacked:
-					print("Player has already attacked. Trajectory will not be started.")										
-					return  # Exit the function without starting the trajectory
-				
-				# Get mouse position for trajectory path and adjust for map conversion
-				var mouse_position = get_global_mouse_position()
-				mouse_position.y += 8  # Adjust for map-specific offsets if needed
-				var mouse_local = Map.local_to_map(mouse_position)
-				print("Mouse position adjusted to:", mouse_position, "converted to map coordinates:", mouse_local)
+				# Hide special buttons and trigger zombie actions
+				var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")
+				hud_manager.hide_special_buttons()
+				clear_zombie_tiles()
 
-				# Ensure the mouse position is within map boundaries
-				var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-				var map_size = tilemap.get_used_rect()  # Get the map's used rectangle
-				var map_width = map_size.size.x
-				var map_height = map_size.size.y
-				
-				# Check if the mouse position is within map bounds
-				if mouse_local.x >= 0 and mouse_local.x < map_width and mouse_local.y >= 0 and mouse_local.y < map_height:
-					# The mouse position is within the map boundaries
-					# Create a new trajectory instance
-					var trajectory_instance = self.duplicate()
-					self.get_parent().add_child(trajectory_instance)
-					trajectory_instance.add_to_group("trajectories")
-					print("Trajectory instance created and added to the scene.")
-					
-					# Convert the global mouse position to the local position relative to the TileMap
-					var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
-					var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
 
-					# Convert the target position (assumed to be global) to local
-					var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
-					
-					dynamite_launched += 1
-					if dynamite_launched == 1:
-						add_xp()  # Add XP	
-															
-					# Start the trajectory
-					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
-					
-					player_to_act.has_attacked = true
-					player_to_act.has_moved = true
-					player_to_act.check_end_turn_conditions()
-					
-					var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
-					hud_manager.hide_special_buttons()	
-					
-					# Trigger zombie action: find and chase player
-					clear_zombie_tiles()
-					
-				else:
-					# If the mouse position is out of bounds, print a message or handle it as needed
-					print("Mouse position out of map bounds:", mouse_local)
-					return
+func find_closest_zombies(target_position: Vector2):
+	# Get all zombie positions
+	var zombies = get_tree().get_nodes_in_group("zombies")  # Custom function to fetch all zombies on the map
+	var zombie_positions = []
+	for zombie in zombies:
+		zombie_positions.append(zombie.global_position)
+
+	# Sort zombies by distance from the trigger location
+	zombie_positions.sort_custom(func(a, b):
+		return target_position.distance_to(a) < target_position.distance_to(b))
+
+	# Select the 7 closest zombies
+	var closest_zombies = zombie_positions.slice(0, min(8, zombie_positions.size()))
+
+	# Trigger trajectories towards the closest zombies sequentially
+	for zombie_pos in closest_zombies:
+		get_parent().get_child(0).play("attack")		
+		await get_tree().create_timer(0.1).timeout
+		start_trajectory(zombie_pos, get_parent().position)
+		
+func _compare_distance_to_target(zombie_a: Node2D, zombie_b: Node2D, target_position: Vector2) -> bool:
+	return zombie_a.position.distance_to(target_position) < zombie_b.position.distance_to(target_position)
+
+
+func launch_trajectory_to_target(target_position: Vector2) -> void:
+	var start_position = player_to_act.position
+	var trajectory_instance = line2D_scene.instantiate()
+	add_child(trajectory_instance)
+	trajectory_instance.add_to_group("trajectories")
+
+	var control1 = Vector2(start_position.x, start_position.y - 200)  # Adjust for arc
+	var control2 = Vector2(target_position.x, target_position.y - 200)
+	var points = generate_bezier_curve(start_position, control1, control2, target_position)
+
+	# Visualize the trajectory
+	for point in points:
+		trajectory_instance.add_point(point)
+
+	# Instantiate and animate the grenade
+	if grenade_scene:
+		var grenade_inst = grenade_scene.instantiate()
+		add_child(grenade_inst)
+		grenade_inst.global_position = start_position
+		animate_grenade_trajectory(grenade_inst, points)
 
 func debug_ui_rectangles():
 	var hud_controls = get_tree().get_nodes_in_group("hud_controls")
@@ -175,6 +155,22 @@ func clear_zombie_tiles():
 	# Iterate over each zombie in the group
 	for zombie in zombies:
 		zombie.clear_movement_tiles()
+
+func launch_grenade(start: Vector2, points: Array):
+	if grenade_scene and genade_launched == 0:  # Ensure only one grenade can be launched
+		var grenade_inst = grenade_scene.instantiate()
+		add_child(grenade_inst)
+		grenade_inst.global_position = start
+		grenade_inst.attacker = get_parent()
+		grenade_inst.target_position = points[points.size() - 1]
+		print("Grenade instance created and placed at start position.")
+
+		# Animate the grenade along the trajectory points
+		await animate_grenade_trajectory(grenade_inst, points)
+
+		grenade_inst.queue_free()
+		genade_launched += 1
+
 						
 # Function to start the missile trajectory and visualize with Line2D
 func start_trajectory(start: Vector2, target: Vector2) -> void:
@@ -207,25 +203,27 @@ func start_trajectory(start: Vector2, target: Vector2) -> void:
 	for point in points:
 		line_inst.add_point(point)
 
-	# Instantiate and animate the dynamite projectile
-	if dynamite_scene:
-		var dynamite_inst = dynamite_scene.instantiate()
-		add_child(dynamite_inst)
-		dynamite_inst.global_position = start
-		print("Dynamite instance created and placed at start position.")
+	# Instantiate and animate the grenade projectile
+	if grenade_scene:
+		var grenade_inst = grenade_scene.instantiate()
+		add_child(grenade_inst)
+		grenade_inst.global_position = start
+		grenade_inst.attacker = get_parent()
+		grenade_inst.target_position = points[points.size() - 1]
+		print("Grenade instance created and placed at start position.")
 
-		# Animate the dynamite along the trajectory points
-		await animate_dynamite_trajectory(dynamite_inst, points)
+		# Animate the grenade along the trajectory points
+		await animate_grenade_trajectory(grenade_inst, points)
 		
 		# Cleanup after animation
-		dynamite_inst.queue_free()
+		grenade_inst.queue_free()
 
 	onTrajectory = false
 	
 	print("Trajectory animation completed and cleaned up.")
 
-# Function to animate the dynamite projectile along the Bézier curve points
-func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
+# Function to animate the grenade projectile along the Bézier curve points
+func animate_grenade_trajectory(grenade_inst: Node2D, points: Array) -> void:
 	var total_time = 0.01  # Total time to move from start to end (in seconds)
 	var steps = points.size()
 	var step_time = total_time / steps  # Time per step to move along the path
@@ -245,7 +243,7 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 			# Calculate the time ratio
 			var t = elapsed_time / step_time
 			# Lerp between start and end point based on the ratio
-			dynamite_inst.global_position = start_point.lerp(end_point, t)
+			grenade_inst.global_position = start_point.lerp(end_point, t)
 			elapsed_time += get_process_delta_time()
 			
 			await get_tree().create_timer(0.02).timeout  # Wait until the next frame (await instead of yield)
@@ -253,16 +251,24 @@ func animate_dynamite_trajectory(dynamite_inst: Node2D, points: Array) -> void:
 		# Reset elapsed time for the next segment
 		elapsed_time = 0.0
 
-	# Ensure dynamite reaches the final point exactly
-	dynamite_inst.global_position = points[points.size() - 1]
+	# Ensure grenade reaches the final point exactly
+	grenade_inst.global_position = points[points.size() - 1]
 	
 	_trigger_explosion(points[points.size() - 1])
-	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 					
 	# Access the 'special' button within HUDManager
-	var dynamite_button = hud_manager.get_node("HUD/Dynamite")
-	dynamite_button.button_pressed = false	
-	GlobalManager.dynamite_toggle_active = false
+	var grenade_button = hud_manager.get_node("HUD/Grenade")
+	grenade_button.button_pressed = true	
+	GlobalManager.grenade_toggle_active = false
+	
+	explosions_triggered += 1
+	
+	if explosions_triggered >= 8:
+		add_xp()
+		get_parent().has_attacked = true
+		get_parent().has_moved = true
+		get_parent().check_end_turn_conditions()
 
 # Call this function after every player action
 func on_player_action_completed():
@@ -302,24 +308,20 @@ func _trigger_explosion(last_point: Vector2):
 	
 	# Instantiate the explosion effect at the target's position
 	var explosion_instance = explosion_scene.instantiate()
-	get_parent().add_child(explosion_instance)
+	get_parent().get_parent().get_parent().get_parent().add_child(explosion_instance)
 	explosion_instance.position = last_point
 	print("Explosion instance added to scene at:", last_point)
 
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 1.0
-	
-	var xp_awarded = false
 			
 	# Check for PlayerUnit within explosion radius
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.position.distance_to(last_point) <= explosion_radius:	
 			player.flash_damage()
 			player.apply_damage(player.attack_damage)
-					
-			xp_awarded = true  # Mark XP as earned for this explosion
-
-			var hud_manager = get_parent().get_node("HUDManager") 
+				
+			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager") 
 			hud_manager.update_hud(player)	
 
 	# Check for ZombieUnit within explosion radius
@@ -328,34 +330,29 @@ func _trigger_explosion(last_point: Vector2):
 			zombie.flash_damage()
 			# Check for PlayerUnit within explosion radius
 			for player in get_tree().get_nodes_in_group("player_units"):
-				if player.player_name == "Dutch. Major":			
+				if player.player_name == "Logan. Raines":			
 					zombie.apply_damage(player.attack_damage)	
 						
 			print("Zombie Unit removed from explosion")
 			
-			xp_awarded = true
-			
-			var hud_manager = get_parent().get_node("HUDManager") 
+			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager") 
 			hud_manager.update_hud_zombie(zombie)
 
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
-	
-	# Add XP if at least one target was hit
-	if xp_awarded:
-		await get_tree().create_timer(1).timeout
-		add_xp()		
+			
 			
 func add_xp():
 	# Add XP
 	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
-	var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	
 	# Access the 'special' button within HUDManager
-	var missile_button = hud_manager.get_node("HUD/Missile")
-	GlobalManager.missile_toggle_active = false  # Deactivate the special toggle
+	var mek_button = hud_manager.get_node("HUD/Mek")
+	GlobalManager.mek_toggle_active = false  # Deactivate the special toggle
+	mek_button.button_pressed = false
 
 	# Get all nodes in the 'hovertile' group
 	var hover_tiles = get_tree().get_nodes_in_group("hovertile")

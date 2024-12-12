@@ -21,6 +21,8 @@ extends CanvasLayer
 @onready var barrage = $HUD/Barrage
 @onready var octoblast = $HUD/Octoblast
 
+@onready var grenade = $HUD/Grenade
+
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
 
@@ -74,7 +76,11 @@ func _ready():
 	if octoblast:
 		octoblast.connect("toggled", Callable(self, "_on_octoblast_toggled"))
 		print("Octoblast connected")
-									
+
+	if grenade:
+		grenade.connect("toggled", Callable(self, "_on_grenade_toggled"))
+		print("Grenade connected")
+													
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -87,7 +93,7 @@ func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.missile_toggle_active = true  # Set the flag to true
 		print("Missile toggle activated!")
-		
+		landmine.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()			
@@ -99,7 +105,7 @@ func _on_landmine_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.landmine_toggle_active = true  # Set the flag to true
 		print("Landmine toggle activated!")	
-				
+		missile.button_pressed = false		
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
@@ -111,7 +117,7 @@ func _on_mek_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.mek_toggle_active = true  # Set the flag to true
 		print("Mek toggle activated!")	
-		
+		grenade.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
@@ -123,13 +129,25 @@ func _on_dynamite_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.dynamite_toggle_active = true  # Set the flag to true
 		print("Dynamite toggle activated!")	
-
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
 	else:
 		GlobalManager.dynamite_toggle_active = false  # Set the flag to false
 		print("Dynamite toggle deactivated!")
+
+func _on_grenade_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.grenade_toggle_active = true  # Set the flag to true
+		mek.button_pressed = false
+		print("Grenade toggle activated!")	
+
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.grenade_toggle_active = false  # Set the flag to false
+		print("Grenade toggle deactivated!")
 
 func _on_thread_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -369,7 +387,10 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "Logan. Raines":
 		mek.visible = true
-		
+
+	if character.player_name == "Logan. Raines":
+		grenade.visible = true
+				
 	if character.player_name == "Dutch. Major":
 		dynamite.visible = true
 		
@@ -405,3 +426,5 @@ func hide_special_buttons():
 	hellfire.visible = false
 	barrage.visible = false
 	octoblast.visible = false
+	
+	grenade.visible = false

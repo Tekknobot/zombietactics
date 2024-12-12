@@ -292,8 +292,7 @@ func spawn_structures():
 					0:
 						if building_count < max_buildings:  # Check building limit
 							if can_spawn(position, spawned_positions, min_distance_between_structures, [1, 2, 3]):  # Check against districts, stadiums, and towers
-								var building = [BUILDING_SCENE, BUILDING_SCENE_D]
-								spawn_structure(building[randi_range(0,1)], x, y)  # Allow multiple buildings
+								spawn_structure(BUILDING_SCENE, x, y)  # Allow multiple buildings
 								building_count += 1
 								spawned_positions.append(position)  # Track this position
 					1:
@@ -315,8 +314,14 @@ func spawn_structures():
 								tower_count += 1
 								spawned_positions.append(position)  # Track this position
 					4:
-						if building_count < max_buildings:  # Only spawn up to max towers
-							if can_spawn(position, spawned_positions, 3, [0, 1, 2]):  # Check against buildings, districts, and stadiums
+						if building_count < 8:  # Only spawn up to max towers
+							if can_spawn(position, spawned_positions, min_distance_between_structures, [0, 1, 2]):  # Check against buildings, districts, and stadiums
+								spawn_structure(BUILDING_SCENE_D, x, y)
+								building_count += 1
+								spawned_positions.append(position)  # Track this position
+					5:
+						if building_count < 8:  # Only spawn up to max towers
+							if can_spawn(position, spawned_positions, min_distance_between_structures, [0, 1, 2]):  # Check against buildings, districts, and stadiums
 								spawn_structure(BUILDING_SCENE_E, x, y)
 								building_count += 1
 								spawned_positions.append(position)  # Track this position

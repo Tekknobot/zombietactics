@@ -93,7 +93,6 @@ func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
 			return true
 	return false
 
-
 # Handles right-click to toggle between attack and movement range display
 func handle_right_click() -> void:
 	if selected_player:

@@ -36,13 +36,12 @@ script = ExtResource("1_ymcj8")
 
 [node name="Navigation" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
+offset_top = 40.0
+offset_bottom = 40.0
 grow_horizontal = 0
-grow_vertical = 0
 script = ExtResource("3_jawwu")
 
 [node name="Button" type="Button" parent="Navigation"]
@@ -62,10 +61,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 477.0
+offset_left = 548.0
 offset_top = -74.0
-offset_right = -77.0
-offset_bottom = -6.0
+offset_right = 548.0
+offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 0
 

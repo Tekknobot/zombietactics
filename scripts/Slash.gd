@@ -203,6 +203,16 @@ func is_tile_movable(tile_pos: Vector2i) -> bool:
 		return false
 	return true
 
+# Check if a tile is water or not
+func is_water_tile_at_position(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	if tilemap == null:
+		push_error("TileMap node not found at the specified path.")
+		return false
+	
+	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
+	return tile_id == WATER_TILE_ID
+	
 # Check if a tile is a water tile
 func is_water_tile(tile_id: int) -> bool:
 	return tile_id == WATER_TILE_ID
@@ -264,9 +274,8 @@ func display_slash_attack_range():
 				break  # Stop if out of bounds
 
 			# Check if the tile is movable or occupied
-			if is_structure(current_pos) or is_unit_present(current_pos):
-				highlight_attack_tile(current_pos, tilemap)
-				break  # Include the structure/unit in the range, then stop
+			if is_structure(current_pos) or is_unit_present(current_pos) or is_water_tile_at_position(current_pos):
+				break
 			highlight_attack_tile(current_pos, tilemap)
 
 # Helper function to highlight a specific tile

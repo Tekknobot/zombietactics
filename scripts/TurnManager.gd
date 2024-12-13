@@ -7,6 +7,8 @@ var current_group: String = "player_units"  # Which group's turn it is ("player_
 var current_unit_index: int = 0  # Index of the current unit in the current group
 
 var trigger_zombies: bool = false
+var used_turns_count: int = 0
+var max_turn_count: int = 3
 
 signal player_action_completed
 
@@ -49,13 +51,13 @@ func end_current_turn() -> void:
 	var all_player_units = get_tree().get_nodes_in_group("player_units")
 	
 	# Count the number of players who have used their turn
-	var used_turns_count = 0
+	used_turns_count = 0
 	for player in all_player_units:
 		if player.has_used_turn:
 			used_turns_count += 1
 	
 	# If 3 or more units have used their turns and zombies are not triggered, fire event
-	if used_turns_count >= 3 and trigger_zombies == false:
+	if used_turns_count >= max_turn_count and trigger_zombies == false:
 		print("Three player units have used their turns. Ending player turn.")
 		on_player_action_completed()
 		trigger_zombies = true

@@ -1,10 +1,13 @@
 extends CanvasLayer
 
 @onready var portrait = $HUD/Portrait
-@onready var health_bar = $HUD/HealthBar
+
 @onready var player_name = $HUD/LevelStatName/Name
-@onready var xp_bar = $HUD/XPBar
 @onready var level = $HUD/LevelStatName/Level
+@onready var turn = $HUD/LevelStatName/Turn
+
+@onready var health_bar = $HUD/HealthBar
+@onready var xp_bar = $HUD/XPBar
 
 @onready var hp = $HUD/StatContainer/HP
 @onready var xp = $HUD/StatContainer/XP
@@ -93,6 +96,9 @@ func _on_endturn_pressed() -> void:
 	for hovertile in hovertiles:
 		hovertile.clear_action_tiles()
 	turn_manager.on_player_action_completed()
+	turn_manager.used_turns_count = 0
+	for hovertile in hovertiles:
+		update_hud(hovertile.selected_player)
 
 func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -303,6 +309,13 @@ func update_hud(character: PlayerUnit):
 		level.text = "Level " + str(character.current_level)
 		level.adjust_size_to_content()
 		print("Level updated to: ", level.text)
+	else:
+		print("Level node is null!")
+
+	if turn:
+		turn.text = "Group Turn: " + str(turn_manager.used_turns_count + 1) + " of " + str(turn_manager.max_turn_count)
+		turn.adjust_size_to_content()
+		print("Turn updated to: ", turn.text)
 	else:
 		print("Level node is null!")
 

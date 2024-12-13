@@ -119,6 +119,11 @@ func shadow_slash(direction: Vector2):
 	#disable_bullet_time()
 	await get_tree().create_timer(0.1).timeout
 	is_slashing = false
+	
+	get_parent().current_xp += 25
+	if get_parent().current_xp >= get_parent().xp_for_next_level:
+		get_parent().level_up()	
+	
 	get_parent().get_child(0).play("default")
 	get_parent().has_moved = true
 	get_parent().has_attacked = true

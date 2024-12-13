@@ -3352,7 +3352,7 @@ offset_bottom = -40.0
 theme_override_constants/separation = 2
 
 [node name="Name" type="RichTextLabel" parent="LevelStatName"]
-custom_minimum_size = Vector2(65, 0)
+custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
@@ -3372,17 +3372,28 @@ text = "Level 1"
 autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 
+[node name="Turn" type="RichTextLabel" parent="LevelStatName"]
+custom_minimum_size = Vector2(116, 0)
+layout_mode = 2
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_fonts/normal_font = ExtResource("3_fyyii")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_1gp3x")
+text = "TURN: 1 of 3"
+autowrap_mode = 0
+script = ExtResource("3_y7bf6")
+
 [node name="StatContainer" type="HBoxContainer" parent="."]
 custom_minimum_size = Vector2(315, 26)
 layout_mode = 0
 offset_left = 6.0
 offset_top = -38.0
-offset_right = 382.0
+offset_right = 501.0
 offset_bottom = -6.0
 theme_override_constants/separation = 2
 
 [node name="ATK" type="RichTextLabel" parent="StatContainer"]
-custom_minimum_size = Vector2(65, 0)
+custom_minimum_size = Vector2(66, 0)
 layout_mode = 2
 theme_override_colors/default_color = Color(1, 0, 0, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
@@ -3393,7 +3404,7 @@ autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 
 [node name="HP" type="RichTextLabel" parent="StatContainer"]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(127, 0)
 layout_mode = 2
 theme_override_colors/default_color = Color(0, 1, 0, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
@@ -3404,7 +3415,7 @@ autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 
 [node name="XP" type="RichTextLabel" parent="StatContainer"]
-custom_minimum_size = Vector2(115, 0)
+custom_minimum_size = Vector2(117, 0)
 layout_mode = 2
 theme_override_colors/default_color = Color(1, 1, 0, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")

@@ -34,10 +34,18 @@ window/stretch/mode="viewport"
 
 version_control/autoload_on_startup=true
 
+[global]
+
+Tootips=false
+
 [global_group]
 
 hud_controls="HUD Buttons"
 portrait_controls="Mini Portrait"
+
+[gui]
+
+theme/custom="res://assets/themes/tooltips_theme.tres"
 
 [input]
 

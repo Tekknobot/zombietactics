@@ -313,7 +313,7 @@ func update_hud(character: PlayerUnit):
 		print("Level node is null!")
 
 	if turn:
-		turn.text = "Group Turn: " + str(turn_manager.used_turns_count + 1) + " of " + str(turn_manager.max_turn_count)
+		turn.text = "Player Turn: " + str(turn_manager.used_turns_count + 1) + " of " + str(turn_manager.max_turn_count)
 		turn.adjust_size_to_content()
 		print("Turn updated to: ", turn.text)
 	else:

@@ -73,8 +73,9 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 		# If in movement mode and clicked a valid movement tile
 		elif tile_pos in movement_range_tiles:
 			# Prevent movement if clicking the same tile the selected player is on
-			if tile_pos == selected_player.tile_pos:
-				return					
+			# OR if another player unit is on the tile
+			if tile_pos == selected_player.tile_pos or is_tile_occupied_by_player(tile_pos):
+				return
 			move_selected_player(tile_pos)
 		else:
 			# If clicked on a non-action tile, try selecting a different unit
@@ -82,6 +83,16 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 	else:
 		# If no player is selected, try selecting one on the clicked tile
 		select_unit_at_tile(tile_pos)
+
+# Helper function to check if a tile is occupied by another player unit
+func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
+	var all_players = get_tree().get_nodes_in_group("player_units")
+	for player in all_players:
+		if player.tile_pos == tile_pos:
+			select_unit_at_tile(tile_pos)
+			return true
+	return false
+
 
 # Handles right-click to toggle between attack and movement range display
 func handle_right_click() -> void:

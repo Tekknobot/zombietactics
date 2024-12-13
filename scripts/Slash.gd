@@ -16,6 +16,7 @@ extends Node2D
 var attack_range_tiles: Array[Node2D] = []
 
 var WATER_TILE_ID = 0
+var is_slashing: bool = false
 
 func _ready() -> void:
 	if map_manager.map_1:
@@ -79,6 +80,7 @@ func _input(event):
 			elif direction.x < 0:
 				get_parent().scale.x = 1  # Facing left
 			
+			get_parent().get_child(0).play("move")
 			# Trigger Shadow Slash with the calculated direction
 			shadow_slash(direction)
 
@@ -110,13 +112,13 @@ func shadow_slash(direction: Vector2):
 	get_parent().audio_player.stream = get_parent().slash_audio
 	get_parent().audio_player.play()
 	
-	get_parent().get_child(0).play("move")
-	
 	# Dash along the trajectory
+	is_slashing = true
 	await dash_along_trajectory(trajectory)
 
-	disable_bullet_time()
-	await get_tree().create_timer(1).timeout
+	#disable_bullet_time()
+	await get_tree().create_timer(0.1).timeout
+	is_slashing = false
 	get_parent().get_child(0).play("default")
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
@@ -125,7 +127,7 @@ func shadow_slash(direction: Vector2):
 		
 func calculate_line_positions(start: Vector2, end: Vector2) -> Array:
 	var points = []
-	var step = 32  # Adjust step size based on tile/grid resolution
+	var step = 8  # Adjust step size based on tile/grid resolution
 	var direction = (end - start).normalized()
 	var current = start
 	while current.distance_to(end) > step:
@@ -136,11 +138,13 @@ func calculate_line_positions(start: Vector2, end: Vector2) -> Array:
 
 func dash_along_trajectory(trajectory: Array):
 	print("Dashing along trajectory...")
-			
-	for position in trajectory:	
+	
+	for position in trajectory:		
 		# Check for enemies and deal damage
 		var enemy = find_enemy_at_position(position)
 		if enemy:
+			get_parent().get_child(0).play("attack")
+			await get_tree().create_timer(0.5).timeout
 			enemy.flash_damage()
 			
 			enemy.audio_player.stream = enemy.zombie_audio
@@ -152,10 +156,9 @@ func dash_along_trajectory(trajectory: Array):
 		parent_unit.global_position = position
 		
 		await get_tree().create_timer(0.05).timeout  # Adjust for smooth movement
-
+		get_parent().get_child(0).play("move")
+			
 	# Play attack animation
-	get_parent().is_moving = false
-	get_parent().get_child(0).play("attack")
 	clear_attack_range_tiles()
 	print("Shadow Slash completed. Final position:", parent_unit.global_position)
 
@@ -163,9 +166,8 @@ func find_enemy_at_position(position: Vector2) -> Node:
 	# Check for enemies in the specified position
 	var enemies = get_tree().get_nodes_in_group("zombies")
 	for enemy in enemies:
-		if enemy.global_position.distance_to(position) < 14:  # Adjust hitbox tolerance
-			enable_bullet_time()
-			get_parent().get_child(0).play("attack")
+		if enemy.global_position.distance_to(position) < 8:  # Adjust hitbox tolerance
+			#enable_bullet_time()
 			return enemy
 	return null
 
@@ -218,7 +220,7 @@ func is_structure(tile_pos: Vector2i) -> bool:
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("player_units")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:
@@ -262,7 +264,7 @@ func display_slash_attack_range():
 				break  # Stop if out of bounds
 
 			# Check if the tile is movable or occupied
-			if is_structure(current_pos):
+			if is_structure(current_pos) or is_unit_present(current_pos):
 				highlight_attack_tile(current_pos, tilemap)
 				break  # Include the structure/unit in the range, then stop
 			highlight_attack_tile(current_pos, tilemap)

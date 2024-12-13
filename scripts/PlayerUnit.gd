@@ -115,6 +115,7 @@ var attack_range_visible: bool = false  # Variable to track if attack range is v
 @export var is_mek: bool
 
 var is_animation_playing = false  # Tracks whether the "move" animation is currently playing
+var reset_animation: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -343,13 +344,12 @@ func calculate_path(target_tile: Vector2i) -> void:
 
 # Update the AStar grid and calculate the path
 func move_player_to_target(target_tile: Vector2i) -> void:
+	reset_animation = false  # Allow animation reset after this movement
+	
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
 	
-	self.is_moving = true
-	
-	if self.is_moving:
-		self.get_child(0).play("move")  # Play the "move" animation
+	self.get_child(0).play("move")  # Play the "move" animation
 			
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
@@ -387,7 +387,6 @@ func move_along_path(delta: float) -> void:
 			path_index += 1  # Move to the next tile in the path
 			
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)
-			self.has_moved = true
 			item_manager.check_for_item_discovery(self)
 			update_astar_grid()
 			
@@ -398,7 +397,12 @@ func move_along_path(delta: float) -> void:
 			check_end_turn_conditions()
 	else:
 		# Path is complete, no more tiles to move to
-		self.get_child(0).play("default")
+		self.has_moved = true
+		
+		# Reset animation to default only once
+		if not reset_animation:
+			get_child(0).play("default")  # Play default animation
+			reset_animation = true  # Prevent further resets
 		
 		print("No more tiles to move to.")	
 	
@@ -712,7 +716,7 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	hud_manager.update_hud(self)	
 	hud_manager.hide_special_buttons()				
 	#check_end_turn_conditions()
-	get_child(0).play("default")
+	#get_child(0).play("default")
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:
@@ -944,7 +948,7 @@ func check_end_turn_conditions() -> void:
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud(self)
 					
-		#self.get_child(0).play("default")
+		#get_child(0).play("default")
 		end_turn()
 
 func end_turn() -> void:

@@ -64,7 +64,8 @@ func _process(delta):
 		zoom = zoom.lerp(original_zoom, zoom_speed * delta)
 		if position.distance_to(original_position) < 0.1 and zoom.distance_to(original_zoom) < 0.1:
 			is_zooming_out = false
-			emit_signal("zoom_completed")  # Notify that zooming in is complete
+			emit_signal("zoom_completed") 
+			 # Notify that zooming in is complete
 
 	if is_mouse_wheel_up and is_zooming_in == false:
 		zoom = zoom.lerp(target_zoom, zoom_speed * delta)

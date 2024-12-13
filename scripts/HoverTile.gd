@@ -333,4 +333,5 @@ func set_special_button_pressed():
 	hud_manager.octoblast.button_pressed = false
 	
 	hud_manager.grenade.button_pressed = false
+	hud_manager.slash.button_pressed = false
 		

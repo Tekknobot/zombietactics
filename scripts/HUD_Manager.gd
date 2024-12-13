@@ -163,10 +163,21 @@ func _on_slash_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-	else:
-		GlobalManager.slash_toggle_active = false  # Set the flag to false
-		print("Slash toggle deactivated!")
 		
+		var hovertiles = get_tree().get_nodes_in_group("hovertile")
+		for hovertile in hovertiles:
+			if hovertile.selected_player and hovertile.selected_player.player_name == "Dutch. Major":
+				hovertile.selected_player.get_child(7).display_slash_attack_range()
+					
+	else:	
+		GlobalManager.slash_toggle_active = false  # Set the flag to false
+		var hovertiles = get_tree().get_nodes_in_group("hovertile")
+		for hovertile in hovertiles:
+			if hovertile.selected_player and hovertile.selected_player.player_name == "Dutch. Major":
+				hovertile.selected_player.get_child(7).clear_attack_range_tiles()
+					
+		print("Slash toggle deactivated!")
+
 func _on_thread_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.thread_toggle_active = true  # Set the flag to true

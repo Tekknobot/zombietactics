@@ -90,6 +90,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var invisibility_audio = preload("res://audio/SFX/call_mek.wav")
 @export var footstep_audio = preload("res://audio/SFX/blade_dash.wav")
 @export var claw_audio = preload("res://audio/SFX/panther_growl.wav")
+@export var slash_audio = preload("res://audio/SFX/slash.wav")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
@@ -499,6 +500,8 @@ func is_mouse_over_gui() -> bool:
 			
 # Display attack range tiles around the soldier using the attack_tile_scene
 func display_attack_range_tiles() -> void:
+	if GlobalManager.slash_toggle_active:
+		return
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false

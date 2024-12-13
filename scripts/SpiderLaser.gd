@@ -38,6 +38,7 @@ var spark_emitter = preload("res://assets/scenes/vfx/sparks.tscn")  # Reference 
 var spark_scene
 var segment
 var current_segment
+var laser_active: bool = false
 
 func _ready():
 	# Initialize color cycle
@@ -64,7 +65,7 @@ func _process(delta):
 	
 func _input(event):
 	# Check for mouse click
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and laser_active == false:
 		# Block gameplay input if the mouse is over GUI
 		if is_mouse_over_gui():
 			print("Input blocked by GUI.")
@@ -110,6 +111,9 @@ func _input(event):
 				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
 			
 			get_zombie_in_area()
+			laser_active = true
+			
+			
 
 func get_zombie_in_area():
 	if zombie_index >= min(closest_zombies.size() - 1, 7):
@@ -130,7 +134,8 @@ func get_zombie_in_area():
 		# Access the 'special' button within HUDManager
 		GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
 		hud_manager.thread.button_pressed = false		
-			
+		
+		laser_active = false	
 		get_parent().check_end_turn_conditions()
 		return
 
@@ -172,7 +177,6 @@ func deploy_laser(target_position: Vector2, zombie):
 	var cell_size = Vector2(32, 32)
 	
 	var start = tilemap.local_to_map(Vector2(global_position.x, global_position.y))
-	start = Vector2i(start.x - 1, start.y)
 	var end = tilemap.local_to_map(Vector2(target_position.x, target_position.y))
 
 	# Use a Bresenham line algorithm to get all tiles along the laser path

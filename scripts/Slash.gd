@@ -96,7 +96,7 @@ func shadow_slash(direction: Vector2):
 
 	# Dash along the trajectory
 	dash_along_trajectory(trajectory)
-
+	
 func calculate_line_positions(start: Vector2, end: Vector2) -> Array:
 	var points = []
 	var step = 32  # Adjust step size based on tile/grid resolution
@@ -110,7 +110,8 @@ func calculate_line_positions(start: Vector2, end: Vector2) -> Array:
 
 func dash_along_trajectory(trajectory: Array):
 	print("Dashing along trajectory...")
-	for position in trajectory:
+			
+	for position in trajectory:	
 		# Check for enemies and deal damage
 		var enemy = find_enemy_at_position(position)
 		if enemy:

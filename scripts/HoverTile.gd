@@ -237,7 +237,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	# If no unit or structure is found at the clicked tile, deselect the current player
 	if selected_player:
 		last_selected_player = selected_player  # Save the current player as last selected
-		#return_all_players_to_default_animation()
+
 		
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:
@@ -311,22 +311,6 @@ func is_mouse_over_gui() -> bool:
 				return true
 	print("Mouse is NOT over any TextureRect.")
 	return false
-
-func return_all_players_to_default_animation():
-	var players = get_tree().get_nodes_in_group("player_units")
-	for player in players:
-		# Skip resetting to "default" if the player is currently slashing
-		if player.player_name == "Dutch. Major" and player.get_child(7).is_slashing:
-			if player.get_child(0).animation != "move":
-				player.get_child(0).play("move")
-			continue  # Skip the rest of the loop for this player
-		
-		# Reset to "default" only if not already playing it
-		if player.get_child(0).animation != "default":
-			player.get_child(0).play("default")
-		
-		# Ensure the player is marked as not selected
-		player.selected = false
 
 func set_special_button_pressed():
 	var hud_manager = get_parent().get_node("HUDManager")

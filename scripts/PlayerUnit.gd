@@ -396,9 +396,6 @@ func move_along_path(delta: float) -> void:
 				
 			check_end_turn_conditions()
 	else:
-		# Path is complete, no more tiles to move to
-		self.has_moved = true
-		
 		# Reset animation to default only once
 		if not reset_animation:
 			get_child(0).play("default")  # Play default animation
@@ -948,12 +945,12 @@ func check_end_turn_conditions() -> void:
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud(self)
 					
-		#get_child(0).play("default")
+		get_child(0).play("default")
 		end_turn()
 
 func end_turn() -> void:
 	if turn_manager:
-		turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
+		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
 	else:
 		print("Turn manager is not set! Unable to proceed to the next unit.")
 

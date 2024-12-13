@@ -12,6 +12,7 @@ var barrage_toggle_active: bool = false
 var octoblast_toggle_active: bool = false
 
 var grenade_toggle_active: bool = false
+var slash_toggle_active: bool = false
 
 var secret_item_destroyed: bool = false
 var secret_item_found: bool = false

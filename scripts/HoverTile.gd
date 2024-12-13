@@ -109,7 +109,8 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 		GlobalManager.hellfire_toggle_active or 
 		GlobalManager.barrage_toggle_active or 
 		GlobalManager.octoblast_toggle_active or 
-		GlobalManager.grenade_toggle_active 
+		GlobalManager.grenade_toggle_active or 
+		GlobalManager.slash_toggle_active 
 	):
 		return
 	
@@ -144,7 +145,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 				GlobalManager.hellfire_toggle_active or 
 				GlobalManager.barrage_toggle_active or 
 				GlobalManager.octoblast_toggle_active or 
-				GlobalManager.grenade_toggle_active  
+				GlobalManager.grenade_toggle_active or 
+				GlobalManager.slash_toggle_active  
 			):				
 				return
 							
@@ -187,7 +189,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 				GlobalManager.hellfire_toggle_active or 
 				GlobalManager.barrage_toggle_active or 
 				GlobalManager.octoblast_toggle_active or 
-				GlobalManager.grenade_toggle_active  
+				GlobalManager.grenade_toggle_active or 
+				GlobalManager.slash_toggle_active   
 			):				
 				return
 				

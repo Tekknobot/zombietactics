@@ -22,6 +22,7 @@ extends CanvasLayer
 @onready var octoblast = $HUD/Octoblast
 
 @onready var grenade = $HUD/Grenade
+@onready var slash = $HUD/Slash
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -80,7 +81,11 @@ func _ready():
 	if grenade:
 		grenade.connect("toggled", Callable(self, "_on_grenade_toggled"))
 		print("Grenade connected")
-													
+
+	if slash:
+		slash.connect("toggled", Callable(self, "_on_slash_toggled"))
+		print("Slash connected")
+															
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -128,6 +133,7 @@ func _on_mek_toggled(button_pressed: bool) -> void:
 func _on_dynamite_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.dynamite_toggle_active = true  # Set the flag to true
+		slash.button_pressed = false
 		print("Dynamite toggle activated!")	
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
@@ -149,6 +155,18 @@ func _on_grenade_toggled(button_pressed: bool) -> void:
 		GlobalManager.grenade_toggle_active = false  # Set the flag to false
 		print("Grenade toggle deactivated!")
 
+func _on_slash_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.slash_toggle_active = true  # Set the flag to true
+		dynamite.button_pressed = false
+		print("Slash toggle activated!")	
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.slash_toggle_active = false  # Set the flag to false
+		print("Slash toggle deactivated!")
+		
 func _on_thread_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.thread_toggle_active = true  # Set the flag to true
@@ -387,12 +405,11 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "Logan. Raines":
 		mek.visible = true
-
-	if character.player_name == "Logan. Raines":
 		grenade.visible = true
-				
+
 	if character.player_name == "Dutch. Major":
 		dynamite.visible = true
+		slash.visible = true
 		
 	if character.player_name == "Sarah. Reese":
 		thread.visible = true		
@@ -428,3 +445,4 @@ func hide_special_buttons():
 	octoblast.visible = false
 	
 	grenade.visible = false
+	slash.visible = false

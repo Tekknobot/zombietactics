@@ -64,7 +64,7 @@ func end_current_turn() -> void:
 		await zombie_spawn_manager.spawn_zombies()
 		GlobalManager.zombies_processed = 0
 		GlobalManager.zombie_queue.clear()
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(0.1).timeout
 		on_player_action_completed()
 		trigger_zombies = true
 

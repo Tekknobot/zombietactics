@@ -1,66 +1,57 @@
 extends Control
 
-# Variables for dialogue data
+const portraitPaths = {
+	"Logan": "res://assets/portraits/soldier_port.png",
+	"Dutch": "res://assets/portraits/rambo_port.png",
+	"Yoshida": "res://assets/portraits/dog_port.png",
+	"Chuck": "res://assets/portraits/pilots/l0_por04.png",
+	"Sarah": "res://assets/portraits/pilots/l0_por06.png",
+	"Angel": "res://assets/portraits/pilots/l0_por07.png",
+	"John": "res://assets/portraits/pilots/l0_por08.png",
+	"Aleks": "res://assets/portraits/pilots/l0_por10.png",
+	"Annie": "res://assets/portraits/pilots/l0_por03.png"
+};
+
 var dialogue = [
-	{ "speaker": "Logan. Raines", "text": "Major, I told you—this wasn’t a solo op. If we fail, millions die.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "And I told *you*, soldier boy, I don’t work for free. This intel better be worth it.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Statistically speaking, your chances of survival are slim. But hey, I’m just the dog.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "We’re in Novacrest, Sector 13. Used to be a manufacturing hub before the outbreak.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Yeah, yeah, I remember. The last time I was here, it wasn’t crawling with brain-eaters. I liked it better then.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Noted: Dutch prefers his cities uninfested. Scanning Sector 13... Little power, minimal heat signatures, but plenty of undead activity.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "The objective is clear. We find the data core in this sector and secure it. No mistakes.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Mistakes? Me? You’re lucky I’m even here. Let’s just grab the intel and get out before things get messy.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Too late for that. Zombies inbound. Shall I mark their positions on your HUDs, or do you prefer surprises?", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Yoshida, mark them. We’ll clear the streets one tile at a time. Let’s move, and spread out!", "portrait": "res://assets/portraits/soldier_port.png" }
-]
+	{ "speaker": "Logan. Raines", "text": "Major, I told you—this wasn’t a solo op. If we fail, millions die.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Dutch. Major", "text": "And I told *you*, soldier boy, I don’t work for free. This intel better be worth it.", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Yoshida. Boi", "text": "Statistically speaking, your chances of survival are slim. But hey, I’m just the dog.", "portrait": portraitPaths["Yoshida"] },
+	{ "speaker": "Chuck. Genius", "text": "Raines, I’ve been monitoring comms. This operation better not go sideways.", "portrait": portraitPaths["Chuck"] },
+	{ "speaker": "Logan. Raines", "text": "We’re in Novacrest, Sector 13. Used to be a manufacturing hub before the outbreak.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Sarah. Reese", "text": "Focus, everyone. If this is as bad as it sounds, we need to stay sharp.", "portrait": portraitPaths["Sarah"] },
+	{ "speaker": "Angel. Charlie", "text": "‘Stay sharp’? That’s the understatement of the year, Reese.", "portrait": portraitPaths["Angel"] },
+	{ "speaker": "Dutch. Major", "text": "Yeah, yeah, I remember. I liked it better then.", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Annie. Switch", "text": "Alright, team. Less banter, more action. Let’s move.", "portrait": portraitPaths["Annie"] },
+	{ "speaker": "Logan. Raines", "text": "Let’s move, and spread out!", "portrait": portraitPaths["Logan"] }
+];
 
 var dialogue_2 = [
-	{ "speaker": "Yoshida. Boi", "text": "We’re approaching the core. Radiation levels are spiking again. I’d advise against prolonged exposure, but hey, I’m just a dog.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "We’ll move fast. Stay sharp. Dutch, keep an eye on our six while we search for the core.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Don’t worry about me. I’ve got this. But I’m not sure how much longer I can handle the heat. These zombies are getting thicker.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "You’re not the only one dealing with the heat, Dutch. These zombies are becoming a serious issue. Let’s find that core before they find us.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Focus, people. The core is in a nearby facility—Yoshida, scan for any signs of it. We don’t have much time.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "I’m on it. Scanners are picking up a signal. But it’s faint. This facility must be heavily damaged, or someone’s messing with the data.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Faint signals, radiation spikes, and an army of zombies? Perfect. What could possibly go wrong?", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Cut the sarcasm, Dutch. We find that core, extract the data, and get out. Easy, right?", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Hold up. Scanners are picking up a cluster of zombies ahead. They’re closing in on the core’s location.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Zombies ahead? What else is new? Just tell me where to shoot.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "It’s not just about shooting. We need to move carefully, take them out quietly. We don’t want the whole facility on us at once.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Agreed. Focus fire, clean shots. Dutch, lead the way. Yoshida, stay on comms and monitor the signal. I’ll cover the rear.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Lead the way? Sure, as long as there’s something to shoot at. Let’s just get this done.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "I’m detecting more movement... too many for a quiet approach. We’ll need to fight our way through.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Then we fight. Just don’t let them overwhelm us. We stick together, focus on the objective: the core.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Sounds like a plan. I’ve got your back, just don’t expect me to go easy on the zombies.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "I’ll keep scanning. The core should be in the one of the buildings. Let’s move.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Once we get the core, we extract. No detours, no heroics. We finish this and get out.", "portrait": "res://assets/portraits/soldier_port.png" }
-]
+	{ "speaker": "Yoshida. Boi", "text": "We’re approaching the core. Radiation levels are spiking again. I’d advise against prolonged exposure, but hey, I’m just a dog.", "portrait": portraitPaths["Yoshida"] },
+	{ "speaker": "Chuck. Genius", "text": "Radiation? Wonderful. Just make sure my equipment doesn’t fry.", "portrait": portraitPaths["Chuck"] },
+	{ "speaker": "Logan. Raines", "text": "We’ll move fast. Stay sharp. Dutch, keep an eye on our six while we search for the core.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Dutch. Major", "text": "Don’t worry about me. I’ve got this. But I’m not sure how much longer I can handle the heat.", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Angel. Charlie", "text": "You’re not the only one. Let’s find this core and get out.", "portrait": portraitPaths["Angel"] },
+	{ "speaker": "Logan. Raines", "text": "Focus, people. The core is in a nearby facility—Yoshida, scan for any signs of it. We don’t have much time.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Sarah. Reese", "text": "On it. If something goes wrong, we’re not splitting up.", "portrait": portraitPaths["Sarah"] },
+	{ "speaker": "Yoshida. Boi", "text": "I’m on it. Scanners are picking up a signal. But it’s faint. This facility must be heavily damaged.", "portrait": portraitPaths["Yoshida"] },
+	{ "speaker": "Dutch. Major", "text": "Faint signals and radiation spikes? Perfect. What could possibly go wrong?", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Aleks. Ducat", "text": "Less sarcasm, more solutions. Let’s move.", "portrait": portraitPaths["Aleks"] },
+	{ "speaker": "Logan. Raines", "text": "Cut the sarcasm, Dutch. We find that core, extract the data, and get out. Easy, right?", "portrait": portraitPaths["Logan"] }
+];
 
 var dialogue_3 = [
-	{ "speaker": "Logan. Raines", "text": "Crimson District. Used to be biotech labs. Now it’s a kill zone.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "You mean a *death* zone. Something’s already creeping me out here.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Scanners picking up massive heat signatures ahead. Whatever’s there, it’s big.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Big? That’s not good. What exactly are we walking into?", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Reports suggest it’s a new type—‘Crushers.’ Stronger, faster, and meaner than the rest. Stick to cover.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Confirmed: Crushers detected. Enhanced movement range and significant damage output. Recommend cautious engagement.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Cautious? I prefer decisive. These things don’t look like they’ll go down easy.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Logan. Raines", "text": "They won’t. Keep your distance and focus fire. Yoshida, plot a route to the core.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Core located in central containment. Heavy hostile activity detected. Safe routes marked on HUD.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Great. Just what I needed—a maze full of walking tanks. Let’s move.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Contact! Crusher in Sector 2! Dutch, focus on suppressing fire! Yoshida, track its movements.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Suppressing fire? This thing’s charging! Someone slow it down before it flattens us!", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Crusher approaching! It regenerates slowly—take it out quickly or risk prolonged fights.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Stay spread out! Don’t let it take multiple targets at once. We hold it here!", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Regeneration or not, it’s going down. Keep shooting until it stays down!", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Crusher neutralized. Marking next waypoint. High density of hostiles ahead—more Crushers likely.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Let’s not waste time. Stick to safe zones and use choke points. We can’t handle another one unprepared.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Core located. Containment lock engaged. Defend the position while I override the system.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Here we go again. Hope we don’t get any more of those Crushers while we’re stuck here.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Hold position! We don’t leave until Yoshida finishes. Keep those Crushers off the perimeter.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Override complete! Core secured. Extract now before reinforcements arrive.", "portrait": "res://assets/portraits/dog_port.png" },
-	{ "speaker": "Dutch. Major", "text": "Let’s move before this place decides to throw more surprises our way.", "portrait": "res://assets/portraits/rambo_port.png" },
-	{ "speaker": "Logan. Raines", "text": "Extraction point marked. Move as a unit—no unnecessary risks. We’re not out of the woods yet.", "portrait": "res://assets/portraits/soldier_port.png" },
-	{ "speaker": "Yoshida. Boi", "text": "Extraction path clear. Minimal hostiles ahead. Mission success within reach.", "portrait": "res://assets/portraits/dog_port.png" }
-]
+	{ "speaker": "Logan. Raines", "text": "Crimson District. Used to be biotech labs. Now it’s deserted.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Dutch. Major", "text": "You mean a dead zone. Something’s already creeping me out here.", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Yoshida. Boi", "text": "Scanners picking up significant activity ahead. The facility layout looks complex.", "portrait": portraitPaths["Yoshida"] },
+	{ "speaker": "John. Doom", "text": "Complex or not, we adapt. Just point me in the right direction.", "portrait": portraitPaths["John"] },
+	{ "speaker": "Dutch. Major", "text": "What exactly are we walking into?", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Sarah. Reese", "text": "Stay focused. This sector might still hold some surprises.", "portrait": portraitPaths["Sarah"] },
+	{ "speaker": "Logan. Raines", "text": "Reports suggest this sector might have been critical for containment research. Stay alert.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Annie. Switch", "text": "I’ve marked potential routes on the HUD. Let’s stick to them.", "portrait": portraitPaths["Annie"] },
+	{ "speaker": "Dutch. Major", "text": "Just what I needed—a maze with zero visibility. Let’s move.", "portrait": portraitPaths["Dutch"] },
+	{ "speaker": "Logan. Raines", "text": "Stay sharp. No unnecessary risks.", "portrait": portraitPaths["Logan"] },
+	{ "speaker": "Aleks. Ducat", "text": "No risks? This whole mission is a risk. Let’s keep moving.", "portrait": portraitPaths["Aleks"] }
+];
 
 
 var chapter_text_1: String = "Chapter 1: No Way Out — The Descent into Sector 13"

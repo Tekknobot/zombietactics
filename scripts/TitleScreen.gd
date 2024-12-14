@@ -12,9 +12,9 @@ extends CanvasLayer
 @onready var audio_player = $AudioStreamPlayer2D 
 @export var zombie_audio: AudioStream
 
-var scrolling_duration : float = 60.0  # Time it takes for the text to scroll up
+var scrolling_duration : float = 90.0  # Time it takes for the text to scroll up
 var start_pos : float = 0  # Start position of the text (adjust based on your scene)
-var target_pos : float = -2000  # End position (adjust based on your scene)
+var target_pos : float = -2100  # End position (adjust based on your scene)
 
 var speed : float = 1.0 / scrolling_duration  # Speed for the scroll
 
@@ -26,19 +26,23 @@ var introduction_text : String = """
 
 The outbreak spread faster than anyone could predict, turning cities into graveyards and humanity’s last hope into a distant memory. Governments crumbled, and entire sectors became nothing but ruins, overrun by the undead.
 
-In the shadows of a broken world, a team of unlikely allies has been assembled. 
+In the shadows of a broken world, a team of unlikely allies has been assembled.
 
-Logan Raines, a hardened soldier with a history in the military and the ability to call on Mechas for assistance, leads the charge. 
+Logan Raines, a hardened soldier with a history in the military and the ability to call on Shadow Mechas for assistance, leads the charge.
 
-Dutch Major, a mercenary with a reputation for not caring about anything but the payout, provides the muscle. 
+Dutch Major, a mercenary with a reputation for not caring about anything but the payout, provides the muscle.
 
-And Yoshida Boi, a robot dog with artificial intelligence turned reluctant guide, crunches the numbers, knowing the chances of survival are slim.
+Yoshida Boi, a robot dog with artificial intelligence turned reluctant guide, crunches the numbers, knowing the chances of survival are slim.
 
-Their mission: retrieve vital data from Novacrest, Sector 13. Once a manufacturing hub, now a war zone teeming with the undead. 
+Joining them are the pilots of the remaining operational Mechas, each bringing their own unique skills to the mission:
 
-The risks are high, the objective clear, and the outcome uncertain.
+Chuck Genius, the team’s technical savant, ensures the Mechas remain functional under extreme conditions. Sarah Reese, a no-nonsense strategist, excels at battlefield coordination. Angel Charlie, ever skeptical, keeps the group grounded with her critical insights. John Doom, a fighter with an unshakable resolve, never shies away from danger. Aleks Ducat, sharp and pragmatic, ensures the group doesn’t lose focus. And Annie Switch, the optimist, keeps morale high even in the darkest moments.
 
-This is not a solo operation, but if they fail... millions will die and all hope will be lost.
+Their mission: retrieve vital data from Novacrest, Sector 13. Once a manufacturing hub, now a war zone teeming with the undead.
+
+The risks are high. Each step forward is a test of skill and unity. The objective is clear, but the outcome is uncertain.
+
+This is not a solo operation, but if they fail... millions will die, and all hope will be lost.
 """
 
 func _ready():

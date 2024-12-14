@@ -87,7 +87,7 @@ signal astar_setup_complete
 signal movement_completed
 
 var active_zombie: Area2D = null
-var zombie_queue: Array = []  # Queue of zombies to move
+#var zombie_queue: Array = []  # Queue of zombies to move
 var closest_player: Area2D = null
 var best_adjacent_tile: Vector2i = Vector2i()
 
@@ -142,6 +142,8 @@ func _process(delta: float) -> void:
 				self.remove_from_group("zombies")				
 				self.visible = false
 				
+				GlobalManager.zombie_queue.clear()
+				
 				if self.zombie_type == "Radioactive":
 					self.get_child(4).active_particle_instances.clear()
 				
@@ -149,8 +151,9 @@ func _process(delta: float) -> void:
 				if zombies.size() <= 0:
 					reset_player_units()	
 					GlobalManager.zombies_cleared = true
+					GlobalManager.zombie_queue.clear()
 					mission_manager.check_mission_manager()
-					
+
 				#queue_free()  # Destroy the zombie once the death animation ends
 
 	# Zombie movement
@@ -190,6 +193,10 @@ func _process(delta: float) -> void:
 
 					# Update AStar grid after movement
 					update_astar_grid()
+					
+					# Increment the processed zombies counter
+					GlobalManager.zombies_processed += 1	
+									
 					process_zombie_queue()
 					emit_signal("movement_completed")  # Notify main loop
 		else:
@@ -209,11 +216,11 @@ func _process(delta: float) -> void:
 	
 func process_zombie_queue() -> void:		
 	print("Debug: zombies_processed =", GlobalManager.zombies_processed, "zombie_limit =", GlobalManager.zombie_limit)
-	print("Debug: zombie_queue size =", zombie_queue.size())
+	print("Debug: zombie_queue size =", GlobalManager.zombie_queue.size())
 	
 	been_attacked = false
 	
-	if GlobalManager.zombies_processed >= GlobalManager.zombie_limit or zombie_queue.is_empty():
+	if GlobalManager.zombies_processed >= GlobalManager.zombie_limit or GlobalManager.zombie_queue.is_empty():
 		print("Processed ", GlobalManager.zombies_processed, " zombies. Turn complete.")
 		
 		var all_zombies = get_tree().get_nodes_in_group("zombies")
@@ -234,15 +241,15 @@ func process_zombie_queue() -> void:
 		return
 	
 	# Process the next zombie
-	if not zombie_queue.is_empty():
-		var active_zombie = zombie_queue.pop_front()
+	if not GlobalManager.zombie_queue.is_empty():
+		var active_zombie = GlobalManager.zombie_queue.pop_front()
 		GlobalManager.active_zombie = active_zombie
 		GlobalManager.active_zombie.has_moved = true
 		print("Processing Zombie ID:", active_zombie.zombie_id)	
 
 	# Get the next zombie that has not moved
-	while not zombie_queue.is_empty():
-		GlobalManager.active_zombie = zombie_queue.pop_front()
+	while not GlobalManager.zombie_queue.is_empty():
+		GlobalManager.active_zombie = GlobalManager.zombie_queue.pop_front()
 		if not GlobalManager.active_zombie.has_moved:
 			break
 		print("Skipping Zombie ID:", GlobalManager.active_zombie.zombie_id, "as it has already moved.")
@@ -255,7 +262,7 @@ func process_zombie_queue() -> void:
 
 	# Reset path and movement state for the current zombie
 	GlobalManager.active_zombie.path_index = 0
-	GlobalManager.active_zombie.current_path = PackedVector2Array()
+	GlobalManager.active_zombie.current_path.clear()
 	print("Processing Zombie ID:", GlobalManager.active_zombie.zombie_id)
 
 	# Find the closest player and calculate the path
@@ -279,9 +286,22 @@ func process_zombie_queue() -> void:
 				min_distance = distance
 				closest_player = player
 				best_adjacent_tile = adj_tile
+				
+	if not closest_player or best_adjacent_tile == Vector2i():
+		print("No valid adjacent tiles found. Attempting fallback.")
+		# Optional fallback logic here (e.g., move toward player without attack)
+		process_zombie_queue()
+		return				
 
 	if closest_player and best_adjacent_tile != Vector2i():
 		GlobalManager.active_zombie.current_path = astar.get_point_path(GlobalManager.active_zombie.tile_pos, best_adjacent_tile)
+		
+		if GlobalManager.active_zombie.current_path.is_empty():
+			print("No path found for Zombie ID:", GlobalManager.active_zombie.zombie_id, ". Attempting fallback movement.")
+			# Optional fallback logic (e.g., move in the general direction of the player)
+			process_zombie_queue()
+			return	
+				
 		if GlobalManager.active_zombie.current_path.size() > 0:
 			# Limit the path length to the zombie's movement range
 			GlobalManager.active_zombie.current_path = GlobalManager.active_zombie.current_path.slice(0, GlobalManager.active_zombie.movement_range + 1)
@@ -305,28 +325,23 @@ func process_zombie_queue() -> void:
 	else:
 		print("No target for Zombie ID:", GlobalManager.active_zombie.zombie_id)
 		process_zombie_queue()  # Process the next zombie
-		return
-		
-	# Increment the processed zombies counter
-	GlobalManager.zombies_processed += 1	
+		return	
 			
-
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	update_astar_grid()
 	
-	var zombies = get_tree().get_nodes_in_group("zombies")
-	if zombies.size() < 28:
-		#zombie_spawn_manager.spawn_zombies()
-		pass
+	turn_manager.used_turns_count = 0
 	
 	print("Player action completed. Starting zombie movement.")
-	await get_tree().create_timer(1).timeout 
+	await get_tree().create_timer(0.5).timeout 
 	mission_manager.check_mission_manager()
 
 	# Populate the zombie queue
-	zombie_queue = get_tree().get_nodes_in_group("zombies")
-	zombie_queue.sort_custom(func(a, b):
+	GlobalManager.zombie_queue.clear()
+	await get_tree().create_timer(0.5).timeout 
+	GlobalManager.zombie_queue = get_tree().get_nodes_in_group("zombies")
+	GlobalManager.zombie_queue.sort_custom(func(a, b):
 		return zombie_sort_function(a, b, get_tree().get_nodes_in_group("player_units"))
 	)
 	process_zombie_queue()

@@ -26,8 +26,9 @@ var map_cleared: bool = false
 
 var active_zombie: Area2D = null
 
+var zombie_queue: Array = []
 var zombies_processed = 0  # Counter for zombies processed
-var zombie_limit = 4
+var zombie_limit = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

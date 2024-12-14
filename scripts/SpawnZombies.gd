@@ -8,6 +8,17 @@ extends Node2D
 @onready var tilemap = get_node("/root/MapManager/TileMap") # Replace with your actual tilemap path
 var WATER_TILE_ID = 0
 
+var zombie_names = [
+	"Gnasher", "Lunger", "Spewer", "Flailer",
+	"Slosher", "Lasher", "Mumbler", "Thrasher",
+	"Hacker", "Chopper", "Pouncer", "Rattler",
+	"Screecher", "Sprawler", "Wailer", "Twitcher",
+	"Scrambler", "Snapper", "Thriller", "Dribbler",
+	"Shredder", "Cruncher", "Splatter", "Glower",
+	"Piercer", "Seether", "Stabber", "Gusher",
+	"Squelcher", "Shrieker", "Bubbler", "Groaner"
+];
+
 func _ready() -> void:
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
@@ -74,6 +85,14 @@ func spawn_zombies():
 				
 				zombie_instance.audio_player.stream = zombie_instance.zombie_audio
 				zombie_instance.audio_player.play()
+
+				# Assign a unique ID to the zombie
+				zombie_instance.set("zombie_id", unit_spawn.zombie_id_counter)  # Set a custom property for the unique ID
+				unit_spawn.zombie_id_counter += 1  # Increment the zombie ID for the next one
+								
+				# Assign a unique name to the zombie
+				if zombie_names.size() > 0:
+					zombie_instance.zombie_name = zombie_instance.zombie_type + " " + zombie_names.pop_back()  # Remove the last name from the list
 				
 				# Debug: Zombie spawned
 				print("Spawned zombie at position: ", tile_pos)

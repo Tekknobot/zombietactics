@@ -12,6 +12,8 @@ var max_turn_count: int = 3
 
 signal player_action_completed
 
+@onready var zombie_spawn_manager = get_node("/root/MapManager/SpawnZombies")
+
 func _ready() -> void:
 	await get_tree().create_timer(1).timeout
 	
@@ -59,6 +61,7 @@ func end_current_turn() -> void:
 	# If 3 or more units have used their turns and zombies are not triggered, fire event
 	if used_turns_count >= max_turn_count and trigger_zombies == false:
 		print("Three player units have used their turns. Ending player turn.")
+		await zombie_spawn_manager.spawn_zombies()
 		on_player_action_completed()
 		trigger_zombies = true
 

@@ -93,6 +93,8 @@ var best_adjacent_tile: Vector2i = Vector2i()
 
 var has_moved: bool = false
 var been_attacked: bool = false
+var has_processed: bool = false
+var is_death_processed: bool = false
 
 func _ready() -> void:
 	# Possible values for health and XP
@@ -126,22 +128,24 @@ func _ready() -> void:
 	update_unit_ui()
 	setup_astar()
 
-# Called every frame
 func _process(delta: float) -> void:
-	# Check if the zombie has an AnimatedSprite2D node
 	var animated_sprite = get_node("AnimatedSprite2D") as AnimatedSprite2D
 	if animated_sprite:
 		# Check if the current animation is "death"
-		if animated_sprite.animation == "death":
-			# Get the SpriteFrames resource for the current animation
+		if animated_sprite.animation == "death" and not is_death_processed:
 			var sprite_frames = animated_sprite.sprite_frames
 			
 			# Check if the current frame is the last frame of the "death" animation
 			if animated_sprite.frame == sprite_frames.get_frame_count("death") - 1:
-				#print("Death animation finished, destroying zombie.")
-				self.remove_from_group("zombies")				
+				print("Death animation finished, destroying zombie.")
+				
+				# Mark the death as processed
+				is_death_processed = true
+
+				self.remove_from_group("zombies")
 				self.visible = false
 				
+				GlobalManager.zombies_processed = 0
 				GlobalManager.zombie_queue.clear()
 				
 				if self.zombie_type == "Radioactive":
@@ -153,6 +157,7 @@ func _process(delta: float) -> void:
 					GlobalManager.zombies_cleared = true
 					GlobalManager.zombie_queue.clear()
 					mission_manager.check_mission_manager()
+
 
 				#queue_free()  # Destroy the zombie once the death animation ends
 
@@ -194,8 +199,10 @@ func _process(delta: float) -> void:
 					# Update AStar grid after movement
 					update_astar_grid()
 					
-					# Increment the processed zombies counter
-					GlobalManager.zombies_processed += 1	
+				  # Increment the processed zombies counter only here
+					if not self.has_processed:
+						GlobalManager.zombies_processed += 1
+						self.has_processed = true  # Ensure it doesn't increment again
 									
 					process_zombie_queue()
 					emit_signal("movement_completed")  # Notify main loop
@@ -330,6 +337,10 @@ func process_zombie_queue() -> void:
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
 	update_astar_grid()
+	
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	for zombie in zombies:
+		zombie.has_processed = false
 	
 	turn_manager.used_turns_count = 0
 	

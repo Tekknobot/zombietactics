@@ -29,6 +29,7 @@ extends CanvasLayer
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
+@onready var zombie_spawn_manager = get_parent().get_node("/root/MapManager/SpawnZombies")  
 
 func _ready():
 	if portrait:
@@ -95,6 +96,10 @@ func _on_endturn_pressed() -> void:
 	var hovertiles = get_tree().get_nodes_in_group("hovertile")
 	for hovertile in hovertiles:
 		hovertile.clear_action_tiles()
+	GlobalManager.zombies_processed = 0
+	GlobalManager.zombie_queue.clear()
+	await get_tree().create_timer(0.5).timeout
+	await zombie_spawn_manager.spawn_zombies()
 	turn_manager.on_player_action_completed()
 	turn_manager.used_turns_count = 0
 	for hovertile in hovertiles:

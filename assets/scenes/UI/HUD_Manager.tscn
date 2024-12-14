@@ -1,28 +1,12 @@
-[gd_scene load_steps=25 format=3 uid="uid://ostvhqva4npp"]
+[gd_scene load_steps=63 format=3 uid="uid://ostvhqva4npp"]
 
 [ext_resource type="PackedScene" uid="uid://rdlfqfdmhgit" path="res://assets/scenes/UI/HUD.tscn" id="1_iqwu7"]
 [ext_resource type="Script" path="res://scripts/HUD_Manager.gd" id="1_ymcj8"]
 [ext_resource type="Script" path="res://scripts/Navigation.gd" id="3_jawwu"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_lf15b"]
-[ext_resource type="Texture2D" uid="uid://bkcwqu2daxeth" path="res://assets/portraits/soldier_port.png" id="5_giiwy"]
 [ext_resource type="Script" path="res://scripts/CheckPlayerStatus.gd" id="6_27nvl"]
-[ext_resource type="Texture2D" uid="uid://e3ikiqo2c2r" path="res://assets/portraits/Main_Hover/soldier_port-export.png" id="6_lkkb1"]
-[ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="6_sg366"]
-[ext_resource type="Texture2D" uid="uid://bk6yt4vowxo7j" path="res://assets/portraits/dog_port.png" id="7_qo40y"]
-[ext_resource type="Texture2D" uid="uid://lfmluokjn1j6" path="res://assets/portraits/pilots/l0_por04.png" id="8_esie1"]
-[ext_resource type="Texture2D" uid="uid://bukcr3t861xut" path="res://assets/portraits/Main_Hover/rambo_port-export.png" id="9_g6mhh"]
-[ext_resource type="Texture2D" uid="uid://c6nugp4n3dm8a" path="res://assets/portraits/pilots/l0_por06.png" id="9_jyg8a"]
-[ext_resource type="Texture2D" uid="uid://dd7tye4sh84h7" path="res://assets/portraits/pilots/l0_por07.png" id="10_nk4bl"]
-[ext_resource type="Texture2D" uid="uid://d0iqsrumcle22" path="res://assets/portraits/Main_Hover/dog_port-export.png" id="11_r8jq7"]
-[ext_resource type="Texture2D" uid="uid://b51r4y38hvqvj" path="res://assets/portraits/pilots/l0_por08.png" id="11_uhv8a"]
-[ext_resource type="Texture2D" uid="uid://ct5fmcph4qs8w" path="res://assets/portraits/pilots/l0_por10.png" id="12_4kt7h"]
-[ext_resource type="Texture2D" uid="uid://o4q6sjphgkm3" path="res://assets/portraits/pilots/Hover/l0_por04-export.png" id="13_7f5c7"]
-[ext_resource type="Texture2D" uid="uid://gqlqs845wp2q" path="res://assets/portraits/pilots/l0_por03.png" id="13_ihxk8"]
-[ext_resource type="Texture2D" uid="uid://l504myfjat50" path="res://assets/portraits/pilots/Hover/l0_por06-export.png" id="15_drm2y"]
-[ext_resource type="Texture2D" uid="uid://bwyl43auwmklc" path="res://assets/portraits/pilots/Hover/l0_por07-export.png" id="17_r1e2q"]
-[ext_resource type="Texture2D" uid="uid://bp7fwfn4gp520" path="res://assets/portraits/pilots/Hover/l0_por08-export.png" id="17_t4128"]
-[ext_resource type="Texture2D" uid="uid://bcd43p882gc2b" path="res://assets/portraits/pilots/Hover/l0_por03-export.png" id="20_kpdbi"]
-[ext_resource type="Texture2D" uid="uid://buswacsnqbt6r" path="res://assets/portraits/pilots/Hover/l0_por10-export.png" id="21_f0rto"]
+[ext_resource type="Script" path="res://scripts/MiniXPBar.gd" id="6_bq5k7"]
+[ext_resource type="Script" path="res://scripts/MiniHealthBar.gd" id="8_mu5ix"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lhc5"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
@@ -30,6 +14,258 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_1i3s6"]
+load_path = "res://.godot/imported/soldier_port.png-835e0b2bb6951b52683f80dc6c7e7918.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pyllm"]
+load_path = "res://.godot/imported/soldier_port-export.png-451e31764f692acbf5ba34eeb94d3579.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8pekt"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i65j1"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_epjcc"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4oru"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_rrbkr"]
+load_path = "res://.godot/imported/rambo_port.png-5b480adceb7422f1e50a5905cf025744.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_cy86t"]
+load_path = "res://.godot/imported/rambo_port-export.png-005a5720cd7c46370ce7a6baf0e68a9a.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paibf"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opswl"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v3hdt"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fj8hn"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_7tcv8"]
+load_path = "res://.godot/imported/dog_port.png-2520b34f83662a2440e3507d3547b5ae.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dyrf4"]
+load_path = "res://.godot/imported/dog_port-export.png-0cc32699eac8114def1a56fa5c048e9b.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hetko"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0sed5"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0pa8"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u40og"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dd426"]
+load_path = "res://.godot/imported/l0_por04.png-a8681625e55d24f63c64493398a5e239.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_tnght"]
+load_path = "res://.godot/imported/l0_por04-export.png-54be28f3de96d6fb618854cd5b160d61.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lb2s1"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fsjvf"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxljr"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s0au5"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qfrdi"]
+load_path = "res://.godot/imported/l0_por06.png-1e7fe40febb069f4b479c27e812282ed.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_a5leg"]
+load_path = "res://.godot/imported/l0_por06-export.png-eb6d3096b17cc74c2ed2536f674aff83.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b2ema"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jhh5g"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fii45"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eq704"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_n7cwk"]
+load_path = "res://.godot/imported/l0_por07.png-ca0e25c5bfccb8a584f5c4a4b22189be.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qif05"]
+load_path = "res://.godot/imported/l0_por07-export.png-8a2bc6ba7589e49e2dd5435e19cf95f0.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x0myi"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw3x3"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cdg3r"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46fla"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4yiul"]
+load_path = "res://.godot/imported/l0_por08.png-ff0118432f68ce1b72e032fadd2ae30c.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_o4l6f"]
+load_path = "res://.godot/imported/l0_por08-export.png-176319c3e649505c0699469481b05576.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_137i2"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mej5m"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qr14c"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3c1sl"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_yui11"]
+load_path = "res://.godot/imported/l0_por10.png-90e5069720a750d865de3082809b8ef1.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_iepev"]
+load_path = "res://.godot/imported/l0_por10-export.png-54c7af50d6de23c475da2de497a92c71.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htgf7"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1pkj"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6vtpj"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hg1ch"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_kihy0"]
+load_path = "res://.godot/imported/l0_por03.png-29a800436548fef94728bc3fa9472d91.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6pfiu"]
+load_path = "res://.godot/imported/l0_por03-export.png-ddfd19ea8002fad109d7f5183bbfa188.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2tduq"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5gevw"]
+bg_color = Color(0, 1, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5r55s"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3q8vw"]
+bg_color = Color(1, 1, 0, 1)
+border_width_right = 2
 border_color = Color(1, 1, 1, 1)
 
 [node name="HUDManager" type="CanvasLayer"]
@@ -64,93 +300,328 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 548.0
+offset_left = 442.0
 offset_top = -74.0
-offset_right = 548.0
-offset_bottom = -74.0
+offset_right = -6.0
+offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Border" type="ColorRect" parent="MiniPortraitsHUD"]
 layout_mode = 0
-offset_right = 598.0
+offset_right = 704.0
 offset_bottom = 68.0
 
 [node name="ColorRect" type="ColorRect" parent="MiniPortraitsHUD"]
 layout_mode = 0
 offset_left = 2.0
 offset_top = 2.0
-offset_right = 596.0
+offset_right = 702.0
 offset_bottom = 66.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
 [node name="MiniPortraits" type="HBoxContainer" parent="MiniPortraitsHUD"]
+custom_minimum_size = Vector2(612, 64)
 layout_mode = 0
 offset_left = 2.0
 offset_top = 2.0
-offset_right = 596.0
+offset_right = 614.0
 offset_bottom = 66.0
-theme_override_constants/separation = 2
+theme_override_constants/separation = 0
 
-[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="Logan" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
 layout_mode = 2
-texture_normal = ExtResource("5_giiwy")
-texture_hover = ExtResource("6_lkkb1")
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Logan" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_1i3s6")
+texture_hover = SubResource("CompressedTexture2D_pyllm")
 script = ExtResource("6_27nvl")
 player_name = "Logan. Raines"
 
-[node name="Port2" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Logan"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("6_sg366")
-texture_hover = ExtResource("9_g6mhh")
+theme_override_styles/background = SubResource("StyleBoxFlat_8pekt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_i65j1")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Logan. Raines"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Logan"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_epjcc")
+theme_override_styles/fill = SubResource("StyleBoxFlat_m4oru")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Logan. Raines"
+
+[node name="Dutch" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Dutch" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_rrbkr")
+texture_hover = SubResource("CompressedTexture2D_cy86t")
 script = ExtResource("6_27nvl")
 player_name = "Dutch. Major"
 
-[node name="Port3" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Dutch"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("7_qo40y")
-texture_hover = ExtResource("11_r8jq7")
+theme_override_styles/background = SubResource("StyleBoxFlat_paibf")
+theme_override_styles/fill = SubResource("StyleBoxFlat_opswl")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Dutch. Major"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Dutch"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_v3hdt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fj8hn")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Dutch. Major"
+
+[node name="Yoshida" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Yoshida" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_7tcv8")
+texture_hover = SubResource("CompressedTexture2D_dyrf4")
 script = ExtResource("6_27nvl")
 player_name = "Yoshida. Boi"
 
-[node name="Port4" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Yoshida"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("8_esie1")
-texture_hover = ExtResource("13_7f5c7")
+theme_override_styles/background = SubResource("StyleBoxFlat_hetko")
+theme_override_styles/fill = SubResource("StyleBoxFlat_0sed5")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Yoshida. Boi"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Yoshida"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_y0pa8")
+theme_override_styles/fill = SubResource("StyleBoxFlat_u40og")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Yoshida. Boi"
+
+[node name="Chuck" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Chuck" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_dd426")
+texture_hover = SubResource("CompressedTexture2D_tnght")
 script = ExtResource("6_27nvl")
 player_name = "Chuck. Genius"
 
-[node name="Port5" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Chuck"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("9_jyg8a")
-texture_hover = ExtResource("15_drm2y")
+theme_override_styles/background = SubResource("StyleBoxFlat_lb2s1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fsjvf")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Chuck. Genius"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Chuck"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_vxljr")
+theme_override_styles/fill = SubResource("StyleBoxFlat_s0au5")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Chuck. Genius"
+
+[node name="Sarah" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Sarah" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_qfrdi")
+texture_hover = SubResource("CompressedTexture2D_a5leg")
 script = ExtResource("6_27nvl")
 player_name = "Sarah. Reese"
 
-[node name="Port6" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Sarah"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("10_nk4bl")
-texture_hover = ExtResource("17_r1e2q")
+theme_override_styles/background = SubResource("StyleBoxFlat_b2ema")
+theme_override_styles/fill = SubResource("StyleBoxFlat_jhh5g")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Sarah. Reese"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Sarah"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_fii45")
+theme_override_styles/fill = SubResource("StyleBoxFlat_eq704")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Sarah. Reese"
+
+[node name="Angel" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Angel" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_n7cwk")
+texture_hover = SubResource("CompressedTexture2D_qif05")
 script = ExtResource("6_27nvl")
 player_name = "Angel. Charlie"
 
-[node name="Port7" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Angel"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("11_uhv8a")
-texture_hover = ExtResource("17_t4128")
+theme_override_styles/background = SubResource("StyleBoxFlat_x0myi")
+theme_override_styles/fill = SubResource("StyleBoxFlat_jw3x3")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Angel. Charlie"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Angel"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_cdg3r")
+theme_override_styles/fill = SubResource("StyleBoxFlat_46fla")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Angel. Charlie"
+
+[node name="John" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/John" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_4yiul")
+texture_hover = SubResource("CompressedTexture2D_o4l6f")
 script = ExtResource("6_27nvl")
 player_name = "John. Doom"
 
-[node name="Port8" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/John"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("12_4kt7h")
-texture_hover = ExtResource("21_f0rto")
+theme_override_styles/background = SubResource("StyleBoxFlat_137i2")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mej5m")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "John. Doom"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/John"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_qr14c")
+theme_override_styles/fill = SubResource("StyleBoxFlat_3c1sl")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "John. Doom"
+
+[node name="Aleks" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Aleks" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_yui11")
+texture_hover = SubResource("CompressedTexture2D_iepev")
 script = ExtResource("6_27nvl")
 player_name = "Aleks. Ducat"
 
-[node name="Port9" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Aleks"]
+custom_minimum_size = Vector2(8, 64)
 layout_mode = 2
-texture_normal = ExtResource("13_ihxk8")
-texture_hover = ExtResource("20_kpdbi")
+theme_override_styles/background = SubResource("StyleBoxFlat_htgf7")
+theme_override_styles/fill = SubResource("StyleBoxFlat_g1pkj")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Aleks. Ducat"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Aleks"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_6vtpj")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hg1ch")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
+player_name = "Aleks. Ducat"
+
+[node name="Annie" type="HBoxContainer" parent="MiniPortraitsHUD/MiniPortraits"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits/Annie" groups=["portrait_controls"]]
+layout_mode = 2
+texture_normal = SubResource("CompressedTexture2D_kihy0")
+texture_hover = SubResource("CompressedTexture2D_6pfiu")
 script = ExtResource("6_27nvl")
+player_name = "Annie. Switch"
+
+[node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Annie"]
+custom_minimum_size = Vector2(8, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_2tduq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_5gevw")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_mu5ix")
+player_name = "Annie. Switch"
+
+[node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Annie"]
+custom_minimum_size = Vector2(6, 64)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_5r55s")
+theme_override_styles/fill = SubResource("StyleBoxFlat_3q8vw")
+step = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("6_bq5k7")
 player_name = "Annie. Switch"

@@ -15,11 +15,16 @@ var firing_time: float = 0.0
 
 @export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
 @onready var hover_tile = get_node_or_null(hover_tile_path)
+@export var hover_tile_scene: PackedScene
 
 # Signals
 signal ability_used
 
 var barrage_completed: bool = false
+
+# Variables to track state
+var hover_tiles_visible = false  # Whether hover tiles are currently displayed
+var hover_tiles = []  # Store references to dynamically created hover tiles
 
 func _ready():
 	pass
@@ -34,9 +39,72 @@ func _process(delta):
 		# Check end turn conditions after firing
 		get_parent().check_end_turn_conditions()
 		barrage_completed = false  # Reset the flag to prevent multiple triggers
-			
+
+	# Check if the barrage toggle is active
+	if GlobalManager.barrage_toggle_active:
+		display_hover_tiles()  # Display hover tiles if the toggle is active
+	elif not GlobalManager.barrage_toggle_active:
+		clear_hover_tiles()  # Clear hover tiles if the toggle is turned off
+					
 	is_mouse_over_gui()
 
+func display_hover_tiles():
+	# Ensure hover_tile exists and a player is selected
+	if not hover_tile or not hover_tile.selected_player:
+		print("No selected player or hover tile.")
+		return
+
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var hovertile_nodes = get_tree().get_nodes_in_group("hovertile")  # Get all nodes in the "hovertile" group
+
+	# Define relative positions for the 8 surrounding tiles + the center tile
+	var relative_positions = [
+		Vector2i(0, 0),   # Center
+		Vector2i(-1, 0),  # Left
+		Vector2i(1, 0),   # Right
+		Vector2i(0, -1),  # Up
+		Vector2i(0, 1),   # Down
+		Vector2i(-1, -1), # Top-left
+		Vector2i(1, -1),  # Top-right
+		Vector2i(-1, 1),  # Bottom-left
+		Vector2i(1, 1)    # Bottom-right
+	]
+
+	# Clear any existing hover tiles before placing new ones
+	clear_hover_tiles()
+
+	# Generate hover tiles at the relevant positions
+	for hovertile in hovertile_nodes:
+		if hovertile:
+			# Get the hovertile's tile position only once
+			var hovertile_tile_pos = hovertile.tile_pos
+			print("Processing hovertile at position: ", hovertile_tile_pos)
+
+			for offset in relative_positions:
+				var target_tile_pos = hovertile_tile_pos + offset
+				var target_world_pos = tilemap.map_to_local(target_tile_pos)
+
+				print("Creating hover tile at: ", target_world_pos)
+
+				# Ensure hover_tile_scene is assigned
+				if hover_tile_scene == null:
+					print("Error: hover_tile_scene is not assigned!")
+					return
+
+				var hover_tile_instance = hover_tile_scene.instantiate() as Node2D
+				hover_tile_instance.position = target_world_pos
+				tilemap.add_child(hover_tile_instance)
+				hover_tiles.append(hover_tile_instance)  # Keep track of the hover tile
+
+	print("Hover tiles displayed: ", hover_tiles.size())
+
+func clear_hover_tiles():
+	# Remove all hover tiles
+	for hover_tile_instance in hover_tiles:
+		if hover_tile_instance:
+			hover_tile_instance.queue_free()
+	hover_tiles.clear()
+	
 func _input(event):
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -210,6 +278,7 @@ func is_mouse_over_gui() -> bool:
 			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 			if rect.has_point(mouse_pos):
 				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				clear_hover_tiles()
 				return true
 	print("Mouse is NOT over any button.")
 	return false

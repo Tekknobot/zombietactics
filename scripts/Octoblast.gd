@@ -96,6 +96,8 @@ func trigger_octoblast():
 	get_parent().has_moved = true
 	await get_tree().create_timer(4).timeout
 	
+	get_parent().current_xp -= 25
+	
 	get_parent().current_xp += 25
 	if get_parent().current_xp >= get_parent().xp_for_next_level:
 		get_parent().level_up()	

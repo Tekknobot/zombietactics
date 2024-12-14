@@ -22,27 +22,27 @@ load_path = "res://.godot/imported/soldier_port.png-835e0b2bb6951b52683f80dc6c7e
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pyllm"]
 load_path = "res://.godot/imported/soldier_port-export.png-451e31764f692acbf5ba34eeb94d3579.ctex"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8pekt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hi3o1"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i65j1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1spur"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_epjcc"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d3gfc"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4oru"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5p7r4"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_rrbkr"]
 load_path = "res://.godot/imported/rambo_port.png-5b480adceb7422f1e50a5905cf025744.ctex"
@@ -54,23 +54,23 @@ load_path = "res://.godot/imported/rambo_port-export.png-005a5720cd7c46370ce7a6b
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opswl"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v3hdt"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fj8hn"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_7tcv8"]
 load_path = "res://.godot/imported/dog_port.png-2520b34f83662a2440e3507d3547b5ae.ctex"
@@ -82,23 +82,23 @@ load_path = "res://.godot/imported/dog_port-export.png-0cc32699eac8114def1a56fa5
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0sed5"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0pa8"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u40og"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dd426"]
 load_path = "res://.godot/imported/l0_por04.png-a8681625e55d24f63c64493398a5e239.ctex"
@@ -110,23 +110,23 @@ load_path = "res://.godot/imported/l0_por04-export.png-54be28f3de96d6fb618854cd5
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fsjvf"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxljr"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s0au5"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qfrdi"]
 load_path = "res://.godot/imported/l0_por06.png-1e7fe40febb069f4b479c27e812282ed.ctex"
@@ -138,23 +138,23 @@ load_path = "res://.godot/imported/l0_por06-export.png-eb6d3096b17cc74c2ed2536f6
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jhh5g"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fii45"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eq704"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_n7cwk"]
 load_path = "res://.godot/imported/l0_por07.png-ca0e25c5bfccb8a584f5c4a4b22189be.ctex"
@@ -166,23 +166,23 @@ load_path = "res://.godot/imported/l0_por07-export.png-8a2bc6ba7589e49e2dd5435e1
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw3x3"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cdg3r"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46fla"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4yiul"]
 load_path = "res://.godot/imported/l0_por08.png-ff0118432f68ce1b72e032fadd2ae30c.ctex"
@@ -194,23 +194,23 @@ load_path = "res://.godot/imported/l0_por08-export.png-176319c3e649505c069946948
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mej5m"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qr14c"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3c1sl"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_yui11"]
 load_path = "res://.godot/imported/l0_por10.png-90e5069720a750d865de3082809b8ef1.ctex"
@@ -222,23 +222,23 @@ load_path = "res://.godot/imported/l0_por10-export.png-54c7af50d6de23c475da2de49
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1pkj"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6vtpj"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hg1ch"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_kihy0"]
 load_path = "res://.godot/imported/l0_por03.png-29a800436548fef94728bc3fa9472d91.ctex"
@@ -250,23 +250,23 @@ load_path = "res://.godot/imported/l0_por03-export.png-ddfd19ea8002fad109d7f5183
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5gevw"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 2
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5r55s"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3q8vw"]
 bg_color = Color(1, 1, 0, 1)
 border_width_right = 2
-border_color = Color(1, 1, 1, 1)
+border_color = Color(1, 1, 1, 0)
 
 [node name="HUDManager" type="CanvasLayer"]
 script = ExtResource("1_ymcj8")
@@ -300,7 +300,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 442.0
+offset_left = 476.0
 offset_top = -74.0
 offset_right = -6.0
 offset_bottom = -6.0
@@ -309,14 +309,14 @@ grow_vertical = 0
 
 [node name="Border" type="ColorRect" parent="MiniPortraitsHUD"]
 layout_mode = 0
-offset_right = 704.0
+offset_right = 670.0
 offset_bottom = 68.0
 
 [node name="ColorRect" type="ColorRect" parent="MiniPortraitsHUD"]
 layout_mode = 0
 offset_left = 2.0
 offset_top = 2.0
-offset_right = 702.0
+offset_right = 668.0
 offset_bottom = 66.0
 color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
@@ -325,7 +325,7 @@ custom_minimum_size = Vector2(612, 64)
 layout_mode = 0
 offset_left = 2.0
 offset_top = 2.0
-offset_right = 614.0
+offset_right = 704.0
 offset_bottom = 66.0
 theme_override_constants/separation = 0
 
@@ -341,10 +341,10 @@ script = ExtResource("6_27nvl")
 player_name = "Logan. Raines"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Logan"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_8pekt")
-theme_override_styles/fill = SubResource("StyleBoxFlat_i65j1")
+theme_override_styles/background = SubResource("StyleBoxFlat_hi3o1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1spur")
 step = 1.0
 fill_mode = 3
 show_percentage = false
@@ -352,10 +352,10 @@ script = ExtResource("8_mu5ix")
 player_name = "Logan. Raines"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Logan"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_epjcc")
-theme_override_styles/fill = SubResource("StyleBoxFlat_m4oru")
+theme_override_styles/background = SubResource("StyleBoxFlat_d3gfc")
+theme_override_styles/fill = SubResource("StyleBoxFlat_5p7r4")
 step = 1.0
 fill_mode = 3
 show_percentage = false
@@ -374,7 +374,7 @@ script = ExtResource("6_27nvl")
 player_name = "Dutch. Major"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Dutch"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_paibf")
 theme_override_styles/fill = SubResource("StyleBoxFlat_opswl")
@@ -385,7 +385,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Dutch. Major"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Dutch"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_v3hdt")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fj8hn")
@@ -407,7 +407,7 @@ script = ExtResource("6_27nvl")
 player_name = "Yoshida. Boi"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Yoshida"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_hetko")
 theme_override_styles/fill = SubResource("StyleBoxFlat_0sed5")
@@ -418,7 +418,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Yoshida. Boi"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Yoshida"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_y0pa8")
 theme_override_styles/fill = SubResource("StyleBoxFlat_u40og")
@@ -440,7 +440,7 @@ script = ExtResource("6_27nvl")
 player_name = "Chuck. Genius"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Chuck"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_lb2s1")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fsjvf")
@@ -451,7 +451,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Chuck. Genius"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Chuck"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_vxljr")
 theme_override_styles/fill = SubResource("StyleBoxFlat_s0au5")
@@ -473,7 +473,7 @@ script = ExtResource("6_27nvl")
 player_name = "Sarah. Reese"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Sarah"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_b2ema")
 theme_override_styles/fill = SubResource("StyleBoxFlat_jhh5g")
@@ -484,7 +484,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Sarah. Reese"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Sarah"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_fii45")
 theme_override_styles/fill = SubResource("StyleBoxFlat_eq704")
@@ -506,7 +506,7 @@ script = ExtResource("6_27nvl")
 player_name = "Angel. Charlie"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Angel"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_x0myi")
 theme_override_styles/fill = SubResource("StyleBoxFlat_jw3x3")
@@ -517,7 +517,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Angel. Charlie"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Angel"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_cdg3r")
 theme_override_styles/fill = SubResource("StyleBoxFlat_46fla")
@@ -539,7 +539,7 @@ script = ExtResource("6_27nvl")
 player_name = "John. Doom"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/John"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_137i2")
 theme_override_styles/fill = SubResource("StyleBoxFlat_mej5m")
@@ -550,7 +550,7 @@ script = ExtResource("8_mu5ix")
 player_name = "John. Doom"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/John"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_qr14c")
 theme_override_styles/fill = SubResource("StyleBoxFlat_3c1sl")
@@ -572,7 +572,7 @@ script = ExtResource("6_27nvl")
 player_name = "Aleks. Ducat"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Aleks"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_htgf7")
 theme_override_styles/fill = SubResource("StyleBoxFlat_g1pkj")
@@ -583,7 +583,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Aleks. Ducat"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Aleks"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_6vtpj")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hg1ch")
@@ -605,7 +605,7 @@ script = ExtResource("6_27nvl")
 player_name = "Annie. Switch"
 
 [node name="ProgressBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Annie"]
-custom_minimum_size = Vector2(8, 64)
+custom_minimum_size = Vector2(6, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_2tduq")
 theme_override_styles/fill = SubResource("StyleBoxFlat_5gevw")
@@ -616,7 +616,7 @@ script = ExtResource("8_mu5ix")
 player_name = "Annie. Switch"
 
 [node name="XPBar" type="ProgressBar" parent="MiniPortraitsHUD/MiniPortraits/Annie"]
-custom_minimum_size = Vector2(6, 64)
+custom_minimum_size = Vector2(4, 64)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_5r55s")
 theme_override_styles/fill = SubResource("StyleBoxFlat_3q8vw")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://ostvhqva4npp"]
+[gd_scene load_steps=25 format=3 uid="uid://ostvhqva4npp"]
 
 [ext_resource type="PackedScene" uid="uid://rdlfqfdmhgit" path="res://assets/scenes/UI/HUD.tscn" id="1_iqwu7"]
 [ext_resource type="Script" path="res://scripts/HUD_Manager.gd" id="1_ymcj8"]
@@ -6,20 +6,23 @@
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="3_lf15b"]
 [ext_resource type="Texture2D" uid="uid://bkcwqu2daxeth" path="res://assets/portraits/soldier_port.png" id="5_giiwy"]
 [ext_resource type="Script" path="res://scripts/CheckPlayerStatus.gd" id="6_27nvl"]
+[ext_resource type="Texture2D" uid="uid://e3ikiqo2c2r" path="res://assets/portraits/Main_Hover/soldier_port-export.png" id="6_lkkb1"]
 [ext_resource type="Texture2D" uid="uid://cadmv3b6b2dsb" path="res://assets/portraits/rambo_port.png" id="6_sg366"]
 [ext_resource type="Texture2D" uid="uid://bk6yt4vowxo7j" path="res://assets/portraits/dog_port.png" id="7_qo40y"]
 [ext_resource type="Texture2D" uid="uid://lfmluokjn1j6" path="res://assets/portraits/pilots/l0_por04.png" id="8_esie1"]
+[ext_resource type="Texture2D" uid="uid://bukcr3t861xut" path="res://assets/portraits/Main_Hover/rambo_port-export.png" id="9_g6mhh"]
 [ext_resource type="Texture2D" uid="uid://c6nugp4n3dm8a" path="res://assets/portraits/pilots/l0_por06.png" id="9_jyg8a"]
 [ext_resource type="Texture2D" uid="uid://dd7tye4sh84h7" path="res://assets/portraits/pilots/l0_por07.png" id="10_nk4bl"]
+[ext_resource type="Texture2D" uid="uid://d0iqsrumcle22" path="res://assets/portraits/Main_Hover/dog_port-export.png" id="11_r8jq7"]
 [ext_resource type="Texture2D" uid="uid://b51r4y38hvqvj" path="res://assets/portraits/pilots/l0_por08.png" id="11_uhv8a"]
 [ext_resource type="Texture2D" uid="uid://ct5fmcph4qs8w" path="res://assets/portraits/pilots/l0_por10.png" id="12_4kt7h"]
+[ext_resource type="Texture2D" uid="uid://o4q6sjphgkm3" path="res://assets/portraits/pilots/Hover/l0_por04-export.png" id="13_7f5c7"]
 [ext_resource type="Texture2D" uid="uid://gqlqs845wp2q" path="res://assets/portraits/pilots/l0_por03.png" id="13_ihxk8"]
-[ext_resource type="Texture2D" uid="uid://cgvo5o4g8t7i7" path="res://assets/meks/M1/m1idle_2.png" id="15_nufwh"]
-[ext_resource type="Texture2D" uid="uid://coo87uak125m" path="res://assets/meks/S3/s3idle_1.png" id="16_11ght"]
-[ext_resource type="Texture2D" uid="uid://bwirocgjkpxsu" path="res://assets/meks/R1/r1idle_1.png" id="17_v8uxk"]
-[ext_resource type="Texture2D" uid="uid://diqi7e4dc63ej" path="res://assets/meks/S2/s2idle_1.png" id="18_idais"]
-[ext_resource type="Texture2D" uid="uid://dfrankfy0q8v1" path="res://assets/meks/M2/m2idle_1.png" id="19_hgfn7"]
-[ext_resource type="Texture2D" uid="uid://dppikiqq4cq5t" path="res://assets/meks/R3/r3idle_1.png" id="20_njpjf"]
+[ext_resource type="Texture2D" uid="uid://l504myfjat50" path="res://assets/portraits/pilots/Hover/l0_por06-export.png" id="15_drm2y"]
+[ext_resource type="Texture2D" uid="uid://bwyl43auwmklc" path="res://assets/portraits/pilots/Hover/l0_por07-export.png" id="17_r1e2q"]
+[ext_resource type="Texture2D" uid="uid://bp7fwfn4gp520" path="res://assets/portraits/pilots/Hover/l0_por08-export.png" id="17_t4128"]
+[ext_resource type="Texture2D" uid="uid://bcd43p882gc2b" path="res://assets/portraits/pilots/Hover/l0_por03-export.png" id="20_kpdbi"]
+[ext_resource type="Texture2D" uid="uid://buswacsnqbt6r" path="res://assets/portraits/pilots/Hover/l0_por10-export.png" id="21_f0rto"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lhc5"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
@@ -89,218 +92,65 @@ offset_right = 596.0
 offset_bottom = 66.0
 theme_override_constants/separation = 2
 
-[node name="Port1" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="Port1" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-texture = ExtResource("5_giiwy")
+texture_normal = ExtResource("5_giiwy")
+texture_hover = ExtResource("6_lkkb1")
 script = ExtResource("6_27nvl")
 player_name = "Logan. Raines"
 
-[node name="Port2" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="Port2" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-texture = ExtResource("6_sg366")
+texture_normal = ExtResource("6_sg366")
+texture_hover = ExtResource("9_g6mhh")
 script = ExtResource("6_27nvl")
 player_name = "Dutch. Major"
 
-[node name="Port3" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="Port3" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-texture = ExtResource("7_qo40y")
+texture_normal = ExtResource("7_qo40y")
+texture_hover = ExtResource("11_r8jq7")
 script = ExtResource("6_27nvl")
 player_name = "Yoshida. Boi"
 
-[node name="Port4" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
+[node name="Port4" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-texture = ExtResource("8_esie1")
+texture_normal = ExtResource("8_esie1")
+texture_hover = ExtResource("13_7f5c7")
 script = ExtResource("6_27nvl")
 player_name = "Chuck. Genius"
 
-[node name="Border" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port4"]
-visible = false
-layout_mode = 0
-offset_left = 41.0
-offset_top = -35.0
-offset_right = 72.0
-
-[node name="Frame" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port4"]
-visible = false
-layout_mode = 0
-offset_left = 43.0
-offset_top = -33.0
-offset_right = 70.0
-offset_bottom = -2.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
-
-[node name="Chuck" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits/Port4" groups=["portrait_controls"]]
-visible = false
+[node name="Port5" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-offset_left = 42.0
-offset_top = -39.0
-offset_right = 74.0
-offset_bottom = 41.0
-texture = ExtResource("15_nufwh")
-script = ExtResource("6_27nvl")
-player_name = "Chuck. Genius"
-
-[node name="Port5" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
-layout_mode = 2
-texture = ExtResource("9_jyg8a")
+texture_normal = ExtResource("9_jyg8a")
+texture_hover = ExtResource("15_drm2y")
 script = ExtResource("6_27nvl")
 player_name = "Sarah. Reese"
 
-[node name="Border" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port5"]
-visible = false
-layout_mode = 0
-offset_left = 35.0
-offset_top = -35.0
-offset_right = 66.0
-
-[node name="Frame" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port5"]
-visible = false
-layout_mode = 0
-offset_left = 37.0
-offset_top = -33.0
-offset_right = 64.0
-offset_bottom = -2.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
-
-[node name="Sarah" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits/Port5" groups=["portrait_controls"]]
-visible = false
+[node name="Port6" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-offset_left = 34.0
-offset_top = -39.0
-offset_right = 66.0
-offset_bottom = 41.0
-texture = ExtResource("16_11ght")
-script = ExtResource("6_27nvl")
-player_name = "Sarah. Reese"
-
-[node name="Port6" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
-layout_mode = 2
-texture = ExtResource("10_nk4bl")
+texture_normal = ExtResource("10_nk4bl")
+texture_hover = ExtResource("17_r1e2q")
 script = ExtResource("6_27nvl")
 player_name = "Angel. Charlie"
 
-[node name="Border" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port6"]
-visible = false
-layout_mode = 0
-offset_left = 27.0
-offset_top = -35.0
-offset_right = 58.0
-
-[node name="Frame" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port6"]
-visible = false
-layout_mode = 0
-offset_left = 29.0
-offset_top = -33.0
-offset_right = 56.0
-offset_bottom = -2.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
-
-[node name="Angel" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits/Port6" groups=["portrait_controls"]]
-visible = false
+[node name="Port7" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-offset_left = 30.0
-offset_top = -39.0
-offset_right = 62.0
-offset_bottom = 41.0
-texture = ExtResource("17_v8uxk")
-script = ExtResource("6_27nvl")
-player_name = "Angel. Charlie"
-
-[node name="Port7" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
-layout_mode = 2
-texture = ExtResource("11_uhv8a")
+texture_normal = ExtResource("11_uhv8a")
+texture_hover = ExtResource("17_t4128")
 script = ExtResource("6_27nvl")
 player_name = "John. Doom"
 
-[node name="Border" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port7"]
-visible = false
-layout_mode = 0
-offset_left = 19.0
-offset_top = -35.0
-offset_right = 50.0
-
-[node name="Frame" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port7"]
-visible = false
-layout_mode = 0
-offset_left = 21.0
-offset_top = -33.0
-offset_right = 48.0
-offset_bottom = -2.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
-
-[node name="John" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits/Port7" groups=["portrait_controls"]]
-visible = false
+[node name="Port8" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-offset_left = 18.0
-offset_top = -34.0
-offset_right = 50.0
-offset_bottom = 46.0
-texture = ExtResource("18_idais")
-script = ExtResource("6_27nvl")
-player_name = "John. Doom"
-
-[node name="Port8" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
-layout_mode = 2
-texture = ExtResource("12_4kt7h")
+texture_normal = ExtResource("12_4kt7h")
+texture_hover = ExtResource("21_f0rto")
 script = ExtResource("6_27nvl")
 player_name = "Aleks. Ducat"
 
-[node name="Border" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port8"]
-visible = false
-layout_mode = 0
-offset_left = 13.0
-offset_top = -39.0
-offset_right = 48.0
-
-[node name="Frame" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port8"]
-visible = false
-layout_mode = 0
-offset_left = 15.0
-offset_top = -37.0
-offset_right = 46.0
-offset_bottom = -2.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
-
-[node name="Aleks" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits/Port8" groups=["portrait_controls"]]
-visible = false
+[node name="Port9" type="TextureButton" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
 layout_mode = 2
-offset_left = 15.0
-offset_top = -41.0
-offset_right = 47.0
-offset_bottom = 39.0
-texture = ExtResource("19_hgfn7")
-script = ExtResource("6_27nvl")
-player_name = "Aleks. Ducat"
-
-[node name="Port9" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits" groups=["portrait_controls"]]
-layout_mode = 2
-texture = ExtResource("13_ihxk8")
-script = ExtResource("6_27nvl")
-player_name = "Annie. Switch"
-
-[node name="Border" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port9"]
-visible = false
-layout_mode = 0
-offset_left = 37.0
-offset_top = -35.0
-offset_right = 68.0
-
-[node name="Frame" type="ColorRect" parent="MiniPortraitsHUD/MiniPortraits/Port9"]
-visible = false
-layout_mode = 0
-offset_left = 39.0
-offset_top = -33.0
-offset_right = 66.0
-offset_bottom = -2.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
-
-[node name="Annie" type="TextureRect" parent="MiniPortraitsHUD/MiniPortraits/Port9" groups=["portrait_controls"]]
-visible = false
-layout_mode = 2
-offset_left = 35.0
-offset_top = -39.0
-offset_right = 67.0
-offset_bottom = 41.0
-texture = ExtResource("20_njpjf")
+texture_normal = ExtResource("13_ihxk8")
+texture_hover = ExtResource("20_kpdbi")
 script = ExtResource("6_27nvl")
 player_name = "Annie. Switch"

@@ -1,4 +1,4 @@
-extends TextureRect
+extends TextureButton
 
 @export var player_name: String  # Name of the player this TextureRect represents
 

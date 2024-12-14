@@ -501,8 +501,6 @@ func is_mouse_over_gui() -> bool:
 			
 # Display attack range tiles around the soldier using the attack_tile_scene
 func display_attack_range_tiles() -> void:
-	if GlobalManager.slash_toggle_active:
-		return
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false

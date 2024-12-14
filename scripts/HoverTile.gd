@@ -266,7 +266,7 @@ func toggle_attack_mode() -> void:
 	audio_player.play()
 		
 	clear_action_tiles()
-	if attack_range_tiles.is_empty():
+	if attack_range_tiles.is_empty() and selected_player.tile_pos == tile_pos:
 		# Switch to attack mode
 		attack_range_tiles = selected_player.get_attack_tiles()
 		selected_player.display_attack_range_tiles()
@@ -276,7 +276,8 @@ func toggle_attack_mode() -> void:
 			hud_manager.hide_special_buttons()	
 	else:
 		# Switch back to movement mode
-		show_movement_tiles(selected_player)
+		#show_movement_tiles(selected_player)
+		pass
 
 # Clears all action tiles (movement and attack) when the selection changes
 func clear_action_tiles() -> void:

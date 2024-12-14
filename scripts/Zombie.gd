@@ -158,7 +158,6 @@ func _process(delta: float) -> void:
 					GlobalManager.zombie_queue.clear()
 					mission_manager.check_mission_manager()
 
-
 				#queue_free()  # Destroy the zombie once the death animation ends
 
 	# Zombie movement

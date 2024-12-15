@@ -119,9 +119,10 @@ func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 
 # Spawn zombies randomly on the opposite half of the map
 func spawn_zombies():
-	var zombie_count = 32
+	var zombies_max = min(map_manager.grid_width, map_manager.grid_height)
+	var zombie_count = zombies_max
 	var spawn_attempts = 0
-	
+			
 	# Shuffle zombie names to ensure uniqueness
 	zombie_names.shuffle()
 	

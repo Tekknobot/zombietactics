@@ -74,7 +74,7 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 		elif tile_pos in movement_range_tiles:
 			# Prevent movement if clicking the same tile the selected player is on
 			# OR if another player unit is on the tile
-			if tile_pos == selected_player.tile_pos or is_tile_occupied_by_player(tile_pos):
+			if tile_pos == selected_player.tile_pos or is_tile_occupied_by_unit(tile_pos):
 				return
 			move_selected_player(tile_pos)
 		else:
@@ -85,8 +85,8 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 		select_unit_at_tile(tile_pos)
 
 # Helper function to check if a tile is occupied by another player unit
-func is_tile_occupied_by_player(tile_pos: Vector2i) -> bool:
-	var all_players = get_tree().get_nodes_in_group("player_units")
+func is_tile_occupied_by_unit(tile_pos: Vector2i) -> bool:
+	var all_players = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
 	for player in all_players:
 		if player.tile_pos == tile_pos:
 			select_unit_at_tile(tile_pos)

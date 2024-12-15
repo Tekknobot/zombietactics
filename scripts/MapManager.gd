@@ -69,6 +69,9 @@ var map_4: bool = false
 func _ready():
 	add_child(hover_tile)  # Add hover tile to the scene
 	hover_tile.visible = false  # Initially hide the hover tile
+	
+	grid_width = get_even_random(16, 33)
+	grid_height = get_even_random(16, 33)
 
 	# Randomly choose a set of values for the tiles
 	match randi() % 4:
@@ -115,6 +118,15 @@ func _ready():
 				
 	generate_map()
 
+# Function to generate even random numbers within a range
+func get_even_random(min_val: int, max_val: int) -> int:
+	var number = randi_range(min_val, max_val)
+	if number % 2 != 0:
+		number += 1  # Adjust to the next even number
+	if number > max_val:  # Ensure it doesn't exceed max_val
+		number -= 2
+	return number
+	
 func _process(delta):
 	# Check if the Space key is pressed
 	if Input.is_action_just_pressed("space"):
@@ -178,7 +190,6 @@ func generate_map():
 	generate_roads(Vector2i(0, horizontal_y4), Vector2i(1, 0))  # Horizontal road 2
 	generate_roads(Vector2i(vertical_x4, 0), Vector2i(0, 1))    # Vertical road 2
 
-
 	spawn_structures()  # Spawn structures after generating the map
 
 # Helper function to generate a unique random odd number within a range
@@ -195,7 +206,7 @@ func get_unique_random_odd(max_value: int, picked_list: Array) -> int:
 # Helper function to generate a random odd number within a range
 func get_random_odd(max_value: int) -> int:
 	var rand_value: int
-	var attempts: int = 0
+	var attempts: int = 16
 	const MAX_ATTEMPTS: int = 1024  # Limit attempts to prevent infinite loop
 
 	# Loop until a valid odd number is found or attempts are exhausted
@@ -205,7 +216,7 @@ func get_random_odd(max_value: int) -> int:
 			rand_value += 1  # Convert to odd if even
 
 		# Ensure the number is not 0 or 16
-		if rand_value != 0 and rand_value != 31:
+		if rand_value != 0 and rand_value != grid_width - 1 and rand_value != grid_height - 1:
 			return rand_value  # Valid odd number found
 
 		attempts += 1

@@ -12,7 +12,7 @@ extends CanvasLayer
 @onready var audio_player = $AudioStreamPlayer2D 
 @export var zombie_audio: AudioStream
 
-var scrolling_duration : float = 90.0  # Time it takes for the text to scroll up
+var scrolling_duration : float = 120.0  # Time it takes for the text to scroll up
 var start_pos : float = 0  # Start position of the text (adjust based on your scene)
 var target_pos : float = -2100  # End position (adjust based on your scene)
 

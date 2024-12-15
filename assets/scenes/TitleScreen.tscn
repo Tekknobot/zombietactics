@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://b08xqujwk1dkr" path="res://assets/ui/TitleLogo/TitleLogo3.png" id="3_w77f6"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="4_wapy1"]
 [ext_resource type="Script" path="res://scripts/MapFader.gd" id="5_6ulmq"]
-[ext_resource type="AudioStream" uid="uid://c7jvd4e8ta7gj" path="res://audio/Tracks/Machine Thang (Rock The Funk) (Demo).mp3" id="6_uylfg"]
+[ext_resource type="AudioStream" uid="uid://dwiiaj73fxtty" path="res://audio/Tracks/Basslined (Demo).mp3" id="8_do4w6"]
 [ext_resource type="FontFile" uid="uid://csnhk3q4gx0" path="res://assets/fonts/magofonts/mago1.ttf" id="9_u12o7"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_aaeo0"]
@@ -47,7 +47,7 @@ offset_left = -43.0
 offset_top = -41.0
 offset_right = 1196.0
 offset_bottom = 771.0
-color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+color = Color(0, 0, 0, 1)
 script = ExtResource("5_6ulmq")
 fade_duration = 3.0
 
@@ -105,7 +105,7 @@ theme_override_font_sizes/normal_font_size = 32
 text = "Version 1.0.0"
 
 [node name="TitleMusic" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("6_uylfg")
+stream = ExtResource("8_do4w6")
 autoplay = true
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]

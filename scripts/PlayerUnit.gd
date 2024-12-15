@@ -949,6 +949,7 @@ func check_end_turn_conditions() -> void:
 func end_turn(player) -> void:
 	if turn_manager:
 		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
+		
 		# Update the HUD to reflect new stats
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud(player)	

@@ -16,12 +16,6 @@ offset_right = 31.0
 grow_vertical = 2
 script = ExtResource("1_8s825")
 
-[node name="Background" type="ColorRect" parent="."]
-visible = false
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
 [node name="DialogueBox" type="VBoxContainer" parent="."]
 layout_mode = 0
 offset_right = 40.0

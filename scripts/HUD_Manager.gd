@@ -266,6 +266,8 @@ func update_hud(character: PlayerUnit):
 	# Debugging: Check if the correct character is passed
 	print("Updating HUD for: ", character)
 
+	turn.visible = true
+
 	# Reset the missile toggle to "off" when updating the HUD
 	if missile:
 		missile.button_pressed = false  # This ensures the toggle is visually set to off
@@ -359,7 +361,9 @@ func update_hud(character: PlayerUnit):
 func update_hud_zombie(character: ZombieUnit):
 	# Debugging: Check if the correct character is passed
 	print("Updating HUD for: ", character)
-
+	
+	turn.visible = false	
+		
 	# Update the rest of the HUD elements
 	if character.portrait_texture and portrait:
 		portrait.texture = character.portrait_texture

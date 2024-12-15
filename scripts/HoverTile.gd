@@ -130,8 +130,9 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 			return
 		
 	if selected_player.has_moved == false:
-		selected_player.move_player_to_target(tile_pos)
-		clear_action_tiles()  # Clear movement and attack tiles after moving
+		await selected_player.move_player_to_target(tile_pos)
+		await clear_action_tiles()  # Clear movement and attack tiles after moving
+		selected_player.has_moved = true
 		
 # Selects a unit or structure at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:	

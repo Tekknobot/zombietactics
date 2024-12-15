@@ -8,6 +8,9 @@ extends Node2D
 @onready var tilemap = get_node("/root/MapManager/TileMap") # Replace with your actual tilemap path
 var WATER_TILE_ID = 0
 
+# Store the used structures globally or as a class variable
+var used_structures = []
+
 var zombie_names = [
 	"Gnasher", "Lunger", "Spewer", "Flailer",
 	"Slosher", "Lasher", "Mumbler", "Thrasher",
@@ -44,13 +47,13 @@ func spawn_zombies():
 		print("No player units or structures found.")
 		return
 
-	# Find the furthest non-demolished structure from any player unit
+	# Find the furthest non-demolished and unused structure from any player unit
 	var furthest_structure = null
 	var furthest_distance = 0  # Start with 0 as we're looking for the max distance
 
 	for structure in structures:
-		if structure.is_demolished:
-			continue  # Skip demolished structures
+		if structure.is_demolished or structure in used_structures:
+			continue  # Skip demolished or already used structures
 
 		for player in player_units:
 			if not structure or not player:
@@ -61,10 +64,13 @@ func spawn_zombies():
 				furthest_structure = structure
 
 	if not furthest_structure:
-		print("No valid non-demolished structures found.")
+		print("No valid non-demolished and unused structures found.")
 		return
 
-	# Debug: Furthest non-demolished structure found
+	# Mark the structure as used
+	used_structures.append(furthest_structure)
+
+	# Debug: Furthest non-demolished and unused structure found
 	print("Furthest structure: ", furthest_structure.name, " at ", furthest_structure.global_position)
 
 	# Spawn 4 zombies adjacent to the furthest structure
@@ -107,7 +113,7 @@ func spawn_zombies():
 
 	if zombies_spawned == 0:
 		print("No zombies were spawned. Check spawn positions.")
-
+		
 # Helper function to get adjacent grid positions
 func get_adjacent_positions(origin: Vector2i) -> Array:
 	var directions = [

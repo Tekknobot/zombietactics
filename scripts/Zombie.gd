@@ -98,14 +98,15 @@ var is_death_processed: bool = false
 
 func _ready() -> void:
 	# Possible values for health and XP
-	var possible_values = [25, 50, 75]
+	var possible_values = [100]
+	var possible_xp_values = [0]
 	
 	# Randomize current_health
 	current_health = possible_values[randi() % possible_values.size()]
 	print("Current Health set to:", current_health)
 
 	# Randomize current_xp
-	current_xp = possible_values[randi() % possible_values.size()]
+	current_xp = possible_xp_values[randi() % possible_xp_values.size()]
 	print("Current XP set to:", current_xp)
 				
 	if map_manager.map_1:

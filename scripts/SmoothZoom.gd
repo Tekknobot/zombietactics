@@ -26,6 +26,9 @@ var drag_start_camera_position: Vector2 = Vector2.ZERO
 
 signal zoom_completed
 
+@export var map_manager: Node2D
+@export var tilemap: TileMap
+
 func _ready():
 	# Initialize the return timer
 	return_to_default_timer = Timer.new()
@@ -33,6 +36,22 @@ func _ready():
 	return_to_default_timer.one_shot = true
 	return_to_default_timer.connect("timeout", Callable(self, "_on_return_to_default_timeout"))
 
+	# Ensure the nodes are ready before focusing
+	call_deferred("_initialize_focus")
+
+func _initialize_focus():
+	if not map_manager or not tilemap:
+		# Ensure map_manager and tilemap are present
+		print("MapManager or TileMap is not set!")
+		return
+
+	# Focus on the tile after ensuring nodes are ready
+	focus_on_tile(tilemap, Vector2i(map_manager.grid_width / 2, map_manager.grid_height / 2))
+	
+	#await get_tree().create_timer(1).timeout
+	#is_mouse_wheel_down = true
+	#target_zoom = Vector2(1,1)
+	
 func focus_on_tile(tilemap: TileMap, tile_coords: Vector2i):
 	# Save the original position and zoom before focusing
 	original_position = position
@@ -62,7 +81,7 @@ func _process(delta):
 		# Smoothly return to the original position and zoom
 		position = position.lerp(original_position, zoom_speed * delta)
 		zoom = zoom.lerp(original_zoom, zoom_speed * delta)
-		if position.distance_to(original_position) < 0.1 and zoom.distance_to(original_zoom) < 0.1:
+		if position.distance_to(original_position) < 15 and zoom.distance_to(original_zoom) < 15:
 			is_zooming_out = false
 			emit_signal("zoom_completed") 
 			 # Notify that zooming in is complete

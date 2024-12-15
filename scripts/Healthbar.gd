@@ -1,7 +1,5 @@
 extends ProgressBar
 
-@export var player_name: String
-
 # Define the color tiers
 @export var high_color: Color = Color(0, 1, 0) # Green
 @export var medium_color: Color = Color(1, 1, 0) # Yellow
@@ -11,7 +9,7 @@ extends ProgressBar
 var fill_stylebox: StyleBoxFlat
 
 func _ready() -> void:	
-	if name == "ProgressBar":
+	if name == "HealthBar":
 		fill_stylebox = self.get_theme_stylebox("fill") as StyleBoxFlat
 		_update_fill_color()
 	else:

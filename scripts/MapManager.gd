@@ -70,8 +70,8 @@ func _ready():
 	add_child(hover_tile)  # Add hover tile to the scene
 	hover_tile.visible = false  # Initially hide the hover tile
 	
-	grid_width = get_even_random(8, 33)
-	grid_height = get_even_random(8, 33)
+	grid_width = get_even_random(12, 33)
+	grid_height = get_even_random(12, 33)
 
 	# Randomly choose a set of values for the tiles
 	match randi() % 4:

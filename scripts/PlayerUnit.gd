@@ -944,11 +944,14 @@ func check_end_turn_conditions() -> void:
 		hud_manager.update_hud(self)
 					
 		get_child(0).play("default")
-		end_turn()
+		end_turn(self)
 
-func end_turn() -> void:
+func end_turn(player) -> void:
 	if turn_manager:
 		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
+		# Update the HUD to reflect new stats
+		var hud_manager = get_parent().get_parent().get_node("HUDManager")
+		hud_manager.update_hud(player)	
 	else:
 		print("Turn manager is not set! Unable to proceed to the next unit.")
 

@@ -16,6 +16,8 @@ var is_shadow_step_active = false
 var WATER_TILE_ID = 0
 @onready var map_manager = get_parent().get_node("/root/MapManager")
 
+var attacked_zombies = []  # List to track already attacked zombies
+
 func _process(delta: float) -> void:
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
@@ -114,7 +116,7 @@ func get_zombie_at_tile(tile_pos: Vector2i):
 func attack_next_zombie():
 	if attack_index >= targeted_zombies.size():
 		print("Shadow Step sequence complete.")
-		is_shadow_step_active = false	# Mark this unit's action as complete
+		is_shadow_step_active = false  # Mark this unit's action as complete
 		
 		GlobalManager.shadows_toggle_active = false
 		
@@ -124,8 +126,10 @@ func attack_next_zombie():
 		return
 
 	var target = targeted_zombies[attack_index]
-	if not target or not target.is_inside_tree():
-		print("Target is no longer valid. Skipping.")
+	
+	# Skip if the target is invalid or already attacked
+	if not target or not target.is_inside_tree() or target in attacked_zombies:
+		print("Target is no longer valid or already attacked. Skipping.")
 		attack_index += 1
 		attack_next_zombie()
 		return
@@ -135,6 +139,9 @@ func attack_next_zombie():
 	teleport_to_adjacent_tile(target)
 	await fade_in(get_parent())
 	perform_attack(target)
+	
+	# Mark this zombie as attacked
+	attacked_zombies.append(target)
 	attack_index += 1
 	attack_next_zombie()
 

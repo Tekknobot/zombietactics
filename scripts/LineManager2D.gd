@@ -286,7 +286,11 @@ func add_xp():
 		if hover_tile.name == "HoverTile":
 			# Check if 'last_selected_player' exists and has 'current_xp' property
 			if hover_tile.selected_player or hover_tile.selected_structure or hover_tile.selected_zombie:
-				hover_tile.selected_player.current_xp += 25
+				if hover_tile.selected_player.player_name == "Annie. Switch" or hover_tile.selected_player.player_name == "John. Doom":
+					pass
+				else:
+					hover_tile.selected_player.current_xp += 25
+				
 				# Update the HUD to reflect new stats
 				hud_manager.update_hud(hover_tile.selected_player)	
 				print("Added 25 XP to", hover_tile.selected_player, "new XP:", hover_tile.selected_player.current_xp)		

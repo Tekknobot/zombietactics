@@ -1,13 +1,18 @@
 extends TextureButton
 
 @export var player_name: String  # Name of the player this TextureRect represents
+@onready var unit_spawn = get_node("/root/MapManager/UnitSpawn")
 
 # Called when the node enters the scene tree for the first time
 func _ready():
-	await get_tree().create_timer(1).timeout
-	check_player_status()
-	# Enable mouse input for the TextureRect
+	# Wait for a signal to start status checking
+	unit_spawn.connect("units_spawned", Callable(self, "_on_units_spawned"))
 	set_mouse_filter(Control.MOUSE_FILTER_PASS)
+
+# Called when all units have spawned
+func _on_units_spawned():
+	# Initial check after units are ready
+	check_player_status()
 
 # Continuously check the player's status in the group
 func _process(delta: float) -> void:
@@ -29,15 +34,14 @@ func check_player_status():
 			else:
 				print("Error: ProgressBar not found for player:", player_name)
 
-			# Find the sibling ProgressBar
+			# Find the sibling XPBar
 			var xp_bar = get_node_or_null("../XPBar")
 			if xp_bar and player.player_name == xp_bar.player_name:
 				xp_bar.value = player.current_xp
 				xp_bar.max_value = player.max_xp
 			else:
-				print("Error: ProgressBar not found for player:", player_name)
+				print("Error: XPBar not found for player:", player_name)
 			
-						
 			# Update modulate based on player's state
 			if player.has_moved and player.has_attacked:
 				self.modulate = Color(0.35, 0.35, 0.35, 1)  # Dim for completed actions
@@ -51,7 +55,7 @@ func check_player_status():
 # Detect when this TextureRect is clicked
 func _gui_input(event: InputEvent) -> void:
 	if GlobalManager.missile_toggle_active or GlobalManager.landmine_toggle_active or GlobalManager.dynamite_toggle_active or GlobalManager.mek_toggle_active or GlobalManager.thread_toggle_active or GlobalManager.dash_toggle_active or GlobalManager.claw_toggle_active or GlobalManager.hellfire_toggle_active or GlobalManager.barrage_toggle_active or GlobalManager.octoblast_toggle_active:
-		return	
+		return    
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		focus_camera_on_player()
 

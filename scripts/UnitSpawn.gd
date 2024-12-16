@@ -42,6 +42,8 @@ var zombie_names = [
 	"Ripper", "Rager", "Slasher", "Tumbler"
 ]
 
+signal units_spawned
+
 func _ready():
 	# Wait for a few frames to ensure the TileMap has generated fully
 	await get_tree().process_frame  # Waits for one frame
@@ -73,7 +75,7 @@ func spawn_player_units():
 	var units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
 
 	# Keep track of failed spawn attempts
-	var max_spawn_attempts_per_unit = 32
+	var max_spawn_attempts_per_unit = 1024
 	var spawned_units = 0
 
 	# Spawn each unit
@@ -97,9 +99,8 @@ func spawn_player_units():
 		print("Warning: Not all player units were spawned. Spawned:", spawned_units, "Expected:", units.size())
 
 	# Trigger zombie spawning once all player units are spawned
-	spawn_zombies()
-
-
+	await spawn_zombies()
+	notify_units_spawned()
 
 func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 	if unit_type == null:
@@ -203,7 +204,7 @@ func get_random_spawn_position(is_player_side: bool) -> Vector2i:
 		return Vector2i(-1, -1)  # Invalid position when map is empty
 	
 	var attempts = 0
-	var max_attempts = 32
+	var max_attempts = 1024
 	while attempts < max_attempts:  # Limit attempts to prevent infinite loops
 		# Determine the x-range based on which side we're spawning on
 		var x_range_start = 0
@@ -252,3 +253,6 @@ func is_occupied(tile_pos: Vector2i) -> bool:
 		if tilemap.local_to_map(structure.position) == tile_pos:
 			return true
 	return false
+
+func notify_units_spawned():
+	emit_signal("units_spawned")

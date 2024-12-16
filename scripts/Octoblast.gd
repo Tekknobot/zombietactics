@@ -86,7 +86,6 @@ func trigger_octoblast():
 		get_parent().get_child(0).play("attack")		
 		await get_tree().create_timer(0.3).timeout
 		missile_manager.start_trajectory(zombie_pos, get_parent().position)
-		get_parent().current_xp -= 25
 
 	GlobalManager.octoblast_toggle_active = false
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
@@ -96,7 +95,7 @@ func trigger_octoblast():
 	get_parent().has_moved = true
 	await get_tree().create_timer(4).timeout
 	
-	#get_parent().current_xp += 25
+	get_parent().current_xp += 25
 	if get_parent().current_xp >= get_parent().xp_for_next_level:
 		get_parent().level_up()	
 	

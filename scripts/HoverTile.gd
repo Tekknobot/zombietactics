@@ -120,7 +120,8 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 		GlobalManager.barrage_toggle_active or 
 		GlobalManager.octoblast_toggle_active or 
 		GlobalManager.grenade_toggle_active or 
-		GlobalManager.slash_toggle_active 
+		GlobalManager.slash_toggle_active or
+		GlobalManager.shadows_toggle_active
 	):
 		return
 	
@@ -157,7 +158,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 				GlobalManager.barrage_toggle_active or 
 				GlobalManager.octoblast_toggle_active or 
 				GlobalManager.grenade_toggle_active or 
-				GlobalManager.slash_toggle_active  
+				GlobalManager.slash_toggle_active or
+				GlobalManager.shadows_toggle_active 
 			):				
 				return
 							
@@ -201,7 +203,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 				GlobalManager.barrage_toggle_active or 
 				GlobalManager.octoblast_toggle_active or 
 				GlobalManager.grenade_toggle_active or 
-				GlobalManager.slash_toggle_active   
+				GlobalManager.slash_toggle_active or
+				GlobalManager.shadows_toggle_active
 			):				
 				return
 				
@@ -340,4 +343,5 @@ func set_special_button_pressed():
 	
 	hud_manager.grenade.button_pressed = false
 	hud_manager.slash.button_pressed = false
+	hud_manager.shadows.button_pressed = false
 		

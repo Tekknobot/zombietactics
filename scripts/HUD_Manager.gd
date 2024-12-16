@@ -26,6 +26,7 @@ extends CanvasLayer
 
 @onready var grenade = $HUD/Grenade
 @onready var slash = $HUD/Slash
+@onready var shadows = $HUD/Shadows
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -89,7 +90,11 @@ func _ready():
 	if slash:
 		slash.connect("toggled", Callable(self, "_on_slash_toggled"))
 		print("Slash connected")
-															
+
+	if shadows:
+		shadows.connect("toggled", Callable(self, "_on_shadows_toggled"))
+		print("Shadows connected")
+																	
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -189,6 +194,18 @@ func _on_slash_toggled(button_pressed: bool) -> void:
 					
 		print("Slash toggle deactivated!")
 
+func _on_shadows_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.shadows_toggle_active = true  # Set the flag to true
+		print("Shadows toggle activated!")	
+		dash.button_pressed = false
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.shadows_toggle_active = false  # Set the flag to false
+		print("Shadows toggle deactivated!")
+
 func _on_thread_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.thread_toggle_active = true  # Set the flag to true
@@ -205,7 +222,7 @@ func _on_dash_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.dash_toggle_active = true  # Set the flag to true
 		print("Dash toggle activated!")	
-
+		shadows.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
@@ -443,12 +460,13 @@ func show_special_buttons(character: PlayerUnit):
 	if character.player_name == "Dutch. Major":
 		dynamite.visible = true
 		slash.visible = true
-		
-	if character.player_name == "Sarah. Reese":
-		thread.visible = true		
 
 	if character.player_name == "Chuck. Genius":
-		dash.visible = true					
+		dash.visible = true
+		shadows.visible = true
+				
+	if character.player_name == "Sarah. Reese":
+		thread.visible = true					
 
 	if character.player_name == "Aleks. Ducat":
 		claw.visible = true	
@@ -479,3 +497,4 @@ func hide_special_buttons():
 	
 	grenade.visible = false
 	slash.visible = false
+	shadows.visible = false

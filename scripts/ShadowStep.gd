@@ -171,7 +171,7 @@ func perform_attack(target):
 
 		# Apply damage to the target
 		target.flash_damage()
-		target.apply_damage(attack_damage)
+		target.apply_damage(get_parent().attack_damage)
 
 		print("Attacked zombie at tile:", target.tile_pos)
 

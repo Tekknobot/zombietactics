@@ -74,33 +74,119 @@ func spawn_player_units():
 	# List of unit scenes for easier access
 	var units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
 
-	# Keep track of failed spawn attempts
+	# Divide the map into 9 zones
+	var zones = initialize_zones()
+	if zones.is_empty():
+		print("Error: Could not initialize zones for spawning.")
+		return
+
+	# Randomly select one zone for players
+	var player_zone = zones.pop_at(randi() % zones.size())
+
+	# Spawn player units in the selected zone
 	var max_spawn_attempts_per_unit = 1024
 	var spawned_units = 0
 
-	# Spawn each unit
 	for unit_type in units:
 		var attempts = 0
 		while attempts < max_spawn_attempts_per_unit:
-			var spawn_position = get_random_spawn_position(true)  # Pass true to restrict to player side
+			var spawn_position = get_random_tile_in_zone(player_zone)
 			if spawn_position != Vector2i(-1, -1):  # Valid position found
 				var unit_instance = spawn_unit_at(unit_type, spawn_position)
 				if unit_instance != null:
 					player_units_spawned += 1
 					spawned_units += 1
-					break  # Move to the next unit after successful spawn
+					break
 			attempts += 1
 
 		if attempts >= max_spawn_attempts_per_unit:
 			print("Failed to spawn unit after multiple attempts:", unit_type)
 
-	# If any units failed to spawn, notify and optionally handle
 	if spawned_units < units.size():
 		print("Warning: Not all player units were spawned. Spawned:", spawned_units, "Expected:", units.size())
 
-	# Trigger zombie spawning once all player units are spawned
-	await spawn_zombies()
+	# Spawn zombies in the remaining zones
+	await spawn_zombies(zones)
 	notify_units_spawned()
+
+func spawn_zombies(zombie_zones: Array):
+	var zombie_count = min(map_manager.grid_width, map_manager.grid_height)
+	var zombie_count_per_zone = zombie_count / zombie_zones.size()
+	zombie_names.shuffle()  # Shuffle zombie names
+
+	for zone in zombie_zones:
+		var spawn_attempts = 0
+		while spawn_attempts < zombie_count_per_zone:
+			var spawn_position = get_random_tile_in_zone(zone)
+			if spawn_position != Vector2i(-1, -1):
+				var zombie_instance = create_zombie_instance()
+				zombie_instance.position = tilemap.map_to_local(spawn_position)
+				zombie_instance.z_index = int(zombie_instance.position.y)
+
+				# Assign unique ID and name
+				zombie_instance.set("zombie_id", zombie_id_counter)
+				zombie_id_counter += 1
+				if zombie_names.size() > 0:
+					zombie_instance.zombie_name = zombie_instance.zombie_type + " " + zombie_names.pop_back()
+
+				# Add to scene tree and group
+				add_child(zombie_instance)
+				zombie_instance.add_to_group("zombies")
+				spawn_attempts += 1
+
+	print("All zombies have been spawned.")
+
+# Divide the map into 9 zones
+func initialize_zones() -> Array:
+	var map_size = tilemap.get_used_rect().size
+
+	if map_size.x == 0 or map_size.y == 0:
+		print("Error: TileMap has no usable tiles.")
+		return []
+
+	var zones = []
+	var zone_width = map_size.x / 3
+	var zone_height = map_size.y / 3
+
+	for i in range(3):
+		for j in range(3):
+			zones.append(Rect2(
+				Vector2i(i * zone_width, j * zone_height),
+				Vector2i(zone_width, zone_height)
+			))
+
+	return zones
+
+# Get a random tile in a specific zone
+func get_random_tile_in_zone(zone: Rect2) -> Vector2i:
+	var attempts = 0
+	var max_attempts = 1024
+	while attempts < max_attempts:
+		var random_x = randi_range(zone.position.x, zone.position.x + zone.size.x - 1)
+		var random_y = randi_range(zone.position.y, zone.position.y + zone.size.y - 1)
+		var tile_pos = Vector2i(random_x, random_y)
+
+		if is_spawnable_tile(tile_pos) and not is_occupied(tile_pos) and is_blank_tile(tile_pos):
+			return tile_pos
+		attempts += 1
+
+	print("Could not find a valid spawn tile in zone:", zone)
+	return Vector2i(-1, -1)
+
+# Create a zombie instance based on map conditions
+func create_zombie_instance() -> Node2D:
+	if GlobalManager.current_map_index == 2:
+		return unit_radioactive_zombie.instantiate() if randi() % 2 == 0 else unit_zombie.instantiate()
+	elif GlobalManager.current_map_index == 3:
+		var roll = randi() % 10
+		if roll < 1:
+			return unit_radioactive_zombie.instantiate()
+		elif roll < 6:
+			return unit_crusher_zombie.instantiate()
+		else:
+			return unit_zombie.instantiate()
+	else:
+		return unit_zombie.instantiate()
 
 func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 	if unit_type == null:
@@ -125,110 +211,6 @@ func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
 	print("Player unit spawned at:", tile_pos, "Facing:", "Right" if random_direction else "Left")
 
 	return unit_instance
-
-# Spawn zombies randomly on the opposite half of the map
-func spawn_zombies():
-	var zombies_max = min(map_manager.grid_width, map_manager.grid_height)
-	var zombie_count = zombies_max
-	var spawn_attempts = 0
-			
-	# Shuffle zombie names to ensure uniqueness
-	zombie_names.shuffle()
-	
-	# Loop until we spawn the desired number of zombies
-	while spawn_attempts < zombie_count:
-		var spawn_position = get_random_spawn_position(false)  # Pass false to restrict to zombie side
-		
-		# Spawn zombie at the chosen position if valid
-		if spawn_position != Vector2i(-1, -1):
-			var zombie_instance
-			
-			# Determine the type of zombie to spawn based on the current map index
-			if GlobalManager.current_map_index == 2:
-				# 50% chance to spawn radioactive zombies on map index 2
-				if randi() % 2 == 0:
-					zombie_instance = unit_radioactive_zombie.instantiate()
-				else:
-					zombie_instance = unit_zombie.instantiate()
-					
-			elif GlobalManager.current_map_index == 3:
-				# Mixed spawning: crusher zombies, radioactive zombies, and normal zombies
-				var roll = randi() % 10  # Random roll (0 to 9)
-				if roll < 1:  # 10% chance for radioactive zombie (0)
-					zombie_instance = unit_radioactive_zombie.instantiate()
-				elif roll < 6:  # 50% chance for crusher zombie (1 to 5)
-					zombie_instance = unit_crusher_zombie.instantiate()
-				else:  # 40% chance for normal zombie (6 to 9)
-					zombie_instance = unit_zombie.instantiate()
-
-			else:
-				# Only spawn normal zombies on other maps
-				zombie_instance = unit_zombie.instantiate()
-			
-			# Set zombie properties
-			zombie_instance.position = tilemap.map_to_local(spawn_position)
-			zombie_instance.z_index = int(zombie_instance.position.y)
-			
-			# Assign a unique ID to the zombie
-			zombie_instance.set("zombie_id", zombie_id_counter)  # Set a custom property for the unique ID
-			zombie_id_counter += 1  # Increment the zombie ID for the next one
-			
-			# Assign a unique name to the zombie
-			if zombie_names.size() > 0:
-				zombie_instance.zombie_name = zombie_instance.zombie_type + " " + zombie_names.pop_back()  # Remove the last name from the list
-
-			# Randomly determine the direction (left or right)
-			var random_direction = randi() % 2 == 0  # True for right, False for left
-			zombie_instance.scale = Vector2(
-				abs(zombie_instance.scale.x) if random_direction else -abs(zombie_instance.scale.x),
-				zombie_instance.scale.y
-			)
-			
-			# Add to scene tree and zombie units group
-			add_child(zombie_instance)
-			zombie_instance.add_to_group("zombies")
-			spawn_attempts += 1
-			print("Zombie spawned at:", spawn_position, "with ID:", zombie_instance.zombie_id, "and name:", zombie_instance.zombie_name)
-	
-	# Disable further spawning once all zombies are spawned
-	can_spawn = false
-	print("All units and zombies have been spawned.")
-
-# Finds a random, unoccupied, spawnable tile on the map, restricted by side if needed
-func get_random_spawn_position(is_player_side: bool) -> Vector2i:
-	var map_size = tilemap.get_used_rect().size
-	
-	# Ensure map size is valid to avoid modulo by zero error
-	if map_size.x == 0 or map_size.y == 0:
-		print("Error: TileMap has no usable tiles.")
-		return Vector2i(-1, -1)  # Invalid position when map is empty
-	
-	var attempts = 0
-	var max_attempts = 1024
-	while attempts < max_attempts:  # Limit attempts to prevent infinite loops
-		# Determine the x-range based on which side we're spawning on
-		var x_range_start = 0
-		var x_range_end = map_size.x / 2 - 1  # Left half for players
-		
-		# If spawning zombies, use the right half of the map
-		if not is_player_side:
-			x_range_start = map_size.x / 2
-			x_range_end = map_size.x - 1
-
-		# Generate a random tile position within the specified range
-		var random_x = randi_range(x_range_start, x_range_end)
-		var random_y = randi() % map_size.y
-		var tile_pos = Vector2i(random_x, random_y)
-		
-		# Check if the tile is spawnable and unoccupied
-		if is_spawnable_tile(tile_pos) and not is_occupied(tile_pos) and is_blank_tile(tile_pos):
-			return tile_pos  # Return a valid position
-		
-		attempts += 1
-	
-	print("Could not find a valid spawn position after multiple attempts.")
-	return Vector2i(-1, -1)  # Return an invalid position if none found
-
 
 # Checks if a tile is spawnable (not water)
 func is_spawnable_tile(tile_pos: Vector2i) -> bool:

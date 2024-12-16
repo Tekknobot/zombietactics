@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://63yq6nmq73ny"
+path="res://.godot/imported/80s Zombie (Demo).mp3-02fd0ae2598d0bc9fba3b5ba60107c5e.mp3str"
+
+[deps]
+
+source_file="res://audio/Tracks/80s Zombie (Demo).mp3"
+dest_files=["res://.godot/imported/80s Zombie (Demo).mp3-02fd0ae2598d0bc9fba3b5ba60107c5e.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

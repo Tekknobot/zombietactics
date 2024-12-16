@@ -68,29 +68,37 @@ func _ready():
 	else:		
 		spawn_player_units()  # Proceed to spawn units if the map has tiles
 
-# Function to spawn player units on one half of the map
 func spawn_player_units():
 	# List of unit scenes for easier access
 	var units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
-	
-	# Units that need color modulation
-	var mek_units = [M1, M2, R1, R3, S2, S3]
 
-	# Spawn each unit at a random, valid position on one half of the map
+	# Keep track of failed spawn attempts
+	var max_spawn_attempts_per_unit = 32
+	var spawned_units = 0
+
+	# Spawn each unit
 	for unit_type in units:
-		var spawn_position = get_random_spawn_position(true)  # Pass true to restrict to player side
-		if spawn_position != Vector2i(-1, -1):
-			var unit_instance = spawn_unit_at(unit_type, spawn_position)
+		var attempts = 0
+		while attempts < max_spawn_attempts_per_unit:
+			var spawn_position = get_random_spawn_position(true)  # Pass true to restrict to player side
+			if spawn_position != Vector2i(-1, -1):  # Valid position found
+				var unit_instance = spawn_unit_at(unit_type, spawn_position)
+				if unit_instance != null:
+					player_units_spawned += 1
+					spawned_units += 1
+					break  # Move to the next unit after successful spawn
+			attempts += 1
 
-			# If the unit is a mek unit, modulate its color
-			if unit_type in mek_units:
-				#unit_instance.modulate = Color8(255, 110, 255)  # Random color modulation
-				pass
-				
-			player_units_spawned += 1
+		if attempts >= max_spawn_attempts_per_unit:
+			print("Failed to spawn unit after multiple attempts:", unit_type)
 
-	# Once all player units are spawned, trigger zombie spawning
+	# If any units failed to spawn, notify and optionally handle
+	if spawned_units < units.size():
+		print("Warning: Not all player units were spawned. Spawned:", spawned_units, "Expected:", units.size())
+
+	# Trigger zombie spawning once all player units are spawned
 	spawn_zombies()
+
 
 
 func spawn_unit_at(unit_type: PackedScene, tile_pos: Vector2i) -> Node2D:
@@ -195,7 +203,8 @@ func get_random_spawn_position(is_player_side: bool) -> Vector2i:
 		return Vector2i(-1, -1)  # Invalid position when map is empty
 	
 	var attempts = 0
-	while attempts < 20:  # Limit attempts to prevent infinite loops
+	var max_attempts = 32
+	while attempts < max_attempts:  # Limit attempts to prevent infinite loops
 		# Determine the x-range based on which side we're spawning on
 		var x_range_start = 0
 		var x_range_end = map_size.x / 2 - 1  # Left half for players

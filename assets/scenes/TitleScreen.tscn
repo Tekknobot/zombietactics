@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://b08xqujwk1dkr" path="res://assets/ui/TitleLogo/TitleLogo3.png" id="3_w77f6"]
 [ext_resource type="FontFile" uid="uid://buw362wjb8o8d" path="res://assets/fonts/magofonts/mago2.ttf" id="4_wapy1"]
 [ext_resource type="Script" path="res://scripts/MapFader.gd" id="5_6ulmq"]
-[ext_resource type="AudioStream" uid="uid://bpenlx3qfvolb" path="res://audio/Tracks/80s Zombie.mp3" id="8_ax00t"]
+[ext_resource type="AudioStream" uid="uid://63yq6nmq73ny" path="res://audio/Tracks/80s Zombie (Demo).mp3" id="8_p5o1f"]
 [ext_resource type="FontFile" uid="uid://csnhk3q4gx0" path="res://assets/fonts/magofonts/mago1.ttf" id="9_u12o7"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_aaeo0"]
@@ -105,7 +105,7 @@ theme_override_font_sizes/normal_font_size = 32
 text = "Version 1.0.0"
 
 [node name="TitleMusic" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("8_ax00t")
+stream = ExtResource("8_p5o1f")
 autoplay = true
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]

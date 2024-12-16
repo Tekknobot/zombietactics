@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://bv2poub3ty2mn"]
+
+[ext_resource type="Script" path="res://scripts/MusicManager.gd" id="1_tp0fg"]
+[ext_resource type="AudioStream" uid="uid://bpenlx3qfvolb" path="res://audio/Tracks/80s Zombie.mp3" id="2_ryruv"]
+
+[node name="MusicManager" type="Node2D"]
+script = ExtResource("1_tp0fg")
+music_stream = ExtResource("2_ryruv")

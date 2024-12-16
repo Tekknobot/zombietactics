@@ -33,11 +33,26 @@ var player_to_move
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 
+@export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
+@onready var hover_tile = get_node_or_null(hover_tile_path)
+@export var hover_tile_scene: PackedScene
+
+var hover_tiles = []  # Store references to instantiated hover tiles
+var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
+
+var yoshida
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	await get_tree().create_timer(1).timeout
+	
 	if tilemap == null:
 		print("Error: Tilemap is not set.")
 		return
+
+	var hovertiles = get_tree().get_nodes_in_group("hovertile")
+	for hovertile in hovertiles:
+		hover_tile = hovertile
 		
 	setup_astar()
 
@@ -54,12 +69,16 @@ func _process(delta: float) -> void:
 	else:
 		print("Error: No map selected, defaulting WATER to 0.")
 		WATER_TILE_ID = 0  # Fallback value if no map is selected
+
+	if GlobalManager.landmine_toggle_active:
+		update_hover_tiles()
+	else:
+		clear_hover_tiles()	
 		
-	move_along_path(delta)
-	
+	move_along_path(delta)	
 	is_mouse_over_gui()
 
-func _input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:	
 	# Block gameplay input if the mouse is over GUI
 	if is_mouse_over_gui():
 		print("Input blocked by GUI.")
@@ -67,6 +86,11 @@ func _input(event: InputEvent) -> void:
 					
 	if not GlobalManager.landmine_toggle_active:
 		return
+
+	# Check for mouse motion or click
+	if event is InputEventMouseMotion:
+		if GlobalManager.landmine_toggle_active:
+			update_hover_tiles()	
 
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
@@ -79,8 +103,57 @@ func _input(event: InputEvent) -> void:
 				# Only move if the target tile is walkable
 				if is_tile_movable(target_tile_pos):
 					move_player_to_target(target_tile_pos)
+					
+					GlobalManager.landmine_toggle_active = false
+					clear_hover_tiles()
 				else:
 					print("Tile is not walkable!")
+
+func update_hover_tiles():
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		if player.player_name == "Yoshida. Boi":
+			yoshida = player
+	
+	var start_tile = yoshida.tile_pos  # Unit's current tile position
+	var end_tile = hover_tile.tile_pos  # Hover tile position
+
+	# Avoid redundant updates if the end tile hasn't changed
+	if end_tile == last_hovered_tile:
+		return
+	
+	last_hovered_tile = end_tile
+
+	# Clear existing hover tiles
+	clear_hover_tiles()
+
+	# Ensure AStar is updated and calculate the path
+	yoshida.update_astar_grid()
+	var path = yoshida.astar.get_point_path(start_tile, end_tile)
+
+	if path.size() == 0:
+		print("No path found between start and end tile.")
+		return
+
+	# Iterate through the path and place hover tiles
+	for pos in path:
+		var tile_pos = Vector2i(pos)  # Ensure tile position is a Vector2i
+		var world_pos = tilemap.map_to_local(tile_pos)
+
+		# Create a hover tile
+		if hover_tile_scene:
+			var hover_tile_instance = hover_tile_scene.instantiate()
+			hover_tile_instance.position = world_pos
+			tilemap.add_child(hover_tile_instance)
+			hover_tiles.append(hover_tile_instance)
+
+func clear_hover_tiles():
+	for tile in hover_tiles:
+		tile.queue_free()
+	hover_tiles.clear()
+
 
 # Update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:

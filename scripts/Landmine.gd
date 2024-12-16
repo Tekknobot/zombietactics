@@ -7,6 +7,10 @@ var tile_pos: Vector2i
 var coord: Vector2
 var layer: int
 
+@export var hover_tile_path: NodePath = "/root/MapManager/HoverTile"
+@onready var hover_tile = get_node_or_null(hover_tile_path)
+@export var hover_tile_scene: PackedScene
+
 func _process(delta: float) -> void:
 	update_tile_position()
 	check_for_units_on_tile()

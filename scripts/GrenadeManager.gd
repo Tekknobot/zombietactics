@@ -281,7 +281,7 @@ func animate_grenade_trajectory(grenade_inst: Node2D, points: Array) -> void:
 	
 	explosions_triggered += 1
 	
-	if explosions_triggered >= 1:
+	if explosions_triggered == 1:
 		add_xp()
 		get_parent().has_attacked = true
 		get_parent().has_moved = true

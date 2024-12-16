@@ -220,7 +220,7 @@ func get_random_spawn_position(is_player_side: bool) -> Vector2i:
 		var tile_pos = Vector2i(random_x, random_y)
 		
 		# Check if the tile is spawnable and unoccupied
-		if is_spawnable_tile(tile_pos) and not is_occupied(tile_pos):
+		if is_spawnable_tile(tile_pos) and not is_occupied(tile_pos) and is_blank_tile(tile_pos):
 			return tile_pos  # Return a valid position
 		
 		attempts += 1
@@ -233,6 +233,11 @@ func get_random_spawn_position(is_player_side: bool) -> Vector2i:
 func is_spawnable_tile(tile_pos: Vector2i) -> bool:
 	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
 	return tile_id != WATER
+
+# Checks if a tile is spawnable (not water)
+func is_blank_tile(tile_pos: Vector2i) -> bool:
+	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
+	return tile_id != -1
 
 # Checks if a tile is occupied by another unit or structure
 func is_occupied(tile_pos: Vector2i) -> bool:

@@ -90,21 +90,30 @@ func shadow_step(target_zombie):
 	# Start the attack sequence
 	attack_next_zombie()
 	
-
 func find_nearest_zombies(max_count: int) -> Array:
 	var zombies_in_range = []
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var current_position = get_parent().tile_pos
 
-	zombies.sort_custom(func(a, b):
-		return current_position.distance_to(a.tile_pos) - current_position.distance_to(b.tile_pos))
+	# Manual bubble sort based on distance to `current_position`
+	for i in range(zombies.size()):
+		for j in range(0, zombies.size() - i - 1):
+			var dist_a = current_position.distance_to(zombies[j].tile_pos)
+			var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
+			if dist_a > dist_b:
+				# Swap the zombies
+				var temp = zombies[j]
+				zombies[j] = zombies[j + 1]
+				zombies[j + 1] = temp
 
+	# Collect the nearest zombies up to max_count
 	for zombie in zombies:
 		zombies_in_range.append(zombie)
 		if zombies_in_range.size() >= max_count:
 			break
 
 	return zombies_in_range
+
 
 func get_zombie_at_tile(tile_pos: Vector2i):
 	var zombies = get_tree().get_nodes_in_group("zombies")

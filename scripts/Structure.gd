@@ -191,4 +191,6 @@ func _remove_unit_from_group(unit: Node, group_name: String) -> void:
 	await get_tree().create_timer(1).timeout
 	unit.visible = false  # Hide the unit
 	unit.remove_from_group(group_name)  # Remove it from its group
+	unit.current_health = 0
+	unit.current_xp = 0
 	print("Unit removed from group: ", group_name)

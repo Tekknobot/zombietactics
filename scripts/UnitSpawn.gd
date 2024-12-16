@@ -93,8 +93,10 @@ func spawn_player_units():
 
 	for unit_type in units:
 		var attempts = 0
+		var spawn_position = Vector2i(-1, -1)
+
 		while attempts < max_spawn_attempts_per_unit:
-			var spawn_position = get_random_tile_in_zone(player_zone)
+			spawn_position = get_random_tile_in_zone(player_zone)
 			if spawn_position != Vector2i(-1, -1):  # Valid position found
 				# Check if the position meets the minimum distance requirement
 				var is_too_close = false
@@ -103,21 +105,25 @@ func spawn_player_units():
 						is_too_close = true
 						break
 
-				if is_too_close:
-					attempts += 1
-					continue
+				if not is_too_close:
+					break  # Found a valid position, exit the loop
 
-				# Spawn the unit and record its position
-				var unit_instance = spawn_unit_at(unit_type, spawn_position)
-				if unit_instance != null:
-					player_positions.append(spawn_position)
-					player_units_spawned += 1
-					spawned_units += 1
-					break
 			attempts += 1
 
-		if attempts >= max_spawn_attempts_per_unit:
-			print("Failed to spawn unit after multiple attempts:", unit_type)
+		# If no valid position was found, fallback to the next best open tile near another player
+		if spawn_position == Vector2i(-1, -1) or attempts >= max_spawn_attempts_per_unit:
+			print("Fallback: Finding an open tile near an existing player.")
+			spawn_position = find_open_tile_near_player(player_positions)
+
+		# Spawn the unit at the selected position
+		if spawn_position != Vector2i(-1, -1):  # Ensure the position is still valid
+			var unit_instance = spawn_unit_at(unit_type, spawn_position)
+			if unit_instance != null:
+				player_positions.append(spawn_position)
+				player_units_spawned += 1
+				spawned_units += 1
+		else:
+			print("Error: No valid position found even after fallback for unit:", unit_type)
 
 	if spawned_units < units.size():
 		print("Warning: Not all player units were spawned. Spawned:", spawned_units, "Expected:", units.size())
@@ -125,6 +131,26 @@ func spawn_player_units():
 	# Spawn zombies in the remaining zones
 	await spawn_zombies(zones)
 	notify_units_spawned()
+
+func find_open_tile_near_player(player_positions: Array) -> Vector2i:
+	# Define directions for adjacent tiles (up, down, left, right)
+	var directions = [
+		Vector2i(0, -1),  # Up
+		Vector2i(0, 1),   # Down
+		Vector2i(-1, 0),  # Left
+		Vector2i(1, 0)    # Right
+	]
+	
+	for player_position in player_positions:
+		for direction in directions:
+			var adjacent_tile = player_position + direction
+			
+			# Check if the tile is valid for spawning
+			if is_spawnable_tile(adjacent_tile) and not is_occupied(adjacent_tile) and is_not_blank_tile(adjacent_tile):
+				return adjacent_tile  # Return the first valid adjacent tile
+
+	print("No valid open tile found next to any player unit.")
+	return Vector2i(-1, -1)  # Return an invalid position if none found
 
 func spawn_zombies(zombie_zones: Array):
 	var zombie_count = min(map_manager.grid_width, map_manager.grid_height)
@@ -183,7 +209,7 @@ func get_random_tile_in_zone(zone: Rect2) -> Vector2i:
 		var random_y = randi_range(zone.position.y, zone.position.y + zone.size.y - 1)
 		var tile_pos = Vector2i(random_x, random_y)
 
-		if is_spawnable_tile(tile_pos) and not is_occupied(tile_pos) and is_blank_tile(tile_pos):
+		if is_spawnable_tile(tile_pos) and not is_occupied(tile_pos) and is_not_blank_tile(tile_pos):
 			return tile_pos
 		attempts += 1
 
@@ -235,7 +261,7 @@ func is_spawnable_tile(tile_pos: Vector2i) -> bool:
 	return tile_id != WATER
 
 # Checks if a tile is spawnable (not water)
-func is_blank_tile(tile_pos: Vector2i) -> bool:
+func is_not_blank_tile(tile_pos: Vector2i) -> bool:
 	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
 	return tile_id != -1
 

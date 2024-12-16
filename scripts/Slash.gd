@@ -108,9 +108,6 @@ func shadow_slash(direction: Vector2):
 
 	# Calculate the trajectory
 	var trajectory = calculate_line_positions(parent_unit.global_position, end_position)
-
-	get_parent().audio_player.stream = get_parent().slash_audio
-	get_parent().audio_player.play()
 	
 	# Dash along the trajectory
 	is_slashing = true
@@ -149,6 +146,10 @@ func dash_along_trajectory(trajectory: Array):
 		var enemy = find_enemy_at_position(position)
 		if enemy:
 			get_parent().get_child(0).play("attack")
+			
+			get_parent().get_child(8).stream = get_parent().slash_audio
+			get_parent().get_child(8).play()
+						
 			await get_tree().create_timer(0.5).timeout
 			enemy.flash_damage()
 			

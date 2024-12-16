@@ -83,6 +83,10 @@ func spawn_player_units():
 	# Randomly select one zone for players
 	var player_zone = zones.pop_at(randi() % zones.size())
 
+	# Set minimum distance between player spawns
+	var minimum_distance = 2  # Adjust based on game requirements
+	var player_positions = []  # Track positions of spawned players
+
 	# Spawn player units in the selected zone
 	var max_spawn_attempts_per_unit = 1024
 	var spawned_units = 0
@@ -92,8 +96,21 @@ func spawn_player_units():
 		while attempts < max_spawn_attempts_per_unit:
 			var spawn_position = get_random_tile_in_zone(player_zone)
 			if spawn_position != Vector2i(-1, -1):  # Valid position found
+				# Check if the position meets the minimum distance requirement
+				var is_too_close = false
+				for existing_position in player_positions:
+					if spawn_position.distance_to(existing_position) < minimum_distance:
+						is_too_close = true
+						break
+
+				if is_too_close:
+					attempts += 1
+					continue
+
+				# Spawn the unit and record its position
 				var unit_instance = spawn_unit_at(unit_type, spawn_position)
 				if unit_instance != null:
+					player_positions.append(spawn_position)
 					player_units_spawned += 1
 					spawned_units += 1
 					break

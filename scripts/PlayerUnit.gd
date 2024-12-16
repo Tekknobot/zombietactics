@@ -91,6 +91,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var footstep_audio = preload("res://audio/SFX/blade_dash.wav")
 @export var claw_audio = preload("res://audio/SFX/panther_growl.wav")
 @export var slash_audio = preload("res://audio/SFX/slash.wav")
+@export var blade_audio = preload("res://audio/SFX/Retro Magic 06.wav")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode

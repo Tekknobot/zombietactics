@@ -216,8 +216,8 @@ func blade_dash_strike(target_tile: Vector2i) -> void:
 		return
 
 	#Play SFX
-	get_parent().get_child(2).stream = get_parent().footstep_audio
-	get_parent().get_child(2).play()
+	get_parent().get_child(9).stream = get_parent().footstep_audio
+	get_parent().get_child(9).play()
 
 	# Dash to the target position along the path
 	dash_to_target(get_process_delta_time())

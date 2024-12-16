@@ -147,6 +147,13 @@ func attack_next_zombie():
 	await fade_out(get_parent())
 	teleport_to_adjacent_tile(target)
 	await fade_in(get_parent())
+	
+	await get_tree().create_timer(0.2).timeout
+	
+	# Play SFX
+	get_parent().get_child(9).stream = get_parent().slash_audio
+	get_parent().get_child(9).play()
+			
 	perform_attack(target)
 	
 	# Mark this zombie as attacked
@@ -155,11 +162,7 @@ func attack_next_zombie():
 	attack_next_zombie()
 
 func perform_attack(target):
-	if target and target.is_inside_tree():
-		# Play SFX
-		target.audio_player.stream = target.zombie_audio
-		target.audio_player.play()
-
+	if target and target.is_inside_tree():	
 		# Flip to face the target
 		update_facing_direction(target.global_position)
 
@@ -169,6 +172,10 @@ func perform_attack(target):
 		# Wait for the attack animation to finish before applying damage
 		await get_tree().create_timer(0.5).timeout
 
+		# Play SFX
+		target.audio_player.stream = target.zombie_audio
+		target.audio_player.play()
+		
 		# Apply damage to the target
 		target.flash_damage()
 		target.apply_damage(get_parent().attack_damage)

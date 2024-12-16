@@ -119,7 +119,8 @@ func attack_next_zombie():
 		GlobalManager.shadows_toggle_active = false
 		
 		get_parent().has_attacked = true
-		get_parent().has_moved = true		
+		get_parent().has_moved = true	
+		get_parent().check_end_turn_conditions()	
 		return
 
 	var target = targeted_zombies[attack_index]

@@ -20,7 +20,7 @@ func check_mission_manager():
 		hud_manager.visible = false
 		map_fader.fade_in()
 		
-	if GlobalManager.zombies_cleared and GlobalManager.secret_item_found:		
+	if GlobalManager.zombies_cleared and GlobalManager.secret_items_found == 3:		
 		GlobalManager.map_cleared = true
 		hud_manager.visible = false
 		await get_tree().create_timer(2).timeout

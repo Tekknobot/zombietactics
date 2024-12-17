@@ -1,124 +1,124 @@
 extends Node
 
-@export var item_name: String = "Secret Document"  # The name of the item to be found
-var item_structure: Node = null  # The structure containing the item
+@export var item_names: Array[String] = ["Secret Document", "A.I. Relic", "Mysterious Artifact"]
+var item_structures: Array = []  # The structures containing the items
 
 @onready var tilemap: TileMap = $TileMap  # Reference your TileMap node
-
 @export var item_scene: PackedScene  # Assign the Item.tscn in the Inspector
 
-var item_discovered: bool = false
-var item_handled: bool = false  # Prevents multiple checks once the outcome is decided
+var items_discovered: int = 0
+var item_handled: Array = []  # Prevents multiple checks per item
 
 func _ready():
 	await get_tree().create_timer(0.1).timeout
-	assign_item_to_structure()
+	assign_items_to_structures()
 
-func check_item_destroyed():
-	# Skip if the item has already been handled
-	if item_handled:
-		return
-	
-	# Wait for 1 second before checking (e.g., to allow animations to play)
-	await get_tree().create_timer(1).timeout
-
-	var animated_sprite = item_structure.get_node("AnimatedSprite2D") as AnimatedSprite2D
-	if animated_sprite.animation == "demolished":
-		on_item_destroyed(item_structure)
-		
-		GlobalManager.secret_item_destroyed = true
-		item_handled = true  # Prevent further checks	
-		print("Secret Item Destroyed: GAME OVER")
-
-# Function to assign the item to a random structure
-func assign_item_to_structure():
-	# Get all structures in the group
+# Function to assign items to 3 random structures
+func assign_items_to_structures():
 	var structures = get_tree().get_nodes_in_group("structures")
-	if structures.size() == 0:
-		print("No structures found in the group!")
+	if structures.size() < 3:
+		print("Not enough structures to assign items!")
 		return
 
-	# Select a random structure
-	item_structure = structures[randi() % structures.size()]
-	print("Item assigned to structure:", item_structure.name)
-	
-	item_structure.modulate = Color(0.4, 0.4, 0.4)
+	# Shuffle the structures and select the first 3 unique ones
+	structures.shuffle()
+	item_structures = structures.slice(0, 3)
+	item_handled = [false, false, false]  # Initialize handling flags for each item
 
-	# Optionally, you can mark the structure visually or with metadata
-	item_structure.set_meta("contains_item", true)  # Tag the structure
-	item_structure.has_item = true
-	# Example: Highlight the structure for debugging (remove in final version)
-	if item_structure.has_method("highlight"):
-		item_structure.highlight(true)
+	# Assign items to structures
+	for i in range(item_structures.size()):
+		var structure = item_structures[i]
+		print("Item assigned:", item_names[i], "to structure:", structure.name)
+		structure.set_meta("contains_item", true)  # Mark the structure
+		structure.has_item = true
 
-# Function to check if a player is adjacent to the structure containing the item
+		# Optional highlight
+		structure.modulate = Color(0.5, 0.5, 0.5)
+
+# Function to check if a player is adjacent to any item structure
 func check_for_item_discovery(player: Area2D):
-	if not item_structure:
-		print("No item structure assigned!")
+	for i in range(item_structures.size()):
+		var structure = item_structures[i]
+		if not structure or item_handled[i]:  # Skip handled items
+			continue
+
+		var player_tile_pos = tilemap.local_to_map(player.global_position)
+		var structure_tile_pos = tilemap.local_to_map(structure.global_position)
+
+		# Check adjacency
+		if is_adjacent(player_tile_pos, structure_tile_pos):
+			print("Player discovered the item:", item_names[i])
+			on_item_discovered(player, structure, i)
+
+# Function to handle item discovery
+func on_item_discovered(player: Area2D, structure: Node, item_index: int):
+	if item_handled[item_index]:  # Ensure the item is not handled twice
 		return
 
-	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	
-	# Get the player's and structure's tile positions
-	var player_tile_pos = tilemap.local_to_map(player.global_position)
-	var structure_tile_pos = tilemap.local_to_map(item_structure.global_position)
+	item_handled[item_index] = true
+	items_discovered += 1
 
-	# Check if the player is adjacent to the structure
-	if is_adjacent(player_tile_pos, structure_tile_pos):
-		print("Player discovered the item:", item_name)
+	# Instantiate the item scene
+	if item_scene:
+		var item_instance = item_scene.instantiate()
+		add_child(item_instance)
+		item_instance.position = structure.global_position + Vector2(0, -40)  # Adjust position as needed
+		print("Item added to scene:", item_names[item_index])
 
-		# Trigger the discovery event (e.g., collect the item, update UI)
-		on_item_discovered(player, item_structure)
+		# Adjust item position based on the structure type
+		match structure.structure_type:
+			"Building":
+				item_instance.position = structure.global_position + Vector2(0, -40)
+			"Tower":
+				item_instance.position = structure.global_position + Vector2(0, -58)
+			"Stadium":
+				item_instance.position = structure.global_position + Vector2(0, -32)
+			"District":
+				item_instance.position = structure.global_position + Vector2(0, -48)
+
+
+	# Perform your item discovery logic
+	structure.set_meta("contains_item", false)
+	GlobalManager.secret_items_found += 1  # Increment global item count
+	print("Total items discovered:", items_discovered)
+
+	# Optional: Check if all items are discovered
+	if items_discovered == 3:
+		print("All items discovered! Congratulations!")
 
 # Helper function to check adjacency between two tiles
 func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:
 	var delta = tile_a - tile_b
 	return abs(delta.x) + abs(delta.y) == 1  # Manhattan distance = 1 for adjacency
 
-func on_item_destroyed(structure: Node):	
+func check_item_destroyed():
+	# Loop through all item structures to check if any is destroyed
+	for i in range(item_structures.size()):
+		var structure = item_structures[i]
+		if not structure or item_handled[i]:  # Skip handled or invalid structures
+			continue
+
+		# Ensure the structure has an AnimatedSprite2D node
+		if structure.has_node("AnimatedSprite2D"):
+			var animated_sprite = structure.get_node("AnimatedSprite2D") as AnimatedSprite2D
+
+			# Check if the structure's animation is "demolished"
+			if animated_sprite.animation == "demolished":
+				on_item_destroyed(structure, i)
+
+				# Mark the item as handled and set global flags
+				GlobalManager.secret_item_destroyed = true
+				item_handled[i] = true  # Prevent further checks for this item
+				print("Secret Item Destroyed: GAME OVER")
+
+func on_item_destroyed(structure: Node, item_index: int):
 	# Instantiate the item scene
 	if item_scene:
 		var item_instance = item_scene.instantiate()
-		add_child(item_instance)  # Add to the current scene
-		
-		# Adjust item position based on the structure type
-		match structure.structure_type:
-			"Building":
-				item_instance.position = structure.global_position + Vector2(0, -40)
-			"Tower":
-				item_instance.position = structure.global_position + Vector2(0, -58)
-			"Stadium":
-				item_instance.position = structure.global_position + Vector2(0, -32)
-			"District":
-				item_instance.position = structure.global_position + Vector2(0, -48)
+		add_child(item_instance)
+		item_instance.position = structure.global_position + Vector2(0, -40)  # Adjust position as needed
+		print("Destroyed item instantiated:", item_names[item_index])
 
-func on_item_discovered(player: Area2D, structure: Node):
-	# Only allow item discovery if it has not been discovered yet
-	if item_discovered:
-		return  # Exit early if the item is already discovered
-
-	# Print information about the item discovery
-	print("Item found by player:", player.player_name)
-	item_discovered = true  # Set the flag to true indicating item was discovered
-	
-	# Update global manager to reflect item discovery
-	GlobalManager.secret_item_found = true
-	
-	# Instantiate the item scene
-	if item_scene:
-		var item_instance = item_scene.instantiate()
-		add_child(item_instance)  # Add to the current scene
-		
-		# Adjust item position based on the structure type
-		match structure.structure_type:
-			"Building":
-				item_instance.position = structure.global_position + Vector2(0, -40)
-			"Tower":
-				item_instance.position = structure.global_position + Vector2(0, -58)
-			"Stadium":
-				item_instance.position = structure.global_position + Vector2(0, -32)
-			"District":
-				item_instance.position = structure.global_position + Vector2(0, -48)
-
-	# Perform your item discovery logic
-	structure.set_meta("contains_item", false)  # Mark the item as collected
+	# Print feedback and update global state
+	print("Item destroyed:", item_names[item_index], "at structure:", structure.name)
+	GlobalManager.secret_items_found -= 1  # Optionally decrement items found

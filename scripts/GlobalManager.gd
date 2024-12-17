@@ -33,6 +33,8 @@ var zombie_queue: Array = []
 var zombies_processed = 0  # Counter for zombies processed
 var zombie_limit = 3
 
+var secret_items_found: int = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.

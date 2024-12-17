@@ -15,6 +15,7 @@ var grenade_toggle_active: bool = false
 var slash_toggle_active: bool = false
 var shadows_toggle_active: bool = false
 var prowler_toggle_active: bool = false
+var regenerate_toggle_active: bool = false
 
 var secret_item_destroyed: bool = false
 var secret_item_found: bool = false
@@ -52,9 +53,11 @@ func reset_global_manager():
 	GlobalManager.barrage_toggle_active = false
 	GlobalManager.octoblast_toggle_active = false
 	GlobalManager.grenade_toggle_active = false
+	
 	GlobalManager.slash_toggle_active = false
 	GlobalManager.shadows_toggle_active = false
 	GlobalManager.prowler_toggle_active = false
+	GlobalManager.regenerate_toggle_active = false
 	
 	GlobalManager.secret_item_destroyed = false
 	GlobalManager.secret_item_found = false

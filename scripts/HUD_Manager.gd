@@ -23,11 +23,12 @@ extends CanvasLayer
 @onready var hellfire = $HUD/Hellfire
 @onready var barrage = $HUD/Barrage
 @onready var octoblast = $HUD/Octoblast
-
 @onready var grenade = $HUD/Grenade
+
 @onready var slash = $HUD/Slash
 @onready var shadows = $HUD/Shadows
 @onready var prowler = $HUD/Prowler
+@onready var regenerate = $HUD/Regenerate
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -99,7 +100,11 @@ func _ready():
 	if prowler:
 		prowler.connect("toggled", Callable(self, "_on_prowler_toggled"))
 		print("Prowler connected")		
-																	
+
+	if regenerate:
+		regenerate.connect("toggled", Callable(self, "_on_regenerate_toggled"))
+		print("Regenerate connected")	
+																			
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -215,7 +220,7 @@ func _on_thread_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.thread_toggle_active = true  # Set the flag to true
 		print("Thread toggle activated!")	
-
+		regenerate.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
@@ -238,26 +243,38 @@ func _on_dash_toggled(button_pressed: bool) -> void:
 func _on_prowler_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.prowler_toggle_active = true  # Set the flag to true
-		print("Dash toggle activated!")	
+		print("Prowler toggle activated!")	
 		claw.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
 	else:
 		GlobalManager.prowler_toggle_active = false  # Set the flag to false
-		print("Dash toggle deactivated!")
+		print("Prowler toggle deactivated!")
 		
 func _on_claw_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.claw_toggle_active = true  # Set the flag to true
-		print("Dash toggle activated!")	
+		print("Claw toggle activated!")	
 		prowler.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
 	else:
 		GlobalManager.claw_toggle_active = false  # Set the flag to false
-		print("Dash toggle deactivated!")
+		print("Claw toggle deactivated!")
+
+func _on_regenerate_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.regenerate_toggle_active = true  # Set the flag to true
+		print("Regenerate toggle activated!")	
+		thread.button_pressed = false
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.regenerate_toggle_active = false  # Set the flag to false
+		print("Regenerate toggle deactivated!")
 
 func _on_hellfire_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -483,7 +500,8 @@ func show_special_buttons(character: PlayerUnit):
 		shadows.visible = true
 				
 	if character.player_name == "Sarah. Reese":
-		thread.visible = true					
+		thread.visible = true
+		regenerate.visible = true					
 
 	if character.player_name == "Aleks. Ducat":
 		claw.visible = true	
@@ -512,8 +530,9 @@ func hide_special_buttons():
 	hellfire.visible = false
 	barrage.visible = false
 	octoblast.visible = false
-	
 	grenade.visible = false
+	
 	slash.visible = false
 	shadows.visible = false
 	prowler.visible = false
+	regenerate.visible = false

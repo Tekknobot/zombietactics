@@ -28,8 +28,8 @@ var laser_deployed: bool = false
 var laser_target
 var pulsing_segments: Array = []  # Array to track which segments are pulsing
 var explosion_target
-var closest_zombies
-var zombie_index = -1
+var closest_players
+var player_index = -1
 var xp_awarded = false
 	
 # Create the timer for the pulse effect
@@ -93,7 +93,7 @@ func _input(event):
 			return  # Exit the function if the mouse is outside the map
 				
 		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.thread_toggle_active == true:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.regenerate_toggle_active == true:
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
@@ -103,22 +103,20 @@ func _input(event):
 			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 			hud_manager.hide_special_buttons()	
 						
-			# Find zombies in the vicinity
-			closest_zombies = get_zombies_in_scene() # Assume this is a function returning all zombies in the scene
+			# Find players in the vicinity
+			closest_players = get_players_in_scene() # Assume this is a function returning all players in the scene
 
-			# Sort zombies by distance to the initial target
-			closest_zombies.sort_custom(func(a, b):
+			# Sort players by distance to the initial target
+			closest_players.sort_custom(func(a, b):
 				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
 			
-			get_zombie_in_area()
+			get_player_in_area()
 			laser_active = true
-			
-			
 
-func get_zombie_in_area():
-	if zombie_index >= min(closest_zombies.size() - 1, 7):
-		zombie_index = -1
-		closest_zombies.clear()
+func get_player_in_area():
+	if player_index >= min(closest_players.size() - 1, get_parent().current_level):
+		player_index = -1
+		closest_players.clear()
 
 		# Add XP if at least one target was hit
 		if xp_awarded:
@@ -132,28 +130,28 @@ func get_zombie_in_area():
 		var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary	
 		
 		# Access the 'special' button within HUDManager
-		GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
-		hud_manager.thread.button_pressed = false		
+		GlobalManager.regenerate_toggle_active = false  # Deactivate the special toggle
+		hud_manager.regenerate.button_pressed = false		
 		
 		laser_active = false	
 		get_parent().check_end_turn_conditions()
 		return
 
-	zombie_index += 1
-	# Deploy lasers to the nearest zombies
-	if zombie_index < closest_zombies.size():
-		var zombie_target = closest_zombies[zombie_index].position
-		deploy_laser(zombie_target, closest_zombies[zombie_index])
+	player_index += 1
+	# Deploy lasers to the nearest players
+	if player_index < closest_players.size():
+		var player_target = closest_players[player_index].position
+		deploy_laser(player_target, closest_players[player_index])
 
-func get_zombies_in_scene() -> Array:
-	# Returns a list of zombies in the scene (to be implemented)
-	var zombies = []
-	for node in get_tree().get_nodes_in_group("zombies"):
+func get_players_in_scene() -> Array:
+	# Returns a list of players in the scene (to be implemented)
+	var players = []
+	for node in get_tree().get_nodes_in_group("player_units"):
 		if node.is_inside_tree():
-			zombies.append(node)
-	return zombies			
+			players.append(node)
+	return players			
 
-func deploy_laser(target_position: Vector2, zombie):
+func deploy_laser(target_position: Vector2, player):
 	# Camera focus
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 	camera_flag = true
@@ -255,7 +253,7 @@ func _on_pulse_timer_timeout():
 		spark_scene.global_position = spark_position
 		spark_scene.emitting = true  # Start emitting particles
 
-		# Camera focuses on the active zombie
+		# Camera focuses on the active players
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 		camera.focus_on_position(spark_position) 	
 
@@ -263,7 +261,7 @@ func _on_pulse_timer_timeout():
 	if current_segment_index == laser_segments.size() - 1:  # Last segment
 		# Get the endpoint of the last segment and trigger the explosion
 		var last_point = current_segment.to_global(current_segment.get_point_position(1))
-		_trigger_explosion(last_point)
+		_trigger_levelup(last_point)
 		get_parent().get_child(0).play("default")
 
 		# Reset spark emitter after finishing
@@ -299,7 +297,7 @@ func get_line_tiles(start: Vector2i, end: Vector2i) -> Array:
 	return tiles
 
 # Trigger explosion at the target position after the missile reaches it
-func _trigger_explosion(last_point: Vector2):
+func _trigger_levelup(last_point: Vector2):
 	print("Explosion triggered at position:", last_point)
 	
 	# Instantiate the explosion effect at the target's position
@@ -311,13 +309,18 @@ func _trigger_explosion(last_point: Vector2):
 	
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 8
-
+	explosion_instance.visible = false
+	explosion_instance.get_child(2).stop()
+	
 	# Check for PlayerUnit within explosion radius
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.position.distance_to(last_point) <= explosion_radius:	
-			player.flash_damage()
-			player.apply_damage(player.attack_damage)
 			player.clear_movement_tiles()
+			
+			player.current_health += player.attack_damage
+			player.audio_player.stream = player.levelup_audio
+			player.audio_player.play()
+			player.play_level_up_effect()
 					
 			xp_awarded = true  # Mark XP as earned for this explosion
 
@@ -349,7 +352,7 @@ func _trigger_explosion(last_point: Vector2):
 			clear_segments()
 		
 	clear_segments()	
-	get_zombie_in_area()			
+	get_player_in_area()			
 				
 func add_xp():
 	# Add XP

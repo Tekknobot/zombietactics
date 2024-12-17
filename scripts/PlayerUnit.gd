@@ -810,7 +810,7 @@ func play_level_up_effect() -> void:
 	modulate = original_color
 	
 	# Darken the unit to visually indicate its turn is over
-	self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
+	#self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
 		
 
 func _create_explosion() -> void:

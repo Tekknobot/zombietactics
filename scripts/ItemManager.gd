@@ -12,7 +12,7 @@ var item_handled: bool = false  # Prevents multiple checks once the outcome is d
 
 func _ready():
 	await get_tree().create_timer(0.1).timeout
-	#assign_item_to_structure()
+	assign_item_to_structure()
 
 func check_item_destroyed():
 	# Skip if the item has already been handled
@@ -42,7 +42,7 @@ func assign_item_to_structure():
 	item_structure = structures[randi() % structures.size()]
 	print("Item assigned to structure:", item_structure.name)
 	
-	item_structure.modulate = Color(0.5, 0.5, 0.5)
+	item_structure.modulate = Color(0.4, 0.4, 0.4)
 
 	# Optionally, you can mark the structure visually or with metadata
 	item_structure.set_meta("contains_item", true)  # Tag the structure

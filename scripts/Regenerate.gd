@@ -93,7 +93,7 @@ func _input(event):
 			return  # Exit if mouse is outside the map
 
 		# Check if player clicked on itself to regenerate
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.tile_pos == mouse_local:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.tile_pos == mouse_local and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.regenerate_toggle_active:
 			print("Regenerating player...")
 			hover_tile.selected_player.current_health += hover_tile.selected_player.attack_damage
 			

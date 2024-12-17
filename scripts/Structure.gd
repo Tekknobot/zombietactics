@@ -40,7 +40,7 @@ func _process(delta: float) -> void:
 	var animated_sprite = self.get_node("AnimatedSprite2D") as AnimatedSprite2D
 	if animated_sprite.animation == "demolished" and !demolished_flag:
 		demolished_flag = true
-		#item_manager.check_item_destroyed()
+		item_manager.check_item_destroyed()
 		await get_tree().create_timer(1).timeout
 		mission_manager.check_mission_manager()	
 		if GlobalManager.secret_item_destroyed:

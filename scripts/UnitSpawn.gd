@@ -43,6 +43,7 @@ var zombie_names = [
 ]
 
 signal units_spawned
+var player_zone
 
 func _ready():
 	# Wait for a few frames to ensure the TileMap has generated fully
@@ -81,7 +82,7 @@ func spawn_player_units():
 		return
 
 	# Randomly select one zone for players
-	var player_zone = zones.pop_at(randi() % zones.size())
+	player_zone = zones.pop_at(randi() % zones.size())
 
 	# Set minimum distance between player spawns
 	var minimum_distance = 2  # Adjust based on game requirements

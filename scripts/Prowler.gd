@@ -163,11 +163,12 @@ func attack_target(target):
 		await get_tree().create_timer(0.5).timeout
 
 		# Play SFX
-		target.audio_player.stream = target.zombie_audio
-		target.audio_player.play()
+		#target.audio_player.stream = target.zombie_audio
+		#target.audio_player.play()
 				
-		target.apply_damage(get_parent().attack_damage)
-		target.flash_damage()
+		#target.apply_damage(get_parent().attack_damage)
+		#target.flash_damage()
+		
 		attacked_zombies.append(target)
 		print("Attacked zombie at tile:", target.tile_pos)
 
@@ -212,7 +213,8 @@ func teleport_to_adjacent_tile(target):
 func dash_forward(target):
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	
-	update_facing_direction(target)
+	update_facing_direction(target.position)
+	await get_tree().create_timer(0.2).timeout
 	
 	# Get player and target positions in tile coordinates
 	var player_tile = tilemap.local_to_map(get_parent().position)
@@ -223,7 +225,14 @@ func dash_forward(target):
 	
 	# Calculate the intended dash position 3 tiles ahead in the direction of the target
 	var dash_target_tile = player_tile + direction * dash_distance
-	
+
+	# Play SFX
+	target.audio_player.stream = target.zombie_audio
+	target.audio_player.play()
+			
+	target.apply_damage(get_parent().attack_damage)
+	target.flash_damage()
+		
 	# Check if the target tile is movable
 	if is_tile_movable(dash_target_tile):
 		var world_pos = tilemap.map_to_local(dash_target_tile)

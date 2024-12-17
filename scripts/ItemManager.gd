@@ -41,7 +41,8 @@ func check_for_item_discovery(player: Area2D):
 		var structure = item_structures[i]
 		if not structure or item_handled[i]:  # Skip handled items
 			continue
-
+		
+		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 		var player_tile_pos = tilemap.local_to_map(player.global_position)
 		var structure_tile_pos = tilemap.local_to_map(structure.global_position)
 
@@ -68,7 +69,7 @@ func on_item_discovered(player: Area2D, structure: Node, item_index: int):
 		# Adjust item position based on the structure type
 		match structure.structure_type:
 			"Building":
-				item_instance.position = structure.global_position + Vector2(0, -40)
+				item_instance.position = structure.global_position + Vector2(0, -44)
 			"Tower":
 				item_instance.position = structure.global_position + Vector2(0, -58)
 			"Stadium":

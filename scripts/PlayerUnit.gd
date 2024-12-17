@@ -783,6 +783,9 @@ func level_up() -> void:
 	# Reset XP threshold
 	current_xp -= xp_for_next_level
 	xp_for_next_level += 25  # Increment XP threshold
+
+	if current_health > max_health:
+		current_health = max_health
 		
 	# Play visual effect
 	play_level_up_effect()

@@ -150,8 +150,15 @@ func find_open_tile_near_player(player_positions: Array) -> Vector2i:
 				return adjacent_tile  # Return the first valid adjacent tile
 
 	print("No valid open tile found next to any player unit.")
+	GlobalManager.reset_global_manager()		
+	reset_level()	
 	return Vector2i(-1, -1)  # Return an invalid position if none found
 
+# Reload the current scene to reset the level
+func reset_level():	
+	get_tree().reload_current_scene()
+	print("Resetting level...")
+	
 func spawn_zombies(zombie_zones: Array):
 	var zombie_count = max(map_manager.grid_width, map_manager.grid_height)
 	var zombie_count_per_zone = zombie_count / zombie_zones.size()

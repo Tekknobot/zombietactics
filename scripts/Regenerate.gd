@@ -114,7 +114,7 @@ func _input(event):
 			laser_active = true
 
 func get_player_in_area():
-	if player_index >= min(closest_players.size() - 1, get_parent().current_level):
+	if player_index >= min(closest_players.size() - 1, get_parent().current_level - 1):
 		player_index = -1
 		closest_players.clear()
 
@@ -318,6 +318,10 @@ func _trigger_levelup(last_point: Vector2):
 			player.clear_movement_tiles()
 			
 			player.current_health += player.attack_damage
+			
+			if player.current_health > player.max_health:
+				player.current_health = player.max_health
+			
 			player.audio_player.stream = player.levelup_audio
 			player.audio_player.play()
 			player.play_level_up_effect()

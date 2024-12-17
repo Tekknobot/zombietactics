@@ -83,7 +83,7 @@ func activate_prowler(target_zombie):
 
 	if targeted_zombies.is_empty():
 		print("No zombies found for Shadow Step.")
-		is_prowler_active = false
+		is_prowler_active = false	
 		return
 
 	await get_tree().create_timer(0.1).timeout
@@ -116,13 +116,13 @@ func find_nearest_zombies(max_count: int) -> Array:
 
 func attack_next_zombie():
 	if attack_index >= targeted_zombies.size():
-		is_prowler_active = false
+		is_prowler_active = false	
 		GlobalManager.prowler_toggle_active = false
 		
 		get_parent().current_xp += 25
 		get_parent().has_attacked = true
 		get_parent().has_moved = true	
-		get_parent().check_end_turn_conditions()			
+		get_parent().check_end_turn_conditions()					
 		return
 	
 	var target = targeted_zombies[attack_index]

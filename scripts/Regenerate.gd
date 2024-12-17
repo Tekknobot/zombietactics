@@ -65,7 +65,7 @@ func _process(delta):
 	
 func _input(event):
 	# Check for mouse click
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and laser_active == false:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not laser_active:
 		# Block gameplay input if the mouse is over GUI
 		if is_mouse_over_gui():
 			print("Input blocked by GUI.")
@@ -75,41 +75,59 @@ func _input(event):
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
 		# Get the boundaries of the map's used rectangle
-		var map_size = tilemap.get_used_rect()  # Rect2: position and size of the used tiles
-		var map_origin_x = map_size.position.x  # Starting x-coordinate of the used rectangle
-		var map_origin_y = map_size.position.y  # Starting y-coordinate of the used rectangle
-		var map_width = map_size.size.x         # Width of the map in tiles
-		var map_height = map_size.size.y        # Height of the map in tiles
+		var map_size = tilemap.get_used_rect()
+		var map_origin_x = map_size.position.x
+		var map_origin_y = map_size.position.y
+		var map_width = map_size.size.x
+		var map_height = map_size.size.y
 
-		var global_mouse_position = get_global_mouse_position() 
+		var global_mouse_position = get_global_mouse_position()
 		global_mouse_position.y += 8
-			
+
 		# Convert the global mouse position to tile coordinates
 		var mouse_local = tilemap.local_to_map(global_mouse_position)
 
 		# Check if the mouse is outside the bounds of the used rectangle
 		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
 		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
-			return  # Exit the function if the mouse is outside the map
-				
-		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.regenerate_toggle_active == true:
-			var mouse_position = get_global_mouse_position() 
+			return  # Exit if mouse is outside the map
+
+		# Check if player clicked on itself to regenerate
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.tile_pos == mouse_local:
+			print("Regenerating player...")
+			hover_tile.selected_player.current_health += hover_tile.selected_player.attack_damage
+			
+			hover_tile.selected_player.audio_player.stream = hover_tile.selected_player.levelup_audio
+			hover_tile.selected_player.audio_player.play()
+			
+			hover_tile.selected_player.play_level_up_effect()  # Optional regeneration effect
+			
+			if hover_tile.selected_player.current_health > hover_tile.selected_player.max_health:
+				hover_tile.selected_player.current_health = hover_tile.selected_player.max_health
+							
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			hud_manager.update_hud(hover_tile.selected_player)
+			GlobalManager.regenerate_toggle_active = false
+			return  # Exit after regenerating
+
+		# Ensure hover_tile exists and specific conditions are met
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.regenerate_toggle_active:
+			var mouse_position = get_global_mouse_position()
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
 			laser_target = tilemap.map_to_local(mouse_pos)
 			explosion_target = laser_target
 
-			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
-			hud_manager.hide_special_buttons()	
-						
+			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")
+			hud_manager.hide_special_buttons()
+
 			# Find players in the vicinity
-			closest_players = get_players_in_scene() # Assume this is a function returning all players in the scene
+			closest_players = get_players_in_scene()
 
 			# Sort players by distance to the initial target
 			closest_players.sort_custom(func(a, b):
 				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
-			
+
 			get_player_in_area()
 			laser_active = true
 

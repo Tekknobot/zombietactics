@@ -70,9 +70,29 @@ func _ready():
 	add_child(hover_tile)  # Add hover tile to the scene
 	hover_tile.visible = false  # Initially hide the hover tile
 	
+	# Set map spawn paramaters
 	grid_width = get_even_random(12, 33)
 	grid_height = get_even_random(12, 33)
 
+	# Ensure the conditions where width or height cannot both be 12
+	if grid_width == 12 and grid_height == 12:
+		if randi() % 2 == 0:  # Randomly adjust width or height
+			grid_width = get_even_random(16, 33)  # Ensure width >= 16
+		else:
+			grid_height = get_even_random(16, 33)  # Ensure height >= 16
+
+	# Additional safety check to ensure the constraints are met
+	if grid_height == 12 and grid_width < 16:
+		grid_width = 16
+	if grid_width == 12 and grid_height < 16:
+		grid_height = 16
+
+	# Reset logic if both are equal to minimum constraints
+	if grid_height == 12 and grid_width == 12:
+		GlobalManager.reset_global_manager()
+		reset_level()
+
+		
 	# Randomly choose a set of values for the tiles
 	match randi() % 4:
 		0:

@@ -3528,6 +3528,23 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_f7s2a")
 toggle_mode = true
 text = "Shadows"
 
+[node name="Prowler" type="Button" parent="." groups=["hud_controls"]]
+visible = false
+layout_mode = 0
+offset_left = 164.0
+offset_top = -173.0
+offset_right = 222.0
+offset_bottom = -143.0
+tooltip_text = "Target to teleport and slash up to 8 enemies."
+theme_override_fonts/font = SubResource("FontFile_ffvx8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/focus = SubResource("StyleBoxEmpty_lnryq")
+theme_override_styles/hover = SubResource("StyleBoxFlat_8fyh7")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_vjq04")
+theme_override_styles/normal = SubResource("StyleBoxFlat_f7s2a")
+toggle_mode = true
+text = "Prowler"
+
 [node name="Mek" type="Button" parent="." groups=["hud_controls"]]
 visible = false
 layout_mode = 0

@@ -27,6 +27,7 @@ extends CanvasLayer
 @onready var grenade = $HUD/Grenade
 @onready var slash = $HUD/Slash
 @onready var shadows = $HUD/Shadows
+@onready var prowler = $HUD/Prowler
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -94,6 +95,10 @@ func _ready():
 	if shadows:
 		shadows.connect("toggled", Callable(self, "_on_shadows_toggled"))
 		print("Shadows connected")
+		
+	if prowler:
+		prowler.connect("toggled", Callable(self, "_on_prowler_toggled"))
+		print("Prowler connected")		
 																	
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
@@ -230,11 +235,23 @@ func _on_dash_toggled(button_pressed: bool) -> void:
 		GlobalManager.dash_toggle_active = false  # Set the flag to false
 		print("Dash toggle deactivated!")
 
+func _on_prowler_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.prowler_toggle_active = true  # Set the flag to true
+		print("Dash toggle activated!")	
+		claw.button_pressed = false
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.prowler_toggle_active = false  # Set the flag to false
+		print("Dash toggle deactivated!")
+		
 func _on_claw_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.claw_toggle_active = true  # Set the flag to true
 		print("Dash toggle activated!")	
-
+		prowler.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
@@ -470,6 +487,7 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "Aleks. Ducat":
 		claw.visible = true	
+		prowler.visible = true
 
 	if character.player_name == "John. Doom":
 		hellfire.visible = true	
@@ -478,7 +496,7 @@ func show_special_buttons(character: PlayerUnit):
 		barrage.visible = true			
 
 	if character.player_name == "Annie. Switch":
-		octoblast.visible = true	
+		octoblast.visible = true			
 						
 func hide_special_buttons():
 	end_turn.visible = false
@@ -498,3 +516,4 @@ func hide_special_buttons():
 	grenade.visible = false
 	slash.visible = false
 	shadows.visible = false
+	prowler.visible = false

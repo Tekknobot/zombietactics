@@ -77,7 +77,6 @@ func on_item_discovered(player: Area2D, structure: Node, item_index: int):
 			"District":
 				item_instance.position = structure.global_position + Vector2(0, -48)
 
-
 	# Perform your item discovery logic
 	structure.set_meta("contains_item", false)
 	GlobalManager.secret_items_found += 1  # Increment global item count

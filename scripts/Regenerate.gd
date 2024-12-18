@@ -125,14 +125,14 @@ func _input(event):
 			closest_players = get_players_in_scene()
 
 			# Sort players by distance to the initial target
-			closest_players.sort_custom(func(a, b):
-				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
+			#closest_players.sort_custom(func(a, b):
+			#	return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
 
 			get_player_in_area()
 			laser_active = true
 
 func get_player_in_area():
-	if player_index >= min(closest_players.size() - 1, get_parent().current_level - 1):
+	if player_index >= closest_players.size() - 1: #min(closest_players.size() - 1, get_parent().current_level - 1):
 		player_index = -1
 		closest_players.clear()
 

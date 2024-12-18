@@ -29,6 +29,7 @@ extends CanvasLayer
 @onready var shadows = $HUD/Shadows
 @onready var prowler = $HUD/Prowler
 @onready var regenerate = $HUD/Regenerate
+@onready var transport = $HUD/Transport
 
 @onready var end_turn = $HUD/EndTurn
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
@@ -104,7 +105,11 @@ func _ready():
 	if regenerate:
 		regenerate.connect("toggled", Callable(self, "_on_regenerate_toggled"))
 		print("Regenerate connected")	
-																			
+
+	if transport:
+		transport.connect("toggled", Callable(self, "_on_transport_toggled"))
+		print("Transport connected")																			
+		
 # Method to handle the toggle state change
 func _on_endturn_pressed() -> void:
 	print("End Turn button pressed")
@@ -276,11 +281,23 @@ func _on_regenerate_toggled(button_pressed: bool) -> void:
 		GlobalManager.regenerate_toggle_active = false  # Set the flag to false
 		print("Regenerate toggle deactivated!")
 
+func _on_transport_toggled(button_pressed: bool) -> void:
+	if button_pressed:
+		GlobalManager.transport_toggle_active = true  # Set the flag to true
+		print("Transport toggle activated!")	
+		hellfire.button_pressed = false
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_attack_range_tiles()	
+	else:
+		GlobalManager.transport_toggle_active = false  # Set the flag to false
+		print("Transport toggle deactivated!")
+		
 func _on_hellfire_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.hellfire_toggle_active = true  # Set the flag to true
 		print("Hellfire toggle activated!")	
-
+		transport.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
@@ -509,6 +526,7 @@ func show_special_buttons(character: PlayerUnit):
 
 	if character.player_name == "John. Doom":
 		hellfire.visible = true	
+		transport.visible = true
 		
 	if character.player_name == "Angel. Charlie":
 		barrage.visible = true			
@@ -525,7 +543,6 @@ func hide_special_buttons():
 	dynamite.visible = false
 	thread.visible = false
 	dash.visible = false
-	dash.visible = false
 	claw.visible = false
 	hellfire.visible = false
 	barrage.visible = false
@@ -536,3 +553,4 @@ func hide_special_buttons():
 	shadows.visible = false
 	prowler.visible = false
 	regenerate.visible = false
+	transport.visible = false

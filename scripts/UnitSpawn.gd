@@ -90,7 +90,6 @@ func spawn_player_units():
 
 	# Spawn player units in the selected zone
 	var max_spawn_attempts_per_unit = 1024
-	var spawned_units = 0
 
 	for unit_type in units:
 		var attempts = 0
@@ -122,13 +121,15 @@ func spawn_player_units():
 			if unit_instance != null:
 				player_positions.append(spawn_position)
 				player_units_spawned += 1
-				spawned_units += 1
 		else:
 			print("Error: No valid position found even after fallback for unit:", unit_type)
 
-	if spawned_units < units.size():
-		print("Warning: Not all player units were spawned. Spawned:", spawned_units, "Expected:", units.size())
-
+	if player_units_spawned < units.size():
+		print("Warning: Not all player units were spawned. Spawned:", player_units_spawned, "Expected:", units.size())
+		GlobalManager.reset_global_manager()		
+		reset_level()	
+		return			
+		
 	# Spawn zombies in the remaining zones
 	await spawn_zombies(zones)
 	notify_units_spawned()
@@ -151,8 +152,6 @@ func find_open_tile_near_player(player_positions: Array) -> Vector2i:
 				return adjacent_tile  # Return the first valid adjacent tile
 
 	print("No valid open tile found next to any player unit.")
-	GlobalManager.reset_global_manager()		
-	reset_level()	
 	return Vector2i(-1, -1)  # Return an invalid position if none found
 
 # Reload the current scene to reset the level

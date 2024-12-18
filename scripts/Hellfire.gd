@@ -15,7 +15,6 @@ extends Node2D
 var hover_tiles_visible = false  # Whether hover tiles are currently displayed
 var hover_tiles = []  # Store references to dynamically created hover tiles
 
-
 func _process(delta):
 	# Check if the barrage toggle is active
 	if GlobalManager.hellfire_toggle_active:

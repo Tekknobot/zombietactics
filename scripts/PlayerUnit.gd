@@ -107,7 +107,6 @@ var has_attacked: bool = false  # Tracks if the unit has attacked this turn
 var has_used_turn: bool = false  # Tracks if it's currently this unit's turn
 
 var can_start_turn: bool = false
-
 var attack_range_visible: bool = false  # Variable to track if attack range is visible
 
 @onready var health_ui = $HealthUI

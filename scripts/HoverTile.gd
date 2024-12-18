@@ -123,7 +123,8 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 		GlobalManager.slash_toggle_active or
 		GlobalManager.shadows_toggle_active or
 		GlobalManager.prowler_toggle_active or
-		GlobalManager.regenerate_toggle_active
+		GlobalManager.regenerate_toggle_active or
+		GlobalManager.transport_toggle_active
 	):
 		return
 	
@@ -163,7 +164,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 				GlobalManager.slash_toggle_active or
 				GlobalManager.shadows_toggle_active or 
 				GlobalManager.prowler_toggle_active or
-				GlobalManager.regenerate_toggle_active
+				GlobalManager.regenerate_toggle_active or
+				GlobalManager.transport_toggle_active
 			):				
 				return
 							
@@ -210,7 +212,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 				GlobalManager.slash_toggle_active or
 				GlobalManager.shadows_toggle_active or 
 				GlobalManager.prowler_toggle_active or
-				GlobalManager.regenerate_toggle_active
+				GlobalManager.regenerate_toggle_active or
+				GlobalManager.transport_toggle_active
 			):				
 				return
 				
@@ -351,4 +354,5 @@ func set_special_button_pressed():
 	hud_manager.shadows.button_pressed = false
 	hud_manager.prowler.button_pressed = false
 	hud_manager.regenerate.button_pressed = false
+	hud_manager.transport.button_pressed = false
 		

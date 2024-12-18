@@ -92,7 +92,6 @@ func _ready():
 		GlobalManager.reset_global_manager()
 		reset_level()
 
-		
 	# Randomly choose a set of values for the tiles
 	match randi() % 4:
 		0:

@@ -92,6 +92,7 @@ var can_display_tiles = true  # Global flag to track if tiles can be displayed
 @export var claw_audio = preload("res://audio/SFX/panther_growl.wav")
 @export var slash_audio = preload("res://audio/SFX/slash.wav")
 @export var blade_audio = preload("res://audio/SFX/Retro Magic 06.wav")
+@export var helicopter_audio = preload("res://audio/SFX/helicopter_audio.mp3")
 
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")  # Reference to the SpecialToggleNode
 @onready var item_manager = get_node("/root/MapManager/ItemManager")  # Reference to the SpecialToggleNode
@@ -349,7 +350,7 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
 	
-	self.get_child(0).play("move")  # Play the "move" animation
+	get_child(0).play("move")  # Play the "move" animation
 			
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
@@ -945,8 +946,10 @@ func check_end_turn_conditions() -> void:
 		# Update the HUD to reflect new stats
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")
 		hud_manager.update_hud(self)
-					
-		get_child(0).play("default")
+		
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:			
+			player.get_child(0).play("default")
 		end_turn(self)
 
 func end_turn(player) -> void:

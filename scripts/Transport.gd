@@ -37,6 +37,9 @@ func _input(event):
 		var mouse_local = tilemap.local_to_map(global_mouse_position)
 
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "John. Doom" and GlobalManager.transport_toggle_active:
+			if is_tile_movable(mouse_local) == false:
+				return
+			
 			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 			hud_manager.hide_special_buttons()		
 			calcualte_transport_path(mouse_local)	
@@ -64,7 +67,11 @@ func calcualte_transport_path(target_tile: Vector2i) -> void:
 
 	# Dash to the target position along the path
 	move_to_transport(get_process_delta_time())
-
+	get_parent().get_child(0).play("move")
+	
+	get_parent().audio_player.stream = get_parent().helicopter_audio
+	get_parent().audio_player.play()
+	
 func move_to_transport(delta: float) -> void:
 	# Get the TileMap
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -137,6 +144,8 @@ func finalize_ability() -> void:
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
 	
+	get_parent().audio_player.stop()
+	
 	assigned = false
 	GlobalManager.transport_toggle_active = false
 		
@@ -192,8 +201,6 @@ func move_along_path() -> void:
 		return  # No path, so don't move
 
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-
-	get_parent().get_child(0).play("move")
 		
 	while get_parent().path_index < get_parent().current_path.size():
 		var target_tile_pos = get_parent().current_path[get_parent().path_index]  # Get the current tile position in the path

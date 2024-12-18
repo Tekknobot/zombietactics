@@ -138,20 +138,6 @@ func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 			print("Unit found:", unit.name)  # Debugging
 			return unit
 	return null
-
-func is_tile_empty(tile_pos: Vector2i) -> bool:
-	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-
-	# Check if the tile is occupied or invalid
-	if tilemap.get_cell_source_id(0, tile_pos) != -1:
-		return false
-
-	# Check if any unit is present at the tile
-	var unit = get_unit_at_tile(tile_pos)
-	if unit:
-		return false
-
-	return true
 		
 func transport_unit_to_adjacent_tile(unit) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -159,20 +145,35 @@ func transport_unit_to_adjacent_tile(unit) -> void:
 		Vector2i(-1, 0), Vector2i(1, 0),  # Left, Right
 		Vector2i(0, -1), Vector2i(0, 1)  # Up, Down
 	]
-
+	
 	for offset in adjacent_positions:
 		var adjacent_tile = original_pos + offset
-		unit.position = tilemap.map_to_local(adjacent_tile)
-		unit.visible = true  # Make the unit visible again
-		print("Transported unit to:", adjacent_tile)
 		
-		assigned = false
-		GlobalManager.transport_toggle_active = false
-		get_parent().get_child(2).play("default")
-		get_parent().has_moved = true
-		get_parent().has_attacked = true
-		get_parent().check_end_turn_conditions()		
-		break	
+		# Check if the tile is movable before placing the unit
+		if is_tile_movable(adjacent_tile):
+			print("Placing unit at:", adjacent_tile)
+
+			# Ensure no duplicate placement occurs
+			if unit.visible:
+				print("Unit is already visible and placed. Exiting.")
+				return
+
+			# Place the unit at the valid tile
+			unit.position = tilemap.map_to_local(adjacent_tile)
+			unit.visible = true  # Make the unit visible again
+			print("Transported unit to:", adjacent_tile)
+
+			# Reset state and finalize the turn
+			assigned = false
+			GlobalManager.transport_toggle_active = false
+			get_parent().get_child(0).play("default")
+			get_parent().has_moved = true
+			get_parent().has_attacked = true
+			get_parent().check_end_turn_conditions()
+			return  # Exit after placing the unit
+
+	# If no movable tile was found, print a failure message
+	print("No movable adjacent tile found. Transport failed.")
 
 func move_along_path() -> void:
 	if get_parent().current_path.is_empty():
@@ -218,7 +219,57 @@ func move_along_path() -> void:
 
 	if unit_on_board and get_parent().tile_pos == original_pos:
 		transport_unit_to_adjacent_tile(boarded_unit)	
+
+# Check if a tile is movable
+func is_tile_movable(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
+	if is_water_tile(tile_id):
+		return false
+	if is_structure(tile_pos) or is_unit_present(tile_pos):
+		return false
+	return true
+
+# Check if a tile is a water tile
+func is_water_tile(tile_id: int) -> bool:
+	var WATER_TILE_ID: int
+
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+
+	# Return whether the tile_id matches the WATER_TILE_ID
+	return tile_id == WATER_TILE_ID
+
+# Check if there is a structure on the tile
+func is_structure(tile_pos: Vector2i) -> bool:
+	var structures = get_tree().get_nodes_in_group("structures")
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for structure in structures:
+		var structure_tile_pos = tilemap.local_to_map(tilemap.to_local(structure.global_position))
+		if tile_pos == structure_tile_pos:
+			return true
+	return false
+
+# Check if there is a unit on the tile
+func is_unit_present(tile_pos: Vector2i) -> bool:
+	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for unit in all_units:
+		var unit_tile_pos = tilemap.local_to_map(tilemap.to_local(unit.global_position))
+		if tile_pos == unit_tile_pos:
+			return true
+	return false
 	
+		
 func is_mouse_over_gui() -> bool:
 	var mouse_pos = get_viewport().get_mouse_position()
 	var hud_controls = get_tree().get_nodes_in_group("portrait_controls") + get_tree().get_nodes_in_group("hud_controls")

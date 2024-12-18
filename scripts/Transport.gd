@@ -45,7 +45,7 @@ func _input(event):
 func calcualte_transport_path(target_tile: Vector2i) -> void:
 	# Update the AStar grid to ensure accurate pathfinding
 	get_parent().update_astar_grid()
-	
+
 	if unit_on_board == false:
 		# Calculate the path to the target's adjacent tile
 		get_parent().calculate_path(target_tile)
@@ -53,7 +53,8 @@ func calcualte_transport_path(target_tile: Vector2i) -> void:
 		get_parent().calculate_path(original_pos)
 
 	if get_parent().current_path.is_empty():
-		print("No valid path to the target.")
+		print("No valid path to the target. Exiting ability.")
+		finalize_ability()  # Exit the ability and finalize the turn
 		return
 
 	# Save the original position for returning later
@@ -78,7 +79,8 @@ func move_to_transport(delta: float) -> void:
 		while position.distance_to(world_pos) > 1:
 			# Break the loop if the node is no longer in the scene tree
 			if not is_inside_tree():
-				print("Node is no longer in the scene tree. Exiting loop.")
+				print("Node is no longer in the scene tree. Exiting ability.")
+				finalize_ability()
 				return
 							
 			# Call the movement function
@@ -118,13 +120,28 @@ func check_and_transport_adjacent_unit() -> void:
 				unit.visible = false  # Make the unit invisible
 				unit_on_board = true
 				boarded_unit = unit
-	
+
+	# Check if no unit was found
+	if not transported_unit:
+		print("No adjacent player unit found. Exiting ability.")
+		finalize_ability()  # Exit the ability and finalize the turn
+		return
+
+	# If a unit is found, move back to the original position
 	await get_tree().create_timer(1).timeout
-	
 	calcualte_transport_path(original_pos)
+	move_to_transport(get_process_delta_time())
+
+func finalize_ability() -> void:
+	get_parent().get_child(0).play("default")  # Reset animation
+	get_parent().has_moved = true
+	get_parent().has_attacked = true
 	
-	# Move back to the original position
-	move_to_transport(get_process_delta_time())	
+	assigned = false
+	GlobalManager.transport_toggle_active = false
+		
+	get_parent().check_end_turn_conditions()
+	print("Ability finalized.")
 
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var all_units = get_tree().get_nodes_in_group("player_units")
@@ -150,7 +167,7 @@ func transport_unit_to_adjacent_tile(unit) -> void:
 		var adjacent_tile = original_pos + offset
 		
 		# Check if the tile is movable before placing the unit
-		if is_tile_movable(adjacent_tile):
+		if is_tile_movable(adjacent_tile) and is_not_blank_tile(adjacent_tile):
 			print("Placing unit at:", adjacent_tile)
 
 			# Ensure no duplicate placement occurs
@@ -164,12 +181,7 @@ func transport_unit_to_adjacent_tile(unit) -> void:
 			print("Transported unit to:", adjacent_tile)
 
 			# Reset state and finalize the turn
-			assigned = false
-			GlobalManager.transport_toggle_active = false
-			get_parent().get_child(0).play("default")
-			get_parent().has_moved = true
-			get_parent().has_attacked = true
-			get_parent().check_end_turn_conditions()
+			finalize_ability()
 			return  # Exit after placing the unit
 
 	# If no movable tile was found, print a failure message
@@ -268,7 +280,12 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 		if tile_pos == unit_tile_pos:
 			return true
 	return false
-	
+
+# Checks if a tile is spawnable (not water)
+func is_not_blank_tile(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
+	return tile_id != -1	
 		
 func is_mouse_over_gui() -> bool:
 	var mouse_pos = get_viewport().get_mouse_position()

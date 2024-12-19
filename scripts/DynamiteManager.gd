@@ -129,8 +129,6 @@ func _input(event: InputEvent) -> void:
 					var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
 					
 					dynamite_launched += 1
-					if dynamite_launched == 1:
-						add_xp()  # Add XP	
 															
 					# Start the trajectory
 					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
@@ -342,7 +340,8 @@ func _trigger_explosion(last_point: Vector2):
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:
 			structure.get_child(0).play("demolished")  # Play "collapse" animation if applicable
-	
+			xp_awarded = true
+			
 	# Add XP if at least one target was hit
 	if xp_awarded:
 		await get_tree().create_timer(1).timeout

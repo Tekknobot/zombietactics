@@ -138,6 +138,9 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 		await clear_action_tiles()  # Clear movement and attack tiles after moving
 		selected_player.has_moved = true
 		
+		if zombies.size() <= 0:
+			reset_player_units()
+		
 # Selects a unit or structure at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:	
 	var hud_manager = get_parent().get_node("HUDManager")
@@ -356,3 +359,12 @@ func set_special_button_pressed():
 	hud_manager.regenerate.button_pressed = false
 	hud_manager.transport.button_pressed = false
 		
+func reset_player_units():
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:	
+		player.has_moved = false
+		player.has_attacked = false
+		player.has_used_turn = false
+		player.can_start_turn = true
+		player.modulate = Color(1, 1, 1)

@@ -9,6 +9,7 @@ extends Node2D
 @export var cooldown = 3.0
 
 @onready var map_manager = get_parent().get_node("/root/MapManager")
+@onready var mission_manager = get_parent().get_node("/root/MissionManager")
 
 var targeted_zombies = [] # Zombies to attack
 var is_shadow_step_active = false
@@ -143,15 +144,18 @@ func finalize_ability() -> void:
 	get_parent().get_child(0).play("default")  # Reset animation
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
+	get_parent().check_end_turn_conditions()
 	
 	get_parent().audio_player.stop()
 	
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	if zombies.size() <= 0:
+		reset_player_units()	
+	
 	assigned = false
 	GlobalManager.transport_toggle_active = false
-		
-	get_parent().check_end_turn_conditions()
 	print("Ability finalized.")
-
+		
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var all_units = get_tree().get_nodes_in_group("player_units")
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -303,3 +307,13 @@ func is_mouse_over_gui() -> bool:
 			if rect.has_point(mouse_pos):
 				return true
 	return false
+
+func reset_player_units():
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:	
+		player.has_moved = false
+		player.has_attacked = false
+		player.has_used_turn = false
+		player.can_start_turn = true
+		player.modulate = Color(1, 1, 1)

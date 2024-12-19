@@ -9,6 +9,8 @@ var item_structures: Array = []  # The structures containing the items
 var items_discovered: int = 0
 var item_handled: Array = []  # Prevents multiple checks per item
 
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")
+
 func _ready():
 	await get_tree().create_timer(0.1).timeout
 	assign_items_to_structures()

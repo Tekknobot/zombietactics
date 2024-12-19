@@ -13,6 +13,8 @@ var max_turn_count: int = 3
 signal player_action_completed
 
 @onready var zombie_spawn_manager = get_node("/root/MapManager/SpawnZombies")
+@onready var mission_manager = get_node("/root/MapManager/MissionManager")
+@onready var hud_mananger = get_node("/root/MapManager/HUDManager")
 
 func _ready() -> void:
 	await get_tree().create_timer(1).timeout
@@ -27,6 +29,12 @@ func _ready() -> void:
 		start_current_unit_turn()  # Start the first unit's turn
 	else:
 		print("No player units available to start.")
+
+func _process(delta: float) -> void:
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	if zombies.size() <= 0:
+		GlobalManager.zombies_cleared = true
+		reset_player_units()	
 
 func start_current_unit_turn() -> void:
 	# Ensure there are valid player units
@@ -80,5 +88,17 @@ func add_zombie_unit(unit: Node) -> void:
 
 # Call this function after every player action
 func on_player_action_completed():
-	emit_signal("player_action_completed")
-	
+	emit_signal("player_action_completed")	
+
+func reset_player_units():
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:	
+		player.has_moved = false
+		player.has_attacked = false
+		player.has_used_turn = false
+		player.can_start_turn = true
+		player.modulate = Color(1, 1, 1)	
+		
+	hud_mananger.hide_special_buttons()
+	mission_manager.check_mission_manager()

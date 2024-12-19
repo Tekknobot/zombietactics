@@ -950,6 +950,11 @@ func check_end_turn_conditions() -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:			
 			player.get_child(0).play("default")
+		
+		var zombies = get_tree().get_nodes_in_group("zombies")
+		if zombies.size() <= 0:
+			reset_player_units()
+				
 		end_turn(self)
 
 func end_turn(player) -> void:
@@ -964,3 +969,13 @@ func end_turn(player) -> void:
 
 func start_turn() -> void:
 	can_start_turn = true
+
+func reset_player_units():
+	# Get all player units in the game
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:	
+		player.has_moved = false
+		player.has_attacked = false
+		player.has_used_turn = false
+		player.can_start_turn = true
+		player.modulate = Color(1, 1, 1)

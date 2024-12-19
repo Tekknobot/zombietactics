@@ -100,14 +100,22 @@ func _input(event):
 			hover_tile.selected_player.audio_player.stream = hover_tile.selected_player.levelup_audio
 			hover_tile.selected_player.audio_player.play()
 			
-			hover_tile.selected_player.play_level_up_effect()  # Optional regeneration effect
+			await hover_tile.selected_player.play_level_up_effect()  # Optional regeneration effect
 			
 			if hover_tile.selected_player.current_health > hover_tile.selected_player.max_health:
 				hover_tile.selected_player.current_health = hover_tile.selected_player.max_health
 							
 			var hud_manager = get_node("/root/MapManager/HUDManager")
-			hud_manager.update_hud(hover_tile.selected_player)
-			GlobalManager.regenerate_toggle_active = false
+			hud_manager.update_hud(hover_tile.selected_player)	
+			
+			laser_active = false	
+			get_parent().has_attacked = true
+			get_parent().has_moved = true		
+			get_parent().check_end_turn_conditions()
+
+			# Access the 'special' button within HUDManager
+			GlobalManager.regenerate_toggle_active = false  # Deactivate the special toggle
+			hud_manager.regenerate.button_pressed = false				
 			return  # Exit after regenerating
 
 		# Ensure hover_tile exists and specific conditions are met
@@ -125,14 +133,14 @@ func _input(event):
 			closest_players = get_players_in_scene()
 
 			# Sort players by distance to the initial target
-			#closest_players.sort_custom(func(a, b):
-			#	return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
+			closest_players.sort_custom(func(a, b):
+				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
 
 			get_player_in_area()
 			laser_active = true
 
 func get_player_in_area():
-	if player_index >= closest_players.size() - 1: #min(closest_players.size() - 1, get_parent().current_level - 1):
+	if player_index >= min(closest_players.size() - 1, get_parent().current_level - 1):
 		player_index = -1
 		closest_players.clear()
 
@@ -140,10 +148,6 @@ func get_player_in_area():
 		if xp_awarded:
 			await get_tree().create_timer(1).timeout
 			add_xp()
-
-		get_parent().has_attacked = true
-		get_parent().has_moved = true
-		xp_awarded = false
 		
 		var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary	
 		
@@ -151,7 +155,10 @@ func get_player_in_area():
 		GlobalManager.regenerate_toggle_active = false  # Deactivate the special toggle
 		hud_manager.regenerate.button_pressed = false		
 		
+		xp_awarded = false
 		laser_active = false	
+		get_parent().has_attacked = true
+		get_parent().has_moved = true		
 		get_parent().check_end_turn_conditions()
 		return
 

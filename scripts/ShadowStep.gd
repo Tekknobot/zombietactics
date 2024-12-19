@@ -154,7 +154,7 @@ func attack_next_zombie():
 	get_parent().get_child(9).stream = get_parent().slash_audio
 	get_parent().get_child(9).play()
 			
-	perform_attack(target)
+	await perform_attack(target)
 	
 	# Mark this zombie as attacked
 	attacked_zombies.append(target)

@@ -58,8 +58,8 @@ func end_current_turn() -> void:
 		if player.has_used_turn:
 			used_turns_count += 1
 	
-	# If 3 or more units have used their turns and zombies are not triggered, fire event
-	if used_turns_count >= max_turn_count and trigger_zombies == false:
+	# If all units have used their turns and zombies are not triggered, fire event
+	if used_turns_count >= all_player_units.size() and trigger_zombies == false:
 		print("Three player units have used their turns. Ending player turn.")
 		await zombie_spawn_manager.spawn_zombies()
 		GlobalManager.zombies_processed = 0

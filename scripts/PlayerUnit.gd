@@ -941,7 +941,7 @@ func check_end_turn_conditions() -> void:
 		await get_tree().create_timer(0.5).timeout	
 		
 		# Darken the unit to visually indicate its turn is over
-		self.modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
+		modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
 
 		# Update the HUD to reflect new stats
 		var hud_manager = get_parent().get_parent().get_node("HUDManager")

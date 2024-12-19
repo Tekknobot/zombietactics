@@ -89,9 +89,8 @@ func _ready():
 
 	# Reset logic if both are equal to minimum constraints
 	if grid_height == 12 and grid_width == 12:
-		GlobalManager.reset_global_manager()
-		reset_level()
-		return
+		grid_width = 32
+		grid_height = 32
 
 	# Randomly choose a set of values for the tiles
 	match randi() % 4:

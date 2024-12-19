@@ -32,6 +32,7 @@ extends CanvasLayer
 @onready var transport = $HUD/Transport
 
 @onready var end_turn = $HUD/EndTurn
+@onready var info = $HUD/Info
 @onready var turn_manager = get_node("/root/MapManager/TurnManager")
 @onready var zombie_spawn_manager = get_parent().get_node("/root/MapManager/SpawnZombies")  
 
@@ -393,6 +394,15 @@ func update_hud(character: PlayerUnit):
 		print("Turn updated to: ", turn.text)
 	else:
 		print("Level node is null!")
+	
+	var zombies = get_tree().get_nodes_in_group("zombies")
+		
+	if info and zombies.size() <= 0:
+		info.visible = true
+		info.adjust_size_to_content()
+		print("Info updated to: ", info.text)
+	else:
+		print("Info node is null!")		
 
 	if hp:
 		hp.text = "HP: " + str(character.current_health) + " of " + str(character.max_health)

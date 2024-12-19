@@ -34,7 +34,9 @@ func _process(delta: float) -> void:
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	if zombies.size() <= 0:
 		GlobalManager.zombies_cleared = true
-		reset_player_units()	
+		reset_player_units()
+	else:
+		GlobalManager.zombies_cleared = false	
 	
 	var all_player_units = get_tree().get_nodes_in_group("player_units")	
 	max_turn_count = all_player_units.size()	

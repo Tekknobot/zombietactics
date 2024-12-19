@@ -520,9 +520,10 @@ func display_attack_range_tiles() -> void:
 		# Prevent tile display or any other player action
 		return
 
-	# Update the HUD to reflect new stats
-	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.show_special_buttons(self)	
+	if GlobalManager.zombies_cleared == false:
+		# Update the HUD to reflect new stats
+		var hud_manager = get_parent().get_parent().get_node("HUDManager")
+		hud_manager.show_special_buttons(self)	
 	
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # First, clear previous attack range tiles

@@ -35,6 +35,9 @@ func _process(delta: float) -> void:
 	if zombies.size() <= 0:
 		GlobalManager.zombies_cleared = true
 		reset_player_units()	
+	
+	var all_player_units = get_tree().get_nodes_in_group("player_units")	
+	max_turn_count = all_player_units.size()	
 
 func start_current_unit_turn() -> void:
 	# Ensure there are valid player units
@@ -67,7 +70,7 @@ func end_current_turn() -> void:
 			used_turns_count += 1
 	
 	# If all units have used their turns and zombies are not triggered, fire event
-	if used_turns_count >= all_player_units.size() and trigger_zombies == false:
+	if used_turns_count >= max_turn_count and trigger_zombies == false:
 		print("Three player units have used their turns. Ending player turn.")
 		await zombie_spawn_manager.spawn_zombies()
 		GlobalManager.zombies_processed = 0

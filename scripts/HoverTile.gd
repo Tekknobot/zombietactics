@@ -55,7 +55,7 @@ func _process(delta: float) -> void:
 		handle_left_click(tile_pos)		
 		
 	elif is_within_bounds(tile_pos) and Input.is_action_just_pressed("mouse_right"):
-		handle_right_click()	
+		handle_right_click()		
 		
 # Checks if the tile position is within the tilemap bounds
 func is_within_bounds(tile_pos: Vector2i) -> bool:
@@ -136,10 +136,19 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 	if selected_player.has_moved == false:
 		await selected_player.move_player_to_target(tile_pos)
 		await clear_action_tiles()  # Clear movement and attack tiles after moving
-		selected_player.has_moved = true
-		
+			
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:						
+			player.check_end_turn_conditions()
+
 		if zombies.size() <= 0:
 			reset_player_units()
+			if GlobalManager.secret_items_found >= 3:
+				GlobalManager.zombies_cleared = true
+				var mission_manager = get_node("/root/MapManager/MissionManager")
+				mission_manager.check_mission_manager()	
+		else:	
+			selected_player.has_moved = true	
 		
 # Selects a unit or structure at the given tile position
 func select_unit_at_tile(tile_pos: Vector2i) -> void:	

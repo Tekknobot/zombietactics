@@ -20,8 +20,10 @@ func _physics_process(delta: float) -> void:
 		dash_to_target(delta)
 
 func _process(delta):
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	
 	# Check if the barrage is complete and the turn has not ended
-	if claw_completed:
+	if claw_completed and zombies.size() > 0:
 		get_parent().current_xp += 25
 		if get_parent().current_xp >= get_parent().xp_for_next_level:
 			get_parent().level_up()	

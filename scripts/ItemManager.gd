@@ -84,9 +84,11 @@ func on_item_discovered(player: Area2D, structure: Node, item_index: int):
 	GlobalManager.secret_items_found += 1  # Increment global item count
 	print("Total items discovered:", items_discovered)
 
+	var zombies = get_tree().get_nodes_in_group("zombies")
 	# Optional: Check if all items are discovered
-	if items_discovered == 3:
-		print("All items discovered! Congratulations!")
+	if items_discovered == 3 and zombies.size() <= 0:
+		print("All items discovered and map cleared! Congratulations!")
+		mission_manager.check_mission_manager()
 
 # Helper function to check adjacency between two tiles
 func is_adjacent(tile_a: Vector2i, tile_b: Vector2i) -> bool:

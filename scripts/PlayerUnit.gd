@@ -470,7 +470,7 @@ func _input(event: InputEvent) -> void:
 				print("Clicked on tile (converted): ", clicked_tile_pos)  # Debug log
 
 				# Check if the tile is occupied by a unit or structure
-				if is_unit_present(clicked_tile_pos):
+				if is_unit_present(clicked_tile_pos) and has_attacked == false:
 					print("Attack triggered at position: ", clicked_tile_pos)  # Debug log
 					attack(clicked_tile_pos)
 					attack_range_visible = false  # Reset the attack range visibility after attacking

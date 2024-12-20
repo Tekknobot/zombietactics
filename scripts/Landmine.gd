@@ -47,6 +47,9 @@ func check_for_units_on_tile() -> void:
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if not player is Node2D:
 			continue
+		
+		if player.player_name == "John. Doom":
+			return
 
 		var player_tile_pos = tilemap.local_to_map(player.position)
 		if player_tile_pos == tile_pos:
@@ -54,7 +57,7 @@ func check_for_units_on_tile() -> void:
 			await get_tree().create_timer(0.1).timeout		
 			_create_explosion()
 			player.flash_damage()
-			player.apply_damage(50)
+			player.apply_damage(25)
 			return  # Only trigger once per check
 
 # Function to create the explosion effect

@@ -3410,13 +3410,13 @@ autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 
 [node name="Turn" type="RichTextLabel" parent="LevelStatName"]
-custom_minimum_size = Vector2(116, 0)
+custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxFlat_1gp3x")
-text = "Player TURN:"
+text = "Turns:"
 autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 
@@ -3603,7 +3603,7 @@ offset_left = 164.0
 offset_top = -173.0
 offset_right = 266.0
 offset_bottom = -143.0
-tooltip_text = "Regengerate all team members health."
+tooltip_text = "Regengerate a team members health based on level."
 theme_override_fonts/font = SubResource("FontFile_ffvx8")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/focus = SubResource("StyleBoxEmpty_lnryq")

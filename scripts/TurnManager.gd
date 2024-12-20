@@ -8,7 +8,7 @@ var current_unit_index: int = 0  # Index of the current unit in the current grou
 
 var trigger_zombies: bool = false
 var used_turns_count: int = 0
-var max_turn_count: int = 3
+var max_turn_count: int = 9
 
 signal player_action_completed
 

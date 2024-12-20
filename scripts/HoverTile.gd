@@ -145,8 +145,7 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 			reset_player_units()
 			if GlobalManager.secret_items_found >= 3:
 				GlobalManager.zombies_cleared = true
-				var mission_manager = get_node("/root/MapManager/MissionManager")
-				mission_manager.check_mission_manager()	
+				var mission_manager = get_node("/root/MapManager/MissionManager")	
 		else:	
 			selected_player.has_moved = true	
 		
@@ -273,7 +272,6 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	if selected_player:
 		last_selected_player = selected_player  # Save the current player as last selected
 
-		
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:
 	movement_range_tiles = player.get_movement_tiles()

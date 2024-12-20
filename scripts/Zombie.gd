@@ -98,7 +98,7 @@ var is_death_processed: bool = false
 
 func _ready() -> void:
 	# Possible values for health and XP
-	var possible_values = [25, 50, 75, 100]
+	var possible_values = [100] #[25, 50, 75, 100]
 	var possible_xp_values = [0]
 	
 	# Randomize current_health

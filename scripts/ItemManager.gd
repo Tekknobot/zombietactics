@@ -86,7 +86,7 @@ func on_item_discovered(player: Area2D, structure: Node, item_index: int):
 
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	# Optional: Check if all items are discovered
-	if items_discovered == 3 and zombies.size() <= 0:
+	if items_discovered >= 3 and zombies.size() <= 0:
 		print("All items discovered and map cleared! Congratulations!")
 		mission_manager.check_mission_manager()
 

@@ -175,22 +175,31 @@ func _on_dynamite_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Dutch. Major":
+				player.display_special_attack_tiles()	
 	else:
 		GlobalManager.dynamite_toggle_active = false  # Set the flag to false
 		print("Dynamite toggle deactivated!")
-
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()
+			
 func _on_grenade_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.grenade_toggle_active = true  # Set the flag to true
 		mek.button_pressed = false
 		print("Grenade toggle activated!")	
-
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Logan. Raines":
+				player.display_special_attack_tiles()
 	else:
 		GlobalManager.grenade_toggle_active = false  # Set the flag to false
 		print("Grenade toggle deactivated!")
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()			
 
 func _on_slash_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -223,10 +232,15 @@ func _on_shadows_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Chuck. Genius":
+				player.display_special_attack_tiles()
 	else:
 		GlobalManager.shadows_toggle_active = false  # Set the flag to false
 		print("Shadows toggle deactivated!")
-
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()	
+			
 func _on_thread_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.thread_toggle_active = true  # Set the flag to true
@@ -235,9 +249,14 @@ func _on_thread_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Sarah. Reese":
+				player.display_special_attack_tiles()
 	else:
 		GlobalManager.thread_toggle_active = false  # Set the flag to false
 		print("Thread toggle deactivated!")
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()			
 
 func _on_dash_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -259,9 +278,14 @@ func _on_prowler_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Aleks. Ducat":
+				player.display_special_attack_tiles()
 	else:
 		GlobalManager.prowler_toggle_active = false  # Set the flag to false
 		print("Prowler toggle deactivated!")
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()		
 		
 func _on_claw_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -307,10 +331,15 @@ func _on_hellfire_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "John. Doom":
+				player.display_special_attack_tiles()
 	else:
 		GlobalManager.hellfire_toggle_active = false  # Set the flag to false
 		print("Hellfire toggle deactivated!")
-
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()
+			
 func _on_barrage_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.barrage_toggle_active = true  # Set the flag to true
@@ -319,9 +348,14 @@ func _on_barrage_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Angel. Charlie":
+				player.display_special_attack_tiles()	
 	else:
 		GlobalManager.barrage_toggle_active = false  # Set the flag to false
 		print("Barrage toggle deactivated!")
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()		
 		
 func _on_octoblast_toggled(button_pressed: bool) -> void:
 	if button_pressed:
@@ -331,10 +365,15 @@ func _on_octoblast_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
+			if player.player_name == "Annie. Switch":
+				player.display_special_attack_tiles()	
 	else:
 		GlobalManager.octoblast_toggle_active = false  # Set the flag to false
 		print("Octoblast toggle deactivated!")
-						
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()	
+									
 # Access and update HUD elements based on the selected player unit
 func update_hud(character: PlayerUnit):
 	# Debugging: Check if the correct character is passed

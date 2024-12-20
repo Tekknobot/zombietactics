@@ -73,33 +73,60 @@ func _input(event: InputEvent) -> void:
 
 		# Left-click to launch missile trajectory (only if right-click has been used to set target)
 		if event.button_index == MOUSE_BUTTON_LEFT and not onTrajectory and genade_launched < 1:
-			if event.pressed:
-				
+			if event.pressed:								
 				explosions_triggered = 0
+
+				# Reference the TileMap node
+				var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+
+				# Get the boundaries of the map's used rectangle
+				var map_size = tilemap.get_used_rect()  # Rect2: position and size of the used tiles
+				var map_origin_x = map_size.position.x  # Starting x-coordinate of the used rectangle
+				var map_origin_y = map_size.position.y  # Starting y-coordinate of the used rectangle
+				var map_width = map_size.size.x         # Width of the map in tiles
+				var map_height = map_size.size.y        # Height of the map in tiles
 
 				var mouse_position = get_global_mouse_position() 
 				mouse_position.y += 8
-				var mouse_pos = Map.local_to_map(mouse_position)
-					
+				var mouse_local = Map.local_to_map(mouse_position)
+
+				# Check if the mouse is outside the bounds of the used rectangle
+				if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
+				   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
+					return  # Exit the function if the mouse is outside the map
+
+				# Check if mouse_local matches the local_to_map position of any special tile
+				var position_matches_tile = false
+
+				for special_tile in get_parent().special_tiles:
+					# Assuming each special_tile has a position in world coordinates
+					if special_tile is Node2D:
+						var tile_map_position = tilemap.local_to_map(special_tile.position)  # Convert to map coordinates
+						if mouse_local == tile_map_position:
+							position_matches_tile = true
+							break
+							
+									
 				# Get the current position in tile coordinates
-				var current_position = mouse_pos
+				var current_position = mouse_local
 
 				# Get the current facing direction of the parent (1 for right, -1 for left)
 				var current_facing = 1 if get_parent().scale.x > 0 else -1
 
-				# Determine sprite flip based on target_position relative to the parent
-				if get_global_mouse_position().x > global_position.x and current_facing == 1:
-					get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
-				elif get_global_mouse_position().x < global_position.x and current_facing == -1:
-					get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
+				if position_matches_tile:	
+					# Determine sprite flip based on target_position relative to the parent
+					if get_global_mouse_position().x > global_position.x and current_facing == 1:
+						get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
+					elif get_global_mouse_position().x < global_position.x and current_facing == -1:
+						get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
 					
-				
-				await find_closest_zombies(get_global_mouse_position())  # Find 2 closest zombies
+					get_parent().clear_special_tiles()						
+					await find_closest_zombies(get_global_mouse_position())  # Find 2 closest zombies
 
-				# Hide special buttons and trigger zombie actions
-				var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")
-				hud_manager.hide_special_buttons()
-				clear_zombie_tiles()
+					# Hide special buttons and trigger zombie actions
+					var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")
+					hud_manager.hide_special_buttons()
+					clear_zombie_tiles()
 
 
 func find_closest_zombies(target_position: Vector2):

@@ -91,27 +91,40 @@ func _input(event):
 		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
 		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
 			return  # Exit the function if the mouse is outside the map
+
+		# Check if mouse_local matches the local_to_map position of any special tile
+		var position_matches_tile = false
+
+		for special_tile in get_parent().special_tiles:
+			# Assuming each special_tile has a position in world coordinates
+			if special_tile is Node2D:
+				var tile_map_position = tilemap.local_to_map(special_tile.position)  # Convert to map coordinates
+				if mouse_local == tile_map_position:
+					position_matches_tile = true
+					break
+					
+		if position_matches_tile:								
+			# Ensure hover_tile exists and "Sarah Reese" is selected
+			if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.thread_toggle_active == true:
+				var mouse_position = get_global_mouse_position() 
+				mouse_position.y += 8
+				var mouse_pos = tilemap.local_to_map(mouse_position)
+				laser_target = tilemap.map_to_local(mouse_pos)
+				explosion_target = laser_target
+
+				var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
+				hud_manager.hide_special_buttons()	
+							
+				# Find zombies in the vicinity
+				closest_zombies = get_zombies_in_scene() # Assume this is a function returning all zombies in the scene
+
+				# Sort zombies by distance to the initial target
+				closest_zombies.sort_custom(func(a, b):
+					return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
 				
-		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.thread_toggle_active == true:
-			var mouse_position = get_global_mouse_position() 
-			mouse_position.y += 8
-			var mouse_pos = tilemap.local_to_map(mouse_position)
-			laser_target = tilemap.map_to_local(mouse_pos)
-			explosion_target = laser_target
-
-			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
-			hud_manager.hide_special_buttons()	
-						
-			# Find zombies in the vicinity
-			closest_zombies = get_zombies_in_scene() # Assume this is a function returning all zombies in the scene
-
-			# Sort zombies by distance to the initial target
-			closest_zombies.sort_custom(func(a, b):
-				return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
-			
-			get_zombie_in_area()
-			laser_active = true
+				get_parent().clear_special_tiles()	
+				get_zombie_in_area()
+				laser_active = true
 			
 			
 

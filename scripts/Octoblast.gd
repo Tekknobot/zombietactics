@@ -41,10 +41,23 @@ func _input(event):
 		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
 		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
 			return  # Exit the function if the mouse is outside the map
+
+		# Check if mouse_local matches the local_to_map position of any special tile
+		var position_matches_tile = false
+
+		for special_tile in get_parent().special_tiles:
+			# Assuming each special_tile has a position in world coordinates
+			if special_tile is Node2D:
+				var tile_map_position = tilemap.local_to_map(special_tile.position)  # Convert to map coordinates
+				if mouse_local == tile_map_position:
+					position_matches_tile = true
+					break
 					
-		# Ensure hover_tile exists and "Sarah Reese" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Annie. Switch" and GlobalManager.octoblast_toggle_active == true:
-			activate_ability()
+		if position_matches_tile:					
+			# Ensure hover_tile exists and "Sarah Reese" is selected
+			if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Annie. Switch" and GlobalManager.octoblast_toggle_active == true:
+				get_parent().clear_special_tiles()	
+				activate_ability()
 			
 func trigger_octoblast():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

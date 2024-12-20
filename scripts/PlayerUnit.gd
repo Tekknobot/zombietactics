@@ -298,8 +298,8 @@ func display_special_attack_tiles() -> void:
 		return
 
 	# Update the HUD to reflect new stats
-	var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	hud_manager.hide_special_buttons()	
+	#var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	#hud_manager.hide_special_buttons()	
 					
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
@@ -340,8 +340,6 @@ func is_special_tile_movable(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
 	if is_water_tile(tile_id):
-		return false
-	if is_structure(tile_pos):
 		return false
 	return true
 

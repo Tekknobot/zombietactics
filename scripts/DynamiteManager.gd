@@ -115,34 +115,45 @@ func _input(event: InputEvent) -> void:
 				# Check if the mouse position is within map bounds
 				if mouse_local.x >= 0 and mouse_local.x < map_width and mouse_local.y >= 0 and mouse_local.y < map_height:
 					# The mouse position is within the map boundaries
-					# Create a new trajectory instance
-					var trajectory_instance = self.duplicate()
-					self.get_parent().add_child(trajectory_instance)
-					trajectory_instance.add_to_group("trajectories")
-					print("Trajectory instance created and added to the scene.")
-					
-					# Convert the global mouse position to the local position relative to the TileMap
-					var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
-					var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
+					# Check if mouse_local matches the local_to_map position of any special tile
+					var position_matches_tile = false
 
-					# Convert the target position (assumed to be global) to local
-					var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
-					
-					dynamite_launched += 1
-															
-					# Start the trajectory
-					await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
-					
-					player_to_act.has_attacked = true
-					player_to_act.has_moved = true
-					player_to_act.check_end_turn_conditions()
-					
-					var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
-					hud_manager.hide_special_buttons()	
-					
-					# Trigger zombie action: find and chase player
-					clear_zombie_tiles()
-					
+					for special_tile in player_to_act.special_tiles:
+						# Assuming each special_tile has a position in world coordinates
+						if special_tile is Node2D:
+							var tile_map_position = tilemap.local_to_map(special_tile.position)  # Convert to map coordinates
+							if mouse_local == tile_map_position:
+								position_matches_tile = true
+								break
+								
+					if position_matches_tile:								
+						# Create a new trajectory instance
+						var trajectory_instance = self.duplicate()
+						self.get_parent().add_child(trajectory_instance)
+						trajectory_instance.add_to_group("trajectories")
+						print("Trajectory instance created and added to the scene.")
+						
+						# Convert the global mouse position to the local position relative to the TileMap
+						var map_mouse_position = Map.local_to_map(mouse_position)  # Convert to TileMap local coordinates
+						var map_mouse_tile_pos = Map.map_to_local(map_mouse_position) + Vector2(0,0) / 2 # Convert to tile coordinates
+
+						# Convert the target position (assumed to be global) to local
+						var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
+						
+						dynamite_launched += 1
+																
+						# Start the trajectory
+						await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
+						
+						player_to_act.has_attacked = true
+						player_to_act.has_moved = true
+						player_to_act.check_end_turn_conditions()
+						
+						var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
+						hud_manager.hide_special_buttons()	
+						
+						# Trigger zombie action: find and chase player
+						clear_zombie_tiles()					
 				else:
 					# If the mouse position is out of bounds, print a message or handle it as needed
 					print("Mouse position out of map bounds:", mouse_local)

@@ -154,6 +154,7 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 	var hud_manager = get_parent().get_node("HUDManager")
 	
 	clear_action_tiles()  # Clear any previous selection tiles
+	clear_action_tiles_for_all_players()
 	clear_action_tiles_zombie()  # Clear any previous zombie selection tiles
 	
 	# Check if a player unit is at the tile
@@ -199,7 +200,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			#camera.focus_on_tile(tilemap, selected_player.tile_pos)
-						
+			
+			clear_action_tiles_for_all_players()			
 			show_movement_tiles(player)
 			hud_manager.update_hud(player)
 			return

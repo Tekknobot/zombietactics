@@ -133,11 +133,16 @@ func _on_missile_toggled(button_pressed: bool) -> void:
 		landmine.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
-			player.clear_attack_range_tiles()			
+			player.clear_attack_range_tiles()	
+			if player.player_name == "Yoshida. Boi":
+				player.display_special_attack_tiles()		
 	else:
 		GlobalManager.missile_toggle_active = false  # Set the flag to false
-		print("Missile toggle deactivated!")
-
+		print("Missile toggle deactivated!")	
+		var players = get_tree().get_nodes_in_group("player_units")
+		for player in players:
+			player.clear_special_tiles()
+			
 func _on_landmine_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		GlobalManager.landmine_toggle_active = true  # Set the flag to true

@@ -13,6 +13,7 @@ class_name PlayerUnit
 
 # Store references to instantiated movement tiles for easy cleanup
 var movement_tiles: Array[Node2D] = []
+var special_tiles: Array[Node2D] = []
 
 # Declare necessary variables for attack
 @export var projectile_scene: PackedScene  # Packed scene for the projectile
@@ -237,6 +238,19 @@ func get_movement_tiles() -> Array[Vector2i]:
 
 	return tiles_in_range
 
+# Get all tiles within movement range based on Manhattan distance
+func get_special_tiles() -> Array[Vector2i]:
+	var tiles_in_range: Array[Vector2i] = []
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for x in range(-movement_range * 2, movement_range * 2 + 1):
+		for y in range(-movement_range * 2, movement_range * 2 + 1):
+			if abs(x) + abs(y) <= movement_range * 2:
+				var target_tile_pos: Vector2i = tile_pos + Vector2i(x, y)
+				if tilemap.get_used_rect().has_point(target_tile_pos):
+					tiles_in_range.append(target_tile_pos)
+
+	return tiles_in_range
+	
 # Display movement tiles within range
 func display_movement_tiles() -> void:
 	# Check if any zombie in the "zombies" group is moving
@@ -266,13 +280,50 @@ func display_movement_tiles() -> void:
 			var movement_tile_instance: Node2D = movement_tile_scene.instantiate() as Node2D
 			movement_tile_instance.position = world_pos
 			tilemap.add_child(movement_tile_instance)
-			movement_tiles.append(movement_tile_instance)
+			self.movement_tiles.append(movement_tile_instance)
+
+# Display movement tiles within range
+func display_special_attack_tiles() -> void:
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			#print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.hide_special_buttons()	
+					
+	clear_movement_tiles()  # Clear existing movement tiles
+	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
+
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for tile in get_special_tiles():
+		if is_special_tile_movable(tile):
+			var world_pos: Vector2 = tilemap.map_to_local(tile)
+			var attack_tile_instance: Node2D = attack_tile_scene.instantiate() as Node2D
+			attack_tile_instance.position = world_pos
+			tilemap.add_child(attack_tile_instance)
+			special_tiles.append(attack_tile_instance)
 
 # Clear displayed movement tiles
 func clear_movement_tiles() -> void:
 	for tile in movement_tiles:
 		tile.queue_free()
-	movement_tiles.clear()
+	self.movement_tiles.clear()
+
+# Clear displayed movement tiles
+func clear_special_tiles() -> void:
+	for tile in special_tiles:
+		tile.queue_free()
+	special_tiles.clear()
 
 # Check if a tile is movable
 func is_tile_movable(tile_pos: Vector2i) -> bool:
@@ -281,6 +332,16 @@ func is_tile_movable(tile_pos: Vector2i) -> bool:
 	if is_water_tile(tile_id):
 		return false
 	if is_structure(tile_pos) or is_unit_present(tile_pos):
+		return false
+	return true
+
+# Check if a tile is movable
+func is_special_tile_movable(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
+	if is_water_tile(tile_id):
+		return false
+	if is_structure(tile_pos):
 		return false
 	return true
 
@@ -420,7 +481,7 @@ func visualize_walkable_tiles() -> void:
 				movement_tile_instance.position = world_pos
 				movement_tile_instance.modulate = Color(0.0, 1.0, 0.0, 0.5)  # Example: Green with some transparency for walkable tiles
 				tilemap.add_child(movement_tile_instance)
-				movement_tiles.append(movement_tile_instance)
+				self.movement_tiles.append(movement_tile_instance)
 
 	# Debug print to confirm visualization
 	print("Visualized walkable tiles.")

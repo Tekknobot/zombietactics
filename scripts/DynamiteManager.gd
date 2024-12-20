@@ -141,7 +141,18 @@ func _input(event: InputEvent) -> void:
 						var map_target_tile_pos = Map.map_to_local(tile_pos)  # Convert to tile coordinates
 						
 						dynamite_launched += 1
-																
+
+						# Get the current facing direction of the parent (1 for right, -1 for left)
+						var current_facing = 1 if player_to_act.scale.x > 0 else -1
+
+						# Determine sprite flip based on target_position relative to the parent
+						if mouse_position.x > player_to_act.position.x and current_facing == 1:
+							player_to_act.scale.x = -abs(player_to_act.scale.x)  # Flip to face left
+						elif mouse_position.x < player_to_act.position.x and current_facing == -1:
+							player_to_act.scale.x = abs(player_to_act.scale.x)  # Flip to face right
+						
+						player_to_act.get_child(0).play("attack")										
+						
 						# Start the trajectory
 						await trajectory_instance.start_trajectory(map_mouse_tile_pos, map_target_tile_pos)
 						

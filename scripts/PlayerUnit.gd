@@ -408,9 +408,7 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 	
 	update_astar_grid()  # Ensure AStar grid is up to date
 	calculate_path(target_tile)  # Now calculate the path
-	
-	get_child(0).play("move")  # Play the "move" animation
-			
+		
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
 	# Do not clear selection here. We keep selected_player intact.
@@ -423,6 +421,8 @@ func move_along_path(delta: float) -> void:
 		return  # No path, so don't move	
 	
 	if path_index < current_path.size():
+		get_child(0).play("move")  # Play the "move" animation
+		
 		var target_pos = current_path[path_index]  # This is a Vector2i (tile position)
 		
 		# Convert the target position to world position (center of the tile)
@@ -438,7 +438,6 @@ func move_along_path(delta: float) -> void:
 		elif direction.x < 0:
 			scale.x = 1  # Facing left (West)	
 		
-			
 		# Move the soldier in the direction of the target position, adjusted by delta
 		position += direction * move_speed * delta
 		

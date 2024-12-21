@@ -37,7 +37,7 @@ func _input(event):
 
 		var mouse_local = tilemap.local_to_map(global_mouse_position)
 
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "John. Doom" and GlobalManager.transport_toggle_active:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "John. Doom" and GlobalManager.transport_toggle_active == true:
 			if is_tile_movable(mouse_local) == false:
 				return
 			
@@ -86,7 +86,7 @@ func move_to_transport(delta: float) -> void:
 		# Move incrementally to each position
 		while position.distance_to(world_pos) > 1:
 			# Break the loop if the node is no longer in the scene tree
-			if not is_inside_tree():
+			if not is_inside_tree() or !get_parent().is_in_group("player_units"):
 				print("Node is no longer in the scene tree. Exiting ability.")
 				finalize_ability()
 				return
@@ -131,28 +131,23 @@ func check_and_transport_adjacent_unit() -> void:
 
 	# Check if no unit was found
 	if not transported_unit:
-		print("No adjacent player unit found. Exiting ability.")
+		print("No adjacent player unit found. Exiting ability.")	
 		finalize_ability()  # Exit the ability and finalize the turn
 		return
 
 	# If a unit is found, move back to the original position
 	await get_tree().create_timer(1).timeout
 	calcualte_transport_path(original_pos)
-	move_to_transport(get_process_delta_time())
 
 func finalize_ability() -> void:
-	get_parent().get_child(0).play("default")  # Reset animation
+	get_parent().get_child(0).play("default")  # Reset animation only for the active unit		
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
 	get_parent().check_end_turn_conditions()
 	
 	get_parent().audio_player.stop()
 	
-	var zombies = get_tree().get_nodes_in_group("zombies")
-	if zombies.size() <= 0:
-		reset_player_units()	
-	
-	assigned = false
+	assigned = false	
 	GlobalManager.transport_toggle_active = false
 	print("Ability finalized.")
 		
@@ -239,8 +234,7 @@ func move_along_path() -> void:
 	if unit_on_board == false:	
 		# Check for adjacent player units
 		check_and_transport_adjacent_unit()
-
-	if unit_on_board and get_parent().tile_pos == original_pos:
+	elif unit_on_board and get_parent().tile_pos == original_pos:
 		transport_unit_to_adjacent_tile(boarded_unit)	
 
 # Check if a tile is movable

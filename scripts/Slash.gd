@@ -81,6 +81,11 @@ func _input(event):
 				get_parent().scale.x = 1  # Facing left
 			
 			get_parent().get_child(0).play("move")
+			
+			# Update the HUD to reflect new stats
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			hud_manager.hide_special_buttons()	
+						
 			# Trigger Shadow Slash with the calculated direction
 			shadow_slash(direction)
 

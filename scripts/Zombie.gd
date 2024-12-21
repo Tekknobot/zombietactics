@@ -98,7 +98,7 @@ var is_death_processed: bool = false
 
 func _ready() -> void:
 	# Possible values for health and XP
-	var possible_values = [100] #[25, 50, 75, 100]
+	var possible_values = [25, 50, 75, 100]
 	var possible_xp_values = [0]
 	
 	# Randomize current_health
@@ -166,6 +166,11 @@ func _process(delta: float) -> void:
 		# Camera focuses on the active zombie
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 		camera.focus_on_position(self.position) 
+		
+		# Update HUD with new stats
+		var hud_manager = get_node("/root/MapManager/HUDManager")
+		hud_manager.update_hud_zombie(self)  # Consolidate all updates into one method
+					
 		if self.path_index < min(self.current_path.size(), self.movement_range + 1):
 			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var target_tile_pos = self.current_path[self.path_index]
@@ -569,6 +574,7 @@ func move_along_path(zombie: Area2D, current_path: PackedVector2Array) -> void:
 	zombie.current_path = current_path
 	zombie.path_index = 0  # Start at the first step of the path
 	zombie.is_moving = true
+	
 	print("Zombie ID:", zombie.zombie_id, "started moving.")
 		
 # Check if a tile is movable
@@ -647,7 +653,6 @@ func display_movement_tiles() -> void:
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.hide_special_buttons()	
 		
-			
 	clear_movement_tiles()  # Clear existing movement tiles
 	
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

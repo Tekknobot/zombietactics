@@ -202,8 +202,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			#camera.focus_on_tile(tilemap, selected_player.tile_pos)
 			
 			clear_action_tiles_for_all_players()			
-			show_movement_tiles(player)
-			hud_manager.update_hud(player)
+			show_movement_tiles(selected_player)
+			hud_manager.update_hud(selected_player)
 			return
 	
 	# Check if a zombie is at the tile

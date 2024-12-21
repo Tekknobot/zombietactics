@@ -295,11 +295,7 @@ func display_special_attack_tiles() -> void:
 	
 	if zombies_moving:
 		# Prevent tile display or any other player action
-		return
-
-	# Update the HUD to reflect new stats
-	#var hud_manager = get_parent().get_parent().get_node("HUDManager")
-	#hud_manager.hide_special_buttons()	
+		return	
 					
 	clear_movement_tiles()  # Clear existing movement tiles
 	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
@@ -991,7 +987,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 		
 func check_end_turn_conditions() -> void:
 	# Check if the unit has completed its turn
-	if has_moved and has_attacked:
+	if self.has_moved and self.has_attacked:
 		print(self.name, "has completed its turn.")
 		has_used_turn = true
 		can_start_turn = false
@@ -1001,10 +997,6 @@ func check_end_turn_conditions() -> void:
 		
 		# Darken the unit to visually indicate its turn is over
 		modulate = Color(0.5, 0.5, 0.5, 1.0)  # Reduce brightness (darken)
-
-		# Update the HUD to reflect new stats
-		var hud_manager = get_parent().get_parent().get_node("HUDManager")
-		hud_manager.update_hud(self)
 		
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:			
@@ -1014,15 +1006,12 @@ func check_end_turn_conditions() -> void:
 		if zombies.size() <= 0:
 			reset_player_units()
 				
-		end_turn(self)
+		end_turn()
 
-func end_turn(player) -> void:
+func end_turn() -> void:
 	if turn_manager:
 		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
-		
-		# Update the HUD to reflect new stats
-		var hud_manager = get_parent().get_parent().get_node("HUDManager")
-		hud_manager.update_hud(player)	
+
 	else:
 		print("Turn manager is not set! Unable to proceed to the next unit.")
 

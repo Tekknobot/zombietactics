@@ -820,7 +820,11 @@ func die() -> void:
 		
 	self.visible = false
 	print("Player has died")	
-	#queue_free()  # Remove player from the scene or handle accordingly		
+	
+	var all_players = get_tree().get_nodes_in_group("player_units")
+	if all_players.size() <= 0:
+		GlobalManager.players_killed = true
+		mission_manager.check_mission_manager()		
 
 func level_up() -> void:
 	# Play SFX

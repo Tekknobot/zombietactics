@@ -140,6 +140,7 @@ func check_and_transport_adjacent_unit() -> void:
 	calcualte_transport_path(original_pos)
 
 func finalize_ability() -> void:
+	get_parent().current_path.clear()
 	get_parent().get_child(0).play("default")  # Reset animation only for the active unit		
 	get_parent().has_moved = true
 	get_parent().has_attacked = true

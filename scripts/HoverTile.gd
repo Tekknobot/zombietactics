@@ -292,6 +292,25 @@ func toggle_attack_mode() -> void:
 		
 	clear_action_tiles()
 	if attack_range_tiles.is_empty() and selected_player.tile_pos == tile_pos:
+		if (
+			GlobalManager.missile_toggle_active or 
+			GlobalManager.landmine_toggle_active or 
+			GlobalManager.dynamite_toggle_active or 
+			GlobalManager.mek_toggle_active or 
+			GlobalManager.thread_toggle_active or 
+			GlobalManager.dash_toggle_active or 
+			GlobalManager.claw_toggle_active or 
+			GlobalManager.hellfire_toggle_active or 
+			GlobalManager.barrage_toggle_active or 
+			GlobalManager.octoblast_toggle_active or 
+			GlobalManager.grenade_toggle_active or 
+			GlobalManager.slash_toggle_active or
+			GlobalManager.shadows_toggle_active or
+			GlobalManager.prowler_toggle_active or
+			GlobalManager.regenerate_toggle_active or
+			GlobalManager.transport_toggle_active
+		):
+			return		
 		# Switch to attack mode
 		attack_range_tiles = selected_player.get_attack_tiles()
 		selected_player.display_attack_range_tiles()

@@ -87,9 +87,6 @@ func activate_prowler(target_zombie):
 	attack_index = 0
 	is_prowler_active = true
 
-	# Start with the clicked zombie
-	targeted_zombies.append(target_zombie)
-
 	# Find nearby zombies (excluding the clicked zombie)
 	var nearby_zombies = find_nearest_zombies(max_targets - 1)
 	targeted_zombies.append_array(nearby_zombies)

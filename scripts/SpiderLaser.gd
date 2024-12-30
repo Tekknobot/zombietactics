@@ -103,7 +103,7 @@ func _input(event):
 					position_matches_tile = true
 					break
 					
-		if position_matches_tile:								
+		if position_matches_tile and is_unit_present(mouse_local):								
 			# Ensure hover_tile exists and "Sarah Reese" is selected
 			if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Sarah. Reese" and GlobalManager.thread_toggle_active == true:
 				var mouse_position = get_global_mouse_position() 
@@ -126,8 +126,6 @@ func _input(event):
 				get_zombie_in_area()
 				laser_active = true
 			
-			
-
 func get_zombie_in_area():
 	if zombie_index >= min(closest_zombies.size() - 1, 7):
 		zombie_index = -1
@@ -398,6 +396,16 @@ func clear_segments():
 	for child in get_children():
 		if child is Line2D:
 			child.queue_free()		
+
+# Check if there is a unit on the tile
+func is_unit_present(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var all_units = get_tree().get_nodes_in_group("zombies")
+	for unit in all_units:
+		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
+		if tile_pos == unit_tile_pos:
+			return true
+	return false
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position

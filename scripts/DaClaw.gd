@@ -101,9 +101,7 @@ func _input(event):
 			claw_dash_strike(mouse_pos)		
 	
 # Blade Dash Strike ability
-func claw_dash_strike(target_tile: Vector2i) -> void:
-	get_parent().move_speed = dash_speed
-	
+func claw_dash_strike(target_tile: Vector2i) -> void:	
 	# Update the AStar grid to ensure accurate pathfinding
 	get_parent().update_astar_grid()
 	
@@ -156,6 +154,7 @@ func dash_to_target(delta: float) -> void:
 
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
+	get_parent().check_end_turn_conditions()
 
 func update_hover_tiles():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

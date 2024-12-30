@@ -95,6 +95,8 @@ func _input(event):
 			# Camera focuses on the active zombie
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			camera.focus_on_position(get_parent().position) 
+			
+			GlobalManager.claw_toggle_active = false
 			clear_hover_tiles()				
 			claw_dash_strike(mouse_pos)		
 	

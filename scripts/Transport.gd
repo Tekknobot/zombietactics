@@ -60,6 +60,10 @@ func _input(event):
 			
 			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 			hud_manager.hide_special_buttons()	
+			GlobalManager.transport_toggle_active = false
+
+			unit_on_board = false
+			boarded_unit = null			
 			clear_hover_tiles()	
 			calcualte_transport_path(mouse_local)	
 
@@ -78,8 +82,6 @@ func calcualte_transport_path(target_tile: Vector2i) -> void:
 		print("No valid path to the target. Exiting ability.")
 		finalize_ability()  # Exit the ability and finalize the turn
 		return
-	
-	assigned = false	
 	
 	# Save the original position for returning later
 	if assigned == false:
@@ -161,16 +163,18 @@ func check_and_transport_adjacent_unit() -> void:
 
 func finalize_ability() -> void:
 	get_parent().current_path.clear()
-	get_parent().get_child(0).play("default")  # Reset animation only for the active unit		
+	get_parent().get_child(0).play("default")
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
-	get_parent().check_end_turn_conditions()
-	
 	get_parent().audio_player.stop()
-	
-	assigned = false	
+
+	# Reset transport-specific states
+	assigned = false
 	GlobalManager.transport_toggle_active = false
+	
+	get_parent().check_end_turn_conditions()
 	print("Ability finalized.")
+
 		
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var all_units = get_tree().get_nodes_in_group("player_units")

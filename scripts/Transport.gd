@@ -21,11 +21,28 @@ var unit_on_board: bool = false
 var boarded_unit
 var moved_back: bool = false
 var assigned = false
+
+@export var hover_tile_scene: PackedScene
+var hover_tiles = []  # Store references to instantiated hover tiles
+var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
 	
 func _ready() -> void:
 	pathfinder = get_node_or_null("/root/MapManager/Pathfinder") # Ensure you have a pathfinder node in your scene
 
+func _process(delta: float) -> void:
+	if GlobalManager.transport_toggle_active:
+		update_hover_tiles()
+	else:
+		clear_hover_tiles()		
+		
+	is_mouse_over_gui()		
+
 func _input(event):
+	# Check for mouse motion or click
+	if event is InputEventMouseMotion:
+		if GlobalManager.transport_toggle_active:
+			update_hover_tiles()	
+		
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if is_mouse_over_gui():
 			print("Input blocked by GUI.")
@@ -42,7 +59,8 @@ func _input(event):
 				return
 			
 			var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
-			hud_manager.hide_special_buttons()		
+			hud_manager.hide_special_buttons()	
+			clear_hover_tiles()	
 			calcualte_transport_path(mouse_local)	
 
 # Transport ability
@@ -60,7 +78,9 @@ func calcualte_transport_path(target_tile: Vector2i) -> void:
 		print("No valid path to the target. Exiting ability.")
 		finalize_ability()  # Exit the ability and finalize the turn
 		return
-
+	
+	assigned = false	
+	
 	# Save the original position for returning later
 	if assigned == false:
 		original_pos = get_parent().tile_pos
@@ -196,6 +216,45 @@ func transport_unit_to_adjacent_tile(unit) -> void:
 	# If no movable tile was found, print a failure message
 	print("No movable adjacent tile found. Transport failed.")
 
+func update_hover_tiles():
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var start_tile = get_parent().tile_pos  # Unit's current tile position
+	var end_tile = hover_tile.tile_pos  # Hover tile position
+
+	# Avoid redundant updates if the end tile hasn't changed
+	if end_tile == last_hovered_tile:
+		return
+	
+	last_hovered_tile = end_tile
+
+	# Clear existing hover tiles
+	clear_hover_tiles()
+
+	# Ensure AStar is updated and calculate the path
+	get_parent().update_astar_grid()
+	var path = get_parent().astar.get_point_path(start_tile, end_tile)
+
+	if path.size() == 0:
+		print("No path found between start and end tile.")
+		return
+
+	# Iterate through the path and place hover tiles
+	for pos in path:
+		var tile_pos = Vector2i(pos)  # Ensure tile position is a Vector2i
+		var world_pos = tilemap.map_to_local(tile_pos)
+
+		# Create a hover tile
+		if hover_tile_scene:
+			var hover_tile_instance = hover_tile_scene.instantiate()
+			hover_tile_instance.position = world_pos
+			tilemap.add_child(hover_tile_instance)
+			hover_tiles.append(hover_tile_instance)
+
+func clear_hover_tiles():
+	for tile in hover_tiles:
+		tile.queue_free()
+	hover_tiles.clear()
+
 func move_along_path() -> void:
 	if get_parent().current_path.is_empty():
 		return  # No path, so don't move
@@ -300,6 +359,7 @@ func is_mouse_over_gui() -> bool:
 		if control is TextureRect or Button and control.is_visible_in_tree():
 			var rect = control.get_global_rect()
 			if rect.has_point(mouse_pos):
+				clear_hover_tiles()
 				return true
 	return false
 

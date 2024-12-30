@@ -15,6 +15,10 @@ var pos_before_dash: Vector2i
 
 var claw_completed: bool = false
 
+@export var hover_tile_scene: PackedScene
+var hover_tiles = []  # Store references to instantiated hover tiles
+var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
+
 func _physics_process(delta: float) -> void:
 	if is_active:  # Assuming you toggle `is_active` during the dash
 		dash_to_target(delta)
@@ -40,10 +44,20 @@ func _process(delta):
 		get_parent().check_end_turn_conditions()
 			
 		claw_completed = false  # Reset the flag to prevent multiple triggers
-				
-	is_mouse_over_gui()
+
+	if GlobalManager.claw_toggle_active:
+		update_hover_tiles()
+	else:
+		clear_hover_tiles()		
+		
+	is_mouse_over_gui()		
 
 func _input(event):
+	# Check for mouse motion or click
+	if event is InputEventMouseMotion:
+		if GlobalManager.claw_toggle_active:
+			update_hover_tiles()	
+				
 	# Check for mouse click
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		# Block gameplay input if the mouse is over GUI
@@ -81,7 +95,7 @@ func _input(event):
 			# Camera focuses on the active zombie
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			camera.focus_on_position(get_parent().position) 
-						
+			clear_hover_tiles()				
 			claw_dash_strike(mouse_pos)		
 	
 # Blade Dash Strike ability
@@ -140,6 +154,45 @@ func dash_to_target(delta: float) -> void:
 
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
+
+func update_hover_tiles():
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var start_tile = get_parent().tile_pos  # Unit's current tile position
+	var end_tile = hover_tile.tile_pos  # Hover tile position
+
+	# Avoid redundant updates if the end tile hasn't changed
+	if end_tile == last_hovered_tile:
+		return
+	
+	last_hovered_tile = end_tile
+
+	# Clear existing hover tiles
+	clear_hover_tiles()
+
+	# Ensure AStar is updated and calculate the path
+	get_parent().update_astar_grid()
+	var path = get_parent().astar.get_point_path(start_tile, end_tile)
+
+	if path.size() == 0:
+		print("No path found between start and end tile.")
+		return
+
+	# Iterate through the path and place hover tiles
+	for pos in path:
+		var tile_pos = Vector2i(pos)  # Ensure tile position is a Vector2i
+		var world_pos = tilemap.map_to_local(tile_pos)
+
+		# Create a hover tile
+		if hover_tile_scene:
+			var hover_tile_instance = hover_tile_scene.instantiate()
+			hover_tile_instance.position = world_pos
+			tilemap.add_child(hover_tile_instance)
+			hover_tiles.append(hover_tile_instance)
+
+func clear_hover_tiles():
+	for tile in hover_tiles:
+		tile.queue_free()
+	hover_tiles.clear()
 	
 func move_along_path(delta: float) -> void:
 	if get_parent().current_path.is_empty():
@@ -280,6 +333,7 @@ func is_mouse_over_gui() -> bool:
 			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 			if rect.has_point(mouse_pos):
 				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				clear_hover_tiles()	
 				return true
 	print("Mouse is NOT over any button.")
 	return false

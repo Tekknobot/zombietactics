@@ -171,6 +171,10 @@ func finalize_ability() -> void:
 	# Reset transport-specific states
 	assigned = false
 	GlobalManager.transport_toggle_active = false
+
+	get_parent().current_xp += 25
+	if get_parent().current_xp >= get_parent().xp_for_next_level:
+		get_parent().level_up()	
 	
 	get_parent().check_end_turn_conditions()
 	print("Ability finalized.")

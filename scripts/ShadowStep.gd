@@ -142,6 +142,10 @@ func attack_next_zombie():
 		GlobalManager.shadows_toggle_active = false
 		
 		get_parent().current_xp += 25
+		# Optional: Check for level up, if applicable
+		if get_parent().current_xp >= get_parent().xp_for_next_level:
+			get_parent().level_up()		
+		
 		get_parent().has_attacked = true
 		get_parent().has_moved = true	
 		get_parent().check_end_turn_conditions()	

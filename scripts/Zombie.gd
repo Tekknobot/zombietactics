@@ -408,7 +408,7 @@ func update_tile_position() -> void:
 	coord = tile_pos
 	layer = tile_pos.x + tile_pos.y
 	self.z_index = layer
-	astar.set_point_solid(position, true)
+	#astar.set_point_solid(position, true)
 
 func update_unit_ui():
 	health_ui.value = current_health

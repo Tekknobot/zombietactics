@@ -7,7 +7,7 @@ extends ColorRect
 @onready var map_scene_name = "map_manager"  # The scene name you're checking
 @onready var titlescreen_name = "TitleScreen"  # The scene name you're checking
 
-@onready var map_manager = get_node("/root/MapManager")
+@onready var map_manager = get_parent().get_node("/root/MapManager")
 
 signal fade_complete  # Define a signal to emit when fade-in is complete
 

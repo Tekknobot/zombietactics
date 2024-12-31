@@ -173,6 +173,13 @@ func spawn_zombies(zombie_zones: Array):
 				zombie_instance.position = tilemap.map_to_local(spawn_position)
 				zombie_instance.z_index = int(zombie_instance.position.y)
 
+				# Randomly determine the direction (left or right)
+				var random_direction = randi() % 2 == 0  # True for right, False for left
+				zombie_instance.scale = Vector2(
+					abs(zombie_instance.scale.x) if random_direction else -abs(zombie_instance.scale.x),
+					zombie_instance.scale.y
+				)
+
 				# Assign unique ID and name
 				zombie_instance.set("zombie_id", zombie_id_counter)
 				zombie_id_counter += 1

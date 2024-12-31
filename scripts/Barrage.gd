@@ -145,7 +145,7 @@ func _input(event):
 					position_matches_tile = true
 					break
 					
-		if position_matches_tile and is_unit_present(mouse_local):													
+		if position_matches_tile:													
 			# Ensure hover_tile exists and "Sarah Reese" is selected
 			if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Angel. Charlie" and GlobalManager.barrage_toggle_active == true:
 				#var tilemap: TileMap = get_node("/root/MapManager/TileMap")

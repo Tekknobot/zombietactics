@@ -90,6 +90,7 @@ func spawn_player_units():
 
 	# Spawn player units in the selected zone
 	var max_spawn_attempts_per_unit = 1024
+	var fallback_tiles = []  # Keep track of fallback tiles
 
 	for unit_type in units:
 		var attempts = 0
@@ -110,12 +111,12 @@ func spawn_player_units():
 
 			attempts += 1
 
-		# If no valid position was found, fallback to the next best open tile near another player
 		if spawn_position == Vector2i(-1, -1) or attempts >= max_spawn_attempts_per_unit:
 			print("Fallback: Finding an open tile near an existing player.")
 			spawn_position = find_open_tile_near_player(player_positions)
+			if spawn_position != Vector2i(-1, -1):
+				fallback_tiles.append(spawn_position)
 
-		# Spawn the unit at the selected position
 		if spawn_position != Vector2i(-1, -1):  # Ensure the position is still valid
 			var unit_instance = spawn_unit_at(unit_type, spawn_position)
 			if unit_instance != null:
@@ -125,11 +126,23 @@ func spawn_player_units():
 			print("Error: No valid position found even after fallback for unit:", unit_type)
 
 	if player_units_spawned < units.size():
-		print("Warning: Not all player units were spawned. Spawned:", player_units_spawned, "Expected:", units.size())
-		GlobalManager.reset_global_manager()		
-		reset_level()	
-		return			
-		
+		print("Warning: Not all player units were spawned. Attempting additional spawns.")
+		for fallback_tile in fallback_tiles:
+			if player_units_spawned >= units.size():
+				break  # Stop if all units are spawned
+			for unit_type in units[player_units_spawned]:
+				if not is_occupied(fallback_tile):
+					var unit_instance = spawn_unit_at(unit_type, fallback_tile)
+					if unit_instance != null:
+						player_positions.append(fallback_tile)
+						player_units_spawned += 1
+
+	if player_units_spawned < units.size():
+		print("Critical: Not all player units were spawned. Resetting level.")
+		GlobalManager.reset_global_manager()
+		reset_level()
+		return
+
 	# Spawn zombies in the remaining zones
 	await spawn_zombies(zones)
 	notify_units_spawned()

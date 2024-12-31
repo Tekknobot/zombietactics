@@ -110,20 +110,19 @@ func trigger_octoblast():
 		await get_tree().create_timer(0.3).timeout
 		missile_manager.start_trajectory(zombie_pos, get_parent().position)
 
-	GlobalManager.octoblast_toggle_active = false
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()	
-	
-	get_parent().has_attacked = true
-	get_parent().has_moved = true
-	await get_tree().create_timer(4).timeout
 	
 	get_parent().current_xp += 25
 	if get_parent().current_xp >= get_parent().xp_for_next_level:
 		get_parent().level_up()	
+		
+	get_parent().has_attacked = true
+	get_parent().has_moved = true
+	GlobalManager.octoblast_toggle_active = false
+	#await get_tree().create_timer(4).timeout
 	
 	get_parent().get_child(0).play("default")
-		
 	get_parent().check_end_turn_conditions()
 	
 # Helper function to get all zombies on the map

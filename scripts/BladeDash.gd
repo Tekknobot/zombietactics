@@ -34,6 +34,8 @@ var path_completed: bool = false
 var hover_tiles = []  # Store references to instantiated hover tiles
 var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
 
+var is_attacking = false
+
 func _process(delta):
 	# Check if the action (e.g., movement or attack) is completed
 	if action_completed and not explosions_triggered:
@@ -252,7 +254,6 @@ func dash_to_target(delta: float) -> void:
 
 	# Ensure the sprite is back to default state and the path is cleared
 	print("Dash completed to target path.")
-	get_parent().move_speed = 75.0  # Reset movement speed
 
 	get_parent().has_moved = true
 	get_parent().has_attacked = true
@@ -302,7 +303,8 @@ func move_along_path() -> void:
 	print("Path traversal completed.")
 	
 	path_completed = true  # Mark path as completed
-
+	get_parent().move_speed = 75.0  # Reset movement speed
+	
 # Updates the facing direction based on movement direction
 func update_facing_direction(target_pos: Vector2) -> void:
 	# Get the world position of the zombie (target)
@@ -319,8 +321,6 @@ func update_facing_direction(target_pos: Vector2) -> void:
 	elif direction_to_target < 0 and get_parent().scale.x != 1:
 		# Zombie is to the left, flip the mek to face left
 		get_parent().scale.x = 1
-
-var is_attacking = false
 
 func check_and_attack_adjacent_zombies() -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

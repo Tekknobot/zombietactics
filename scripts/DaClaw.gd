@@ -150,11 +150,6 @@ func dash_to_target(delta: float) -> void:
 	# Ensure the sprite is back to default state and the path is cleared
 	print("Dash completed to target path.")
 	get_parent().current_path.clear()
-	get_parent().move_speed = 75.0  # Reset movement speed
-
-	get_parent().has_moved = true
-	get_parent().has_attacked = true
-	get_parent().check_end_turn_conditions()
 
 func update_hover_tiles():
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

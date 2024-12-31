@@ -3468,13 +3468,13 @@ custom_minimum_size = Vector2(116, 0)
 layout_mode = 2
 offset_left = 7.0
 offset_top = -240.0
-offset_right = 409.0
+offset_right = 313.0
 offset_bottom = -208.0
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_fonts/normal_font = ExtResource("3_fyyii")
 theme_override_font_sizes/normal_font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxFlat_1gp3x")
-text = "Check dark grey structures for mission items."
+text = "Darkest structures contain items."
 autowrap_mode = 0
 script = ExtResource("3_y7bf6")
 

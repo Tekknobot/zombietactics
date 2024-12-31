@@ -225,13 +225,25 @@ func get_random_tile_in_zone(zone: Rect2) -> Vector2i:
 
 # Create a zombie instance based on map conditions
 func create_zombie_instance() -> Node2D:
-	if GlobalManager.current_map_index == 2:
-		return unit_radioactive_zombie.instantiate() if randi() % 2 == 0 else unit_zombie.instantiate()
-	elif GlobalManager.current_map_index == 3:
-		var roll = randi() % 10
-		if roll < 1:
+	var zombie_chances = {
+		2: {
+			"radioactive": 23,
+			"crusher": 0,
+			"normal": 87
+		},
+		3: {
+			"radioactive": 23,
+			"crusher": 53,
+			"normal": 34
+		}
+	}
+
+	var map_chances = zombie_chances.get(GlobalManager.current_map_index, null)
+	if map_chances:
+		var roll = randi() % 100
+		if roll < map_chances["radioactive"]:
 			return unit_radioactive_zombie.instantiate()
-		elif roll < 6:
+		elif roll < map_chances["radioactive"] + map_chances["crusher"]:
 			return unit_crusher_zombie.instantiate()
 		else:
 			return unit_zombie.instantiate()

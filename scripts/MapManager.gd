@@ -71,8 +71,8 @@ func _ready():
 	hover_tile.visible = false  # Initially hide the hover tile
 	
 	# Set map spawn paramaters
-	grid_width = get_even_random(16, 33)
-	grid_height = get_even_random(16, 33)
+	grid_width = get_even_random(18, 32)
+	grid_height = get_even_random(18, 32)
 
 	# Randomly choose a set of values for the tiles
 	match randi() % 4:

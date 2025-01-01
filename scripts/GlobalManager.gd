@@ -72,3 +72,4 @@ func reset_global_manager():
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:	
 		player.has_attacked = false
+		player.has_moved = false

@@ -19,6 +19,8 @@ var claw_completed: bool = false
 var hover_tiles = []  # Store references to instantiated hover tiles
 var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
 
+var dash_initiated = false
+
 func _physics_process(delta: float) -> void:
 	if is_active:  # Assuming you toggle `is_active` during the dash
 		dash_to_target(delta)
@@ -44,7 +46,8 @@ func _process(delta):
 		get_parent().check_end_turn_conditions()
 			
 		claw_completed = false  # Reset the flag to prevent multiple triggers
-
+		dash_initiated = false
+		
 	if GlobalManager.claw_toggle_active:
 		update_hover_tiles()
 	else:
@@ -97,6 +100,7 @@ func _input(event):
 			camera.focus_on_position(get_parent().position) 
 			
 			GlobalManager.claw_toggle_active = false
+			dash_initiated = true
 			clear_hover_tiles()				
 			claw_dash_strike(mouse_pos)		
 	
@@ -135,9 +139,10 @@ func dash_to_target(delta: float) -> void:
 			if not is_inside_tree():
 				print("Node is no longer in the scene tree. Exiting loop.")
 				return
-				
-			# Call the movement function
-			move_along_path(delta)
+			
+			if dash_initiated == true:	
+				# Call the movement function
+				move_along_path(delta)
 			
 			# Wait for the next frame to allow other processing
 			await get_tree().process_frame
@@ -233,7 +238,6 @@ func move_along_path(delta: float) -> void:
 	get_parent().is_moving = false
 	get_parent().get_child(0).play("default")
 	
-	# Perform attack once the dash is complete
 	check_and_attack_adjacent_zombies()
 
 # Updates the facing direction based on movement direction

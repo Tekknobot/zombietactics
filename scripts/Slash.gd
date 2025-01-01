@@ -67,7 +67,7 @@ func _input(event):
 			return  # Exit the function if the mouse is outside the map
 		
 		# Ensure hover_tile exists and "Dutch. Major" is selected
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Dutch. Major" and GlobalManager.slash_toggle_active == true:
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Dutch. Major" and GlobalManager.slash_toggle_active == true and is_zombie_present(mouse_local) == false:
 			# Calculate direction
 			var mouse_position = get_global_mouse_position()
 			mouse_position.y += 8  # Adjust for any map-specific offsets

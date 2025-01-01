@@ -50,6 +50,8 @@ func _process(delta):
 		get_parent().get_child(0).play("default")
 		dash_initiated = false
 		path_completed = false
+		action_completed = false
+		explosions_triggered = false
 
 	if GlobalManager.dash_toggle_active:
 		update_hover_tiles()

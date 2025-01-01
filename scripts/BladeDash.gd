@@ -35,6 +35,7 @@ var hover_tiles = []  # Store references to instantiated hover tiles
 var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
 
 var is_attacking = false
+var dash_initiated = false
 
 func _process(delta):
 	# Check if the action (e.g., movement or attack) is completed
@@ -47,6 +48,7 @@ func _process(delta):
 	if path_completed:
 		#check_and_attack_adjacent_zombies()
 		get_parent().get_child(0).play("default")
+		dash_initiated = false
 		path_completed = false
 
 	if GlobalManager.dash_toggle_active:
@@ -90,9 +92,7 @@ func _input(event):
 		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
 			return  # Exit the function if the mouse is outside the map
 									
-		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active == true:
-
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
@@ -102,6 +102,7 @@ func _input(event):
 			camera.focus_on_position(get_parent().position) 	
 			
 			GlobalManager.dash_toggle_active = false
+			dash_initiated = true
 			clear_hover_tiles()	
 					
 			await fade_out(get_parent())
@@ -240,9 +241,10 @@ func dash_to_target(delta: float) -> void:
 			if not is_inside_tree():
 				print("Node is no longer in the scene tree. Exiting loop.")
 				return
-							
-			# Call the movement function
-			move_along_path()
+			
+			if dash_initiated == true:				
+				# Call the movement function
+				move_along_path()
 			
 			# Wait for the next frame to allow other processing
 			await get_tree().process_frame

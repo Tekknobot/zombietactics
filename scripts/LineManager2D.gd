@@ -142,6 +142,7 @@ func _input(event: InputEvent) -> void:
 						
 						# Trigger zombie action: find and chase player
 						clear_zombie_tiles()
+						player_to_act.clear_special_tiles()
 						player_to_act.check_end_turn_conditions()
 					else:
 						# If the position is not part of any special tile's map position

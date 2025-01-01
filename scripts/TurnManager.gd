@@ -72,12 +72,10 @@ func end_current_turn() -> void:
 	
 	# If all units have used their turns and zombies are not triggered, fire event
 	if used_turns_count >= max_turn_count and trigger_zombies == false:
-		print("Three player units have used their turns. Ending player turn.")
 		await zombie_spawn_manager.spawn_zombies()
 		GlobalManager.zombies_processed = 0
 		GlobalManager.zombie_queue.clear()
-		await get_tree().create_timer(0.1).timeout
-		
+		await get_tree().create_timer(0.1).timeout		
 		GlobalManager.reset_global_manager()
 		on_player_action_completed()
 		trigger_zombies = true

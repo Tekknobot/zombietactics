@@ -342,6 +342,8 @@ func process_zombie_queue() -> void:
 			
 # Triggered when the player action is completed
 func _on_player_action_completed() -> void:
+	reset_player_units()
+	
 	update_astar_grid()
 	
 	var zombies = get_tree().get_nodes_in_group("zombies")

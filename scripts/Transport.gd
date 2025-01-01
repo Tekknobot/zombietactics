@@ -25,6 +25,8 @@ var assigned = false
 @export var hover_tile_scene: PackedScene
 var hover_tiles = []  # Store references to instantiated hover tiles
 var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
+
+var check_level_up = false
 	
 func _ready() -> void:
 	pathfinder = get_node_or_null("/root/MapManager/Pathfinder") # Ensure you have a pathfinder node in your scene
@@ -62,6 +64,7 @@ func _input(event):
 			hud_manager.hide_special_buttons()	
 			GlobalManager.transport_toggle_active = false
 
+			check_level_up = false
 			unit_on_board = false
 			boarded_unit = null			
 			clear_hover_tiles()	
@@ -172,9 +175,11 @@ func finalize_ability() -> void:
 	assigned = false
 	GlobalManager.transport_toggle_active = false
 
-	get_parent().current_xp += 25
-	if get_parent().current_xp >= get_parent().xp_for_next_level:
-		get_parent().level_up()	
+	if check_level_up == false:
+		get_parent().current_xp += 25
+		if get_parent().current_xp >= get_parent().xp_for_next_level:
+			get_parent().level_up()	
+		check_level_up = true
 	
 	get_parent().check_end_turn_conditions()
 	print("Ability finalized.")

@@ -258,7 +258,8 @@ func process_zombie_queue() -> void:
 		var active_zombie = GlobalManager.zombie_queue.pop_front()
 		GlobalManager.active_zombie = active_zombie
 		GlobalManager.active_zombie.has_moved = true
-		print("Processing Zombie ID:", active_zombie.zombie_id)	
+		print("Processing Zombie ID:", active_zombie.zombie_id)
+		reset_player_units()	
 
 	# Get the next zombie that has not moved
 	while not GlobalManager.zombie_queue.is_empty():
@@ -266,11 +267,13 @@ func process_zombie_queue() -> void:
 		if not GlobalManager.active_zombie.has_moved:
 			break
 		print("Skipping Zombie ID:", GlobalManager.active_zombie.zombie_id, "as it has already moved.")
+		reset_player_units()
 	
 	# If all zombies have moved, stop processing
 	if GlobalManager.active_zombie.has_moved:
 		print("All zombies have moved. Ending turn.")
 		process_zombie_queue()  # Recursive call to clean up
+		reset_player_units()
 		return
 
 	# Reset path and movement state for the current zombie

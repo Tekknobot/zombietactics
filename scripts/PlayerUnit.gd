@@ -9,6 +9,7 @@ class_name PlayerUnit
 
 # Packed scene for the movement tile (ensure you assign the movement tile scene in the editor)
 @export var movement_tile_scene: PackedScene
+@export var has_moved_tile_scene: PackedScene
 @export var attack_tile_scene: PackedScene
 
 # Store references to instantiated movement tiles for easy cleanup
@@ -281,6 +282,38 @@ func display_movement_tiles() -> void:
 			movement_tile_instance.position = world_pos
 			tilemap.add_child(movement_tile_instance)
 			self.movement_tiles.append(movement_tile_instance)
+
+# Display has_moved tiles within range
+func display_has_moved_tiles() -> void:
+	# Check if any zombie in the "zombies" group is moving
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies_moving = false
+	for zombie in zombies:
+		if zombie.is_moving:  # If any zombie is moving, skip player input and prevent showing tiles
+			zombies_moving = true
+			#print("Zombie is moving, skipping player input.")
+			break  # Exit early once we know a zombie is moving
+	
+	if zombies_moving:
+		# Prevent tile display or any other player action
+		return
+
+	# Update the HUD to reflect new stats
+	var hud_manager = get_parent().get_parent().get_node("HUDManager")
+	hud_manager.hide_special_buttons()	
+					
+	clear_movement_tiles()  # Clear existing movement tiles
+	clear_attack_range_tiles()  # Clear existing attack range tiles before displaying new movement tiles
+
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	for tile in get_movement_tiles():
+		if is_tile_movable(tile):
+			var world_pos: Vector2 = tilemap.map_to_local(tile)
+			var movement_tile_instance: Node2D = has_moved_tile_scene.instantiate() as Node2D
+			movement_tile_instance.position = world_pos
+			tilemap.add_child(movement_tile_instance)
+			self.movement_tiles.append(movement_tile_instance)
+
 
 # Display movement tiles within range
 func display_special_attack_tiles() -> void:

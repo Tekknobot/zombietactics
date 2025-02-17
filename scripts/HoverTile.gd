@@ -79,10 +79,10 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 			move_selected_player(tile_pos)
 		else:
 			# If clicked on a non-action tile, try selecting a different unit
-			select_unit_at_tile(tile_pos)
+			select_unit_at_tile(tile_pos)		
 	else:
 		# If no player is selected, try selecting one on the clicked tile
-		select_unit_at_tile(tile_pos)
+		select_unit_at_tile(tile_pos)		
 
 # Helper function to check if a tile is occupied by another player unit
 func is_tile_occupied_by_unit(tile_pos: Vector2i) -> bool:
@@ -150,7 +150,7 @@ func move_selected_player(tile_pos: Vector2i) -> void:
 			selected_player.has_moved = true	
 		
 # Selects a unit or structure at the given tile position
-func select_unit_at_tile(tile_pos: Vector2i) -> void:	
+func select_unit_at_tile(tile_pos: Vector2i) -> void:		
 	var hud_manager = get_parent().get_node("HUDManager")
 	
 	clear_action_tiles()  # Clear any previous selection tiles
@@ -202,7 +202,8 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 			#camera.focus_on_tile(tilemap, selected_player.tile_pos)
 			
 			clear_action_tiles_for_all_players()			
-			show_movement_tiles(selected_player)
+			show_movement_tiles(selected_player)	
+			
 			hud_manager.update_hud(selected_player)
 			return
 	
@@ -276,8 +277,16 @@ func select_unit_at_tile(tile_pos: Vector2i) -> void:
 
 # Displays movement tiles for the selected player
 func show_movement_tiles(player: Area2D) -> void:
+	if player.has_moved == true:
+		return
+	else:
+		movement_range_tiles = player.get_movement_tiles()
+		player.display_movement_tiles()
+
+# Displays movement tiles for the selected player
+func show_has_moved_tiles(player: Area2D) -> void:
 	movement_range_tiles = player.get_movement_tiles()
-	player.display_movement_tiles()
+	player.display_has_moved_tiles()
 
 # Displays movement tiles for the selected player
 func show_movement_tiles_zombie(zombie: Area2D) -> void:

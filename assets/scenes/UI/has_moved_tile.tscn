@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbk6wi0soo1ew"]
+
+[ext_resource type="Texture2D" uid="uid://56t0bjdw3rny" path="res://assets/iso_tiles/ui/tile_hover_black.png" id="1_3xmom"]
+
+[node name="HoverTile" type="Sprite2D"]
+texture = ExtResource("1_3xmom")

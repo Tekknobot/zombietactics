@@ -79,6 +79,7 @@ func end_current_turn() -> void:
 		GlobalManager.reset_global_manager()
 		on_player_action_completed()
 		trigger_zombies = true
+		reset_player_units()
 	
 	check_if_end_map()
 

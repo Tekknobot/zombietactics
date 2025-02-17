@@ -1,7 +1,7 @@
 extends Node2D
 
 # Configuration variables
-var dash_speed = 125
+var dash_speed = 100
 var damage = 50
 var aoe_radius = 32
 var cooldown = 3.0
@@ -18,7 +18,7 @@ var pos_before_dash: Vector2i
 # Exported variables for customization in the editor
 @export var attack_damage: int = 50 # Damage per explosion
 @export var explosion_radius: float = 1.5 # Radius of each explosion effect
-@export var explosion_delay: float = 0.2 # Delay between explosions
+@export var explosion_delay: float = 5 # Delay between explosions
 @export var explosion_effect_scene: PackedScene # Path to explosion effect scene
 
 var path_for_explosions

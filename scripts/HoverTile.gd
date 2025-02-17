@@ -324,6 +324,10 @@ func toggle_attack_mode() -> void:
 		attack_range_tiles = selected_player.get_attack_tiles()
 		selected_player.display_attack_range_tiles()
 		
+		if selected_player.has_attacked == true:
+			selected_player.clear_attack_range_tiles()
+			selected_player.clear_movement_tiles()
+		
 		if selected_player.has_used_turn == true:
 			var hud_manager = get_parent().get_node("HUDManager")  # Adjust the path if necessary
 			hud_manager.hide_special_buttons()	

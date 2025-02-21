@@ -66,15 +66,17 @@ func is_within_bounds(tile_pos: Vector2i) -> bool:
 
 # Handles left-click input for selecting, moving, or attacking with the unit
 func handle_left_click(tile_pos: Vector2i) -> void:
-	if selected_player:
+	if selected_player:		
 		# If in attack mode and clicked a valid attack tile
 		if tile_pos in attack_range_tiles:
+			if selected_player.is_in_group("unitAI"):
+				return
 			attack_selected_player(tile_pos)
 		# If in movement mode and clicked a valid movement tile
 		elif tile_pos in movement_range_tiles:
 			# Prevent movement if clicking the same tile the selected player is on
 			# OR if another player unit is on the tile
-			if tile_pos == selected_player.tile_pos or is_tile_occupied_by_unit(tile_pos):
+			if tile_pos == selected_player.tile_pos or is_tile_occupied_by_unit(tile_pos) or selected_player.is_in_group("unitAI"):
 				return
 			move_selected_player(tile_pos)
 		else:

@@ -70,6 +70,7 @@ func _ready():
 		print("Error: TileMap still has no usable tiles after waiting.")
 	else:		
 		spawn_player_units()  # Proceed to spawn units if the map has tiles
+		spawn_ai_units()
 
 func spawn_player_units():
 	# List of unit scenes for easier access
@@ -146,6 +147,64 @@ func spawn_player_units():
 	# Spawn zombies in the remaining zones
 	await spawn_zombies(zones)
 	notify_units_spawned()
+
+func spawn_ai_units():
+	# List of AI unit scenes for easier access – replace with your actual AI unit scene references
+	var ai_units = [M1, M2, R1, R3, S2, S3]
+
+	# Divide the map into zones
+	var zones = initialize_zones()
+	if zones.is_empty():
+		print("Error: Could not initialize zones for AI spawning.")
+		return
+
+	# Randomly select one zone for AI spawning
+	var ai_zone = zones.pop_at(randi() % zones.size())
+
+	# Set minimum distance between AI spawns (adjust as needed)
+	var minimum_distance = 2
+	var ai_positions = []  # To track positions of spawned AI units
+
+	# Spawn AI units in the selected zone
+	var max_spawn_attempts_per_unit = 1024
+	var fallback_tiles = []  # Keep track of fallback tiles
+
+	for unit_type in ai_units:
+		var attempts = 0
+		var spawn_position = Vector2i(-1, -1)
+
+		# Try to find a valid spawn tile in the selected zone
+		while attempts < max_spawn_attempts_per_unit:
+			spawn_position = get_random_tile_in_zone(ai_zone)
+			if spawn_position != Vector2i(-1, -1):
+				# Ensure the new position is not too close to already-spawned AI units
+				var is_too_close = false
+				for existing_position in ai_positions:
+					if spawn_position.distance_to(existing_position) < minimum_distance:
+						is_too_close = true
+						break
+				if not is_too_close:
+					break  # Valid position found; exit loop
+			attempts += 1
+
+		# Fallback: try to find an open tile near existing AI units if needed
+		if spawn_position == Vector2i(-1, -1) or attempts >= max_spawn_attempts_per_unit:
+			print("Fallback: Finding an open tile near an existing AI unit.")
+			spawn_position = find_open_tile_near_player(ai_positions)
+			if spawn_position != Vector2i(-1, -1):
+				fallback_tiles.append(spawn_position)
+
+		# If a valid position is found, spawn the AI unit
+		if spawn_position != Vector2i(-1, -1):
+			var unit_instance = spawn_unit_at(unit_type, spawn_position)
+			if unit_instance != null:
+				# Set the AI unit's color to (255, 110, 255)
+				unit_instance.modulate = Color8(255, 110, 255)
+				# Add the unit to the "unitAI" group
+				unit_instance.add_to_group("unitAI")
+				ai_positions.append(spawn_position)
+		else:
+			print("Error: No valid position found even after fallback for AI unit:", unit_type)
 
 func find_open_tile_near_player(player_positions: Array) -> Vector2i:
 	# Define directions for adjacent tiles (up, down, left, right)

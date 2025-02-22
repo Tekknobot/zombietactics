@@ -95,6 +95,9 @@ func _input(event):
 			return  # Exit the function if the mouse is outside the map
 									
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active == true:
+			if get_parent().is_in_group("unitAI"):
+				return	
+			
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
@@ -111,6 +114,9 @@ func _input(event):
 			blade_dash_strike(mouse_pos)	
 	
 func update_hover_tiles():
+	if get_parent().is_in_group("unitAI"):
+		return	
+			
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var start_tile = get_parent().tile_pos  # Unit's current tile position
 	var end_tile = hover_tile.tile_pos  # Hover tile position

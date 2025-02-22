@@ -32,7 +32,7 @@ func _ready() -> void:
 	pathfinder = get_node_or_null("/root/MapManager/Pathfinder") # Ensure you have a pathfinder node in your scene
 
 func _process(delta: float) -> void:
-	if GlobalManager.transport_toggle_active:
+	if GlobalManager.transport_toggle_active:		
 		update_hover_tiles()
 	else:
 		clear_hover_tiles()		
@@ -42,7 +42,7 @@ func _process(delta: float) -> void:
 func _input(event):
 	# Check for mouse motion or click
 	if event is InputEventMouseMotion:
-		if GlobalManager.transport_toggle_active:
+		if GlobalManager.transport_toggle_active:			
 			update_hover_tiles()	
 		
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -57,6 +57,9 @@ func _input(event):
 		var mouse_local = tilemap.local_to_map(global_mouse_position)
 
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "John. Doom" and GlobalManager.transport_toggle_active == true:
+			if get_parent().is_in_group("unitAI"):
+				return	
+			
 			if is_tile_movable(mouse_local) == false:
 				return
 			
@@ -230,6 +233,9 @@ func transport_unit_to_adjacent_tile(unit) -> void:
 	print("No movable adjacent tile found. Transport failed.")
 
 func update_hover_tiles():
+	if get_parent().is_in_group("unitAI"):
+		return	
+				
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var start_tile = get_parent().tile_pos  # Unit's current tile position
 	var end_tile = hover_tile.tile_pos  # Hover tile position

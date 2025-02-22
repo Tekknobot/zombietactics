@@ -8,7 +8,7 @@ var current_unit_index: int = 0  # Index of the current unit in the current grou
 
 var trigger_zombies: bool = false
 var used_turns_count: int = 0
-var max_turn_count: int = 9
+var max_turn_count: int = 1
 
 signal player_action_completed
 
@@ -56,31 +56,73 @@ func start_current_unit_turn() -> void:
 			player_units.erase(current_unit)  # Remove invalid or freed units from the array
 
 
+func _compare_candidates(a, b):
+	# Custom comparator function for sorting candidate dictionaries by "dist".
+	if a["dist"] < b["dist"]:
+		return -1
+	elif a["dist"] > b["dist"]:
+		return 1
+	else:
+		return 0
+
 func end_current_turn() -> void:
-	trigger_zombies = false
+	var trigger_zombies = false
+
+	# Get all non-AI player units.
+	var all_non_ai_players = []
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if not player.is_in_group("unitAI"):
+			all_non_ai_players.append(player)
 	
-	# Get all player units
-	var all_player_units = get_tree().get_nodes_in_group("player_units")
-	
-	# Count the number of players who have used their turn
-	used_turns_count = 0
-	for player in all_player_units:
+	# Count the number of non-AI players who have used their turn.
+	var used_turns_count = 0
+	for player in all_non_ai_players:
 		if player.has_used_turn:
 			used_turns_count += 1
 	
-	max_turn_count = all_player_units.size()
+	max_turn_count = all_non_ai_players.size()
 	
-	# If all units have used their turns and zombies are not triggered, fire event
-	if used_turns_count >= max_turn_count and trigger_zombies == false:
-		await zombie_spawn_manager.spawn_zombies()
+	# If all non-AI units have used their turns and zombies haven't been triggered, fire the zombie event.
+	if used_turns_count >= max_turn_count and not trigger_zombies:
+		# Optionally, spawn zombies:
+		# await zombie_spawn_manager.spawn_zombies()
 		GlobalManager.zombies_processed = 0
 		GlobalManager.zombie_queue.clear()
-		await get_tree().create_timer(0.1).timeout		
+		await get_tree().create_timer(0.1).timeout        
 		GlobalManager.reset_global_manager()
-		on_player_action_completed()
+		
+		# Among AI-controlled player units, build a list of candidates sorted by proximity.
+		var all_ai_player_units = get_tree().get_nodes_in_group("unitAI")
+		var candidates = []
+		for ai in all_ai_player_units:
+			var min_dist = INF
+			# Check distance to all non-AI player units.
+			for unit in get_tree().get_nodes_in_group("player_units"):
+				if unit != ai:
+					var d = abs(ai.tile_pos.x - unit.tile_pos.x) + abs(ai.tile_pos.y - unit.tile_pos.y)
+					if d < min_dist:
+						min_dist = d
+			# Check distance to zombies.
+			for zombie in get_tree().get_nodes_in_group("zombies"):
+				var d = abs(ai.tile_pos.x - zombie.tile_pos.x) + abs(ai.tile_pos.y - zombie.tile_pos.y)
+				if d < min_dist:
+					min_dist = d
+			candidates.append({ "ai": ai, "dist": min_dist })
+		
+		# Sort the candidates by distance (smallest first)
+		candidates.sort_custom(Callable(self, "_compare_candidates"))
+		
+		# Iterate through each candidate and trigger its AI turn.
+		for candidate in candidates:
+			var chosen_ai = candidate["ai"]
+			# Await each AI unit's turn to finish before moving to the next.
+			await chosen_ai.start_ai_turn()
+		
 		trigger_zombies = true
-	
-	check_if_end_map()
+
+		# Reset the player units for a new turn.
+		reset_player_units()
+		check_if_end_map()
 
 # Add a player unit
 func add_player_unit(unit: Node) -> void:
@@ -105,7 +147,7 @@ func reset_player_units():
 		player.has_used_turn = false
 		player.can_start_turn = true
 		player.modulate = Color(1, 1, 1)	
-		if player.is_in_group("unitAI"):
+		if player.is_in_group("unitAI"):		
 			player.modulate = Color8(255, 110, 255)
 					
 	hud_mananger.hide_special_buttons()

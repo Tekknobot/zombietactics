@@ -167,6 +167,9 @@ func _process(delta: float) -> void:
 		# Prevent tile display or any other player action
 		return
 
+	if self.is_in_group("unitAI"):
+		self.modulate = Color8(255, 110, 255)
+
 	update_unit_ui()
 		
 	update_tile_position()
@@ -317,6 +320,9 @@ func display_has_moved_tiles() -> void:
 
 # Display movement tiles within range
 func display_special_attack_tiles() -> void:
+	if is_in_group("unitAI"):
+		return
+		
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false
@@ -440,8 +446,8 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 		
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
-	# Do not clear selection here. We keep selected_player intact.
-		
+	
+	
 # Function to move the soldier along the path
 func move_along_path(delta: float) -> void:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -482,7 +488,7 @@ func move_along_path(delta: float) -> void:
 			for hovertile in hovertiles:
 				hovertile.selected_player = self
 				
-			check_end_turn_conditions()
+			#check_end_turn_conditions()
 	else:
 		# Reset animation to default only once
 		if not reset_animation:
@@ -720,9 +726,9 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		return	
 
 	# Check if the target is within the attack range
-	if not is_within_attack_range(target_tile):
-		print("Target is out of range")
-		return
+	#if not is_within_attack_range(target_tile):
+		#print("Target is out of range")
+		#return
 
 	# Check if projectile_scene is set correctly
 	if projectile_scene == null:
@@ -804,15 +810,11 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:
-	# Check if the target tile is within the attack range
-	# Assuming the target is a part of the attack range tiles, which we should have already populated
-	for tile in attack_range_tiles:
-		var tile_position = tile.position
-		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-		var target_pos = tilemap.local_to_map(tile_position)
-		if target_pos == target_tile:
-			return true
-	return false
+	# Get all attack range tiles (calculated based on the current unit tile position)
+	var attack_tiles: Array[Vector2i] = get_attack_tiles()
+	# Return true if the target_tile is found within the attack range tiles
+	return target_tile in attack_tiles
+
 
 # Call this function after every player action
 func on_player_action_completed():
@@ -1048,8 +1050,7 @@ func check_end_turn_conditions() -> void:
 
 func end_turn() -> void:
 	if turn_manager:
-		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
-
+		turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
 	else:
 		print("Turn manager is not set! Unable to proceed to the next unit.")
 
@@ -1067,3 +1068,184 @@ func reset_player_units():
 		player.modulate = Color(1, 1, 1)
 		if player.is_in_group("unitAI"):
 			player.modulate = Color8(255, 110, 255)
+
+func get_adjacent_tile(target_tile: Vector2i) -> Vector2i:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var directions: Array[Vector2i] = [
+		Vector2i(1, 0),   # Right
+		Vector2i(-1, 0),  # Left
+		Vector2i(0, 1),   # Down
+		Vector2i(0, -1)   # Up
+	]
+	var valid_tiles: Array[Vector2i] = []
+	
+	# Collect all adjacent tiles that are within bounds and movable.
+	for d in directions:
+		var adj_tile = target_tile + d
+		if tilemap.get_used_rect().has_point(adj_tile) and is_tile_movable(adj_tile):
+			valid_tiles.append(adj_tile)
+	
+	# Return a random valid tile if available, otherwise fall back.
+	if valid_tiles.size() > 0:
+		# Choose a random index.
+		var index = randi() % valid_tiles.size()
+		return valid_tiles[index]
+	else:
+		return target_tile
+
+
+func execute_ai_turn() -> void:
+	# Ensure this unit is AI-controlled.
+	if not is_in_group("unitAI"):
+		return
+
+	# Wait until no other unitAI is executing.
+	while get_tree().has_meta("unit_ai_executing") and get_tree().get_meta("unit_ai_executing"):
+		await get_tree().create_timer(0.1).timeout
+
+	# Mark that this unit is now executing its AI turn.
+	get_tree().set_meta("unit_ai_executing", true)
+
+	print("AI turn starting for:", name)
+	await get_tree().create_timer(0.5).timeout
+
+	# Get the TileMap reference.
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	# Get all potential enemies from the "zombies" and "player_units" groups.
+	var all_enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	# Filter out any nodes that are also in the "unitAI" group.
+	var enemies = []
+	for enemy in all_enemies:
+		if not enemy.is_in_group("unitAI"):
+			enemies.append(enemy)
+
+	if enemies.is_empty():
+		print("No enemies available. Ending turn.")
+		end_turn()
+		# Clear the flag before returning.
+		get_tree().set_meta("unit_ai_executing", false)
+		return
+
+	# ---------------------------
+	# Pre-Move Attack Check
+	# ---------------------------
+	var immediate_attack_target = null
+	var min_attack_distance = INF
+	
+	# Use the camera to focus on the unitAI's current position (or change as needed).
+	var camera = get_node("/root/MapManager/Camera2D")
+	if camera:
+		camera.focus_on_position(tilemap.map_to_local(self.tile_pos))
+		
+	# Check for enemies that are aligned and within attack range.
+	for enemy in enemies:
+		# Skip if the enemy is self.
+		if enemy == self:
+			continue
+		# For this example, "attackable" means the enemy is aligned (shares same x or y)
+		# AND its tile is within the attack range as determined by is_within_attack_range().
+		if self.tile_pos.x == enemy.tile_pos.x or self.tile_pos.y == enemy.tile_pos.y:
+			var d = abs(self.tile_pos.x - enemy.tile_pos.x) + abs(self.tile_pos.y - enemy.tile_pos.y)
+			if d < min_attack_distance and is_within_attack_range(enemy.tile_pos):
+				min_attack_distance = d
+				immediate_attack_target = enemy
+
+	if immediate_attack_target:
+		print("Immediate attack on enemy at:", immediate_attack_target.tile_pos)
+		display_attack_range_tiles()
+		await get_tree().create_timer(0.5).timeout  # Short delay for visual effect.
+		clear_attack_range_tiles()
+		await attack(immediate_attack_target.tile_pos)
+		await get_tree().create_timer(1).timeout
+		# End turn and clear the flag.
+		get_tree().set_meta("unit_ai_executing", false)
+		return
+
+	# ---------------------------
+	# No immediate attack: Move toward enemy.
+	# ---------------------------
+	# Instead of always choosing the nearest enemy for movement, pick one at random.
+	var random_index = randi() % enemies.size()
+	var target_enemy = enemies[random_index]
+	
+	# For movement, use the selected enemy’s position.
+	var enemy_pos: Vector2i = target_enemy.tile_pos
+	# Get an adjacent tile toward that enemy.
+	var enemy_adjacent_tile: Vector2i = get_adjacent_tile(enemy_pos)
+	
+	# Calculate the full path from the unit's current tile to the enemy's adjacent tile.
+	var full_path: PackedVector2Array = astar.get_point_path(self.tile_pos, enemy_adjacent_tile)
+	var path_array: Array[Vector2i] = []
+	for pos in full_path:
+		path_array.append(Vector2i(pos.x, pos.y))
+	
+	# Determine the target tile along the path based on the unit's movement range.
+	var target_tile: Vector2i
+	var target_index: int = 0
+	
+	if path_array.size() > 0:
+		target_index = min(movement_range, path_array.size() - 1)
+		target_tile = path_array[target_index]
+	else:
+		target_tile = self.tile_pos
+
+	print("AI moving toward enemy adjacent tile; target tile:", target_tile)
+	
+	# (Optional) Highlight the path intended for the unit to follow.
+	var path_highlights: Array = []
+	if path_array.size() > 0:
+		for i in range(target_index + 1):
+			var highlight = movement_tile_scene.instantiate() as Node2D
+			highlight.position = tilemap.map_to_local(path_array[i])
+			tilemap.add_child(highlight)
+			path_highlights.append(highlight)
+	
+	# Wait a moment so the path highlights are visible.
+	await get_tree().create_timer(0.5).timeout
+	
+	# Clear the path highlights.
+	for highlight in path_highlights:
+		highlight.queue_free()
+	
+	# Now move the unit along the selected path.
+	await move_player_to_target(target_tile)
+	
+	# Wait until movement is complete.
+	while current_path.size() > 0:
+		await get_tree().create_timer(0.1).timeout	
+
+	# ---------------------------
+	# Post-Move Attack Check: Pick the nearest attack target within attack range.
+	# ---------------------------
+	var post_move_attack_target = null
+	min_attack_distance = INF
+	for enemy in enemies:
+		if enemy == self:
+			continue
+		if self.tile_pos.x == enemy.tile_pos.x or self.tile_pos.y == enemy.tile_pos.y:
+			var d = abs(self.tile_pos.x - enemy.tile_pos.x) + abs(self.tile_pos.y - enemy.tile_pos.y)
+			if d < min_attack_distance and is_within_attack_range(enemy.tile_pos):
+				min_attack_distance = d
+				post_move_attack_target = enemy
+
+	if post_move_attack_target:
+		print("Post-move attack on enemy at:", post_move_attack_target.tile_pos)
+		display_attack_range_tiles()
+		await get_tree().create_timer(0.5).timeout  # Short delay for visual effect.
+		clear_attack_range_tiles()
+		await attack(post_move_attack_target.tile_pos)
+	else:
+		print("No attackable enemy in aligned range after moving.")
+		
+	await get_tree().create_timer(1).timeout
+	
+	# Clear the flag so that the next unitAI can execute its turn.
+	get_tree().set_meta("unit_ai_executing", false)
+
+# Modified start function for AI-controlled units.
+func start_ai_turn() -> void:
+	can_start_turn = true
+	if is_in_group("unitAI"):
+		# Delay briefly before executing the AI routine.
+		await get_tree().create_timer(1).timeout
+		execute_ai_turn()

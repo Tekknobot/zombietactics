@@ -48,7 +48,7 @@ func _process(delta):
 		claw_completed = false  # Reset the flag to prevent multiple triggers
 		dash_initiated = false
 		
-	if GlobalManager.claw_toggle_active:
+	if GlobalManager.claw_toggle_active:		
 		update_hover_tiles()
 	else:
 		clear_hover_tiles()		
@@ -58,7 +58,7 @@ func _process(delta):
 func _input(event):
 	# Check for mouse motion or click
 	if event is InputEventMouseMotion:
-		if GlobalManager.claw_toggle_active:
+		if GlobalManager.claw_toggle_active:		
 			update_hover_tiles()	
 				
 	# Check for mouse click
@@ -91,6 +91,9 @@ func _input(event):
 						
 		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Aleks. Ducat" and GlobalManager.claw_toggle_active == true:
+			if get_parent().is_in_group("unitAI"):
+				return	
+				
 			#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 			var mouse_position = get_global_mouse_position() 
 			mouse_position.y += 8
@@ -157,6 +160,9 @@ func dash_to_target(delta: float) -> void:
 	get_parent().current_path.clear()
 
 func update_hover_tiles():
+	if get_parent().is_in_group("unitAI"):
+		return	
+			
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var start_tile = get_parent().tile_pos  # Unit's current tile position
 	var end_tile = hover_tile.tile_pos  # Hover tile position

@@ -121,6 +121,7 @@ var is_animation_playing = false  # Tracks whether the "move" animation is curre
 var reset_animation: bool = false
 
 var path_done: bool = false
+var dead: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -883,7 +884,9 @@ func die() -> void:
 	var all_players = get_tree().get_nodes_in_group("player_units")
 	if all_players.size() <= 0:
 		GlobalManager.players_killed = true
-		mission_manager.check_mission_manager()		
+		mission_manager.check_mission_manager()	
+		
+	dead = true	
 
 func level_up() -> void:
 	# Play SFX
@@ -1112,7 +1115,7 @@ func clear_unit_ai_executing_flag() -> void:
 
 func execute_ai_turn() -> void:
 	# Ensure this unit is AI-controlled.
-	if not is_in_group("unitAI"):
+	if not is_in_group("unitAI") or self.dead:
 		return
 
 	# Wait until no other unitAI is executing.

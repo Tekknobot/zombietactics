@@ -439,16 +439,38 @@ func calculate_path(target_tile: Vector2i) -> void:
 	else:
 		print("Target tile is not walkable.")
 
-# Update the AStar grid and calculate the path
+# Update the AStar grid and calculate the path, then move only up to movement_range.
 func move_player_to_target(target_tile: Vector2i) -> void:
 	path_done = false
 	reset_animation = false  # Allow animation reset after this movement
 	
 	update_astar_grid()  # Ensure AStar grid is up to date
-	calculate_path(target_tile)  # Now calculate the path
-		
-	# Once the path is calculated, move the player to the target (will also update selected_player state)
-	await move_along_path(get_process_delta_time())  # This ensures movement happens immediately
+	calculate_path(target_tile)  # Now calculate the full path into current_path
+	
+	# Check that a path was calculated.
+	if current_path.size() == 0:
+		print("No valid path found to target tile.")
+		return
+	
+	# Determine the limited index based on movement_range.
+	var limited_index: int
+	if current_path.size() >= movement_range:
+		limited_index = movement_range  # Arrays are zero-indexed.
+	else:
+		limited_index = current_path.size() - 1  # Use the full path if it's shorter.
+	
+	print("Full calculated path:", current_path)
+	print("Limiting movement to tile index:", limited_index)
+	
+	# Slice the current_path so that we only move along the tiles within our movement range.
+	# Array.slice(start, length) returns a new array. We want tiles 0 through limited_index (inclusive).
+	current_path = current_path.slice(0, limited_index + 1)
+	
+	print("Limited path for movement:", current_path)
+	
+	# Now move the unit along the limited path.
+	await move_along_path(get_process_delta_time())
+
 	
 # Function to move the soldier along the path
 func move_along_path(delta: float) -> void:
@@ -1214,8 +1236,6 @@ func execute_ai_turn() -> void:
 		# Now that movement is done, remove the path highlights.
 		for highlight in path_highlights:
 			highlight.queue_free()
-
-
 
 	# ---------------------------
 	# Post-Move Attack Check

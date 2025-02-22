@@ -456,9 +456,9 @@ func is_mouse_over_gui() -> bool:
 		if control is TextureRect or Button and control.is_visible_in_tree():
 			# Use global rect to check if mouse is over the button
 			var rect = control.get_global_rect()
-			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			#print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 			if rect.has_point(mouse_pos):
-				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				#print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 				return true
-	print("Mouse is NOT over any button.")
+	#print("Mouse is NOT over any button.")
 	return false

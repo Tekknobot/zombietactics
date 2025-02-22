@@ -50,7 +50,7 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:			
 	# Only respond to clicks if the special toggle is active
 	if not GlobalManager.dynamite_toggle_active:
-		print("Special toggle is off, ignoring mouse clicks.")
+		#print("Special toggle is off, ignoring mouse clicks.")
 		return
 		
 	if dynamite_launched >= 1:
@@ -411,9 +411,9 @@ func is_mouse_over_gui() -> bool:
 		if control is TextureRect or Button and control.is_visible_in_tree():
 			# Use global rect to check if mouse is over the button
 			var rect = control.get_global_rect()
-			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			#print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 			if rect.has_point(mouse_pos):
-				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				#print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 				return true
-	print("Mouse is NOT over any button.")
+	#print("Mouse is NOT over any button.")
 	return false

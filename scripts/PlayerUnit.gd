@@ -445,7 +445,7 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 	calculate_path(target_tile)  # Now calculate the path
 		
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
-	move_along_path(get_process_delta_time())  # This ensures movement happens immediately
+	await move_along_path(get_process_delta_time())  # This ensures movement happens immediately
 	
 	
 # Function to move the soldier along the path
@@ -586,11 +586,11 @@ func is_mouse_over_gui() -> bool:
 		if control is Button:
 			# Use global rect to check if mouse is over the button
 			var rect = control.get_global_rect()
-			print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+			#print("Checking button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 			if rect.has_point(mouse_pos):
-				print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
+				#print("Mouse is over button:", control.name, "Rect:", rect, "Mouse Pos:", mouse_pos)
 				return true
-	print("Mouse is NOT over any button.")
+	#print("Mouse is NOT over any button.")
 	return false
 			
 # Display attack range tiles around the soldier using the attack_tile_scene
@@ -788,8 +788,8 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	
 	await clear_attack_range_tiles()
 	#on_player_action_completed()
-	has_attacked = true
-	has_moved = true
+	self.has_attacked = true
+	self.has_moved = true
 
 	# Increase experience points by 25 for each attack
 	current_xp += 25
@@ -1071,29 +1071,17 @@ func reset_player_units():
 
 func get_adjacent_tile(target_tile: Vector2i) -> Vector2i:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var directions: Array[Vector2i] = [
-		Vector2i(1, 0),   # Right
-		Vector2i(-1, 0),  # Left
-		Vector2i(0, 1),   # Down
-		Vector2i(0, -1)   # Up
-	]
-	var valid_tiles: Array[Vector2i] = []
+	# Get all surrounding cells using the tilemap's built-in function.
+	var surrounding_cells: Array[Vector2i] = tilemap.get_surrounding_cells(target_tile)
 	
-	# Collect all adjacent tiles that are within bounds and movable.
-	for d in directions:
-		var adj_tile = target_tile + d
-		if tilemap.get_used_rect().has_point(adj_tile) and is_tile_movable(adj_tile):
-			valid_tiles.append(adj_tile)
+	# Return the first cell that is movable.
+	for cell in surrounding_cells:
+		if is_tile_movable(cell):
+			return cell
 	
-	# Return a random valid tile if available, otherwise fall back.
-	if valid_tiles.size() > 0:
-		# Choose a random index.
-		var index = randi() % valid_tiles.size()
-		return valid_tiles[index]
-	else:
-		return target_tile
-
-
+	# If none are movable, return the original target_tile.
+	return target_tile
+	
 # Helper function to clear the unit AI executing flag.
 func clear_unit_ai_executing_flag() -> void:
 	get_tree().set_meta("unit_ai_executing", false)
@@ -1123,6 +1111,10 @@ func execute_ai_turn() -> void:
 		if not enemy.is_in_group("unitAI"):
 			enemies.append(enemy)
 
+	# Debug: Print enemy positions.
+	for enemy in enemies:
+		print("Enemy found at tile:", enemy.tile_pos)
+
 	if enemies.is_empty():
 		print("No enemies available. Ending turn.")
 		end_turn()
@@ -1146,12 +1138,12 @@ func execute_ai_turn() -> void:
 			continue
 		if self.tile_pos.x == enemy.tile_pos.x or self.tile_pos.y == enemy.tile_pos.y:
 			var d: int = abs(self.tile_pos.x - enemy.tile_pos.x) + abs(self.tile_pos.y - enemy.tile_pos.y)
-			# Only consider this enemy if it's within our attack range.
+			print("Checking enemy at", enemy.tile_pos, "with distance", d)
 			if d < min_attack_distance and is_within_attack_range(enemy.tile_pos):
 				min_attack_distance = d
 				immediate_attack_target = enemy
 
-	# If an immediate attack target was found, attack and finish the turn.
+	# If an immediate attack target is found, attack and finish the turn.
 	if immediate_attack_target:
 		print("Immediate attack on enemy at:", immediate_attack_target.tile_pos)
 		display_attack_range_tiles()
@@ -1160,51 +1152,61 @@ func execute_ai_turn() -> void:
 		await attack(immediate_attack_target.tile_pos)
 		await get_tree().create_timer(1).timeout
 		clear_unit_ai_executing_flag()
-		return  # End the turn here—no further movement or attack.
+		return  # End turn; no further movement or attack.
 
 	# ---------------------------
-	# No immediate attack: Move toward enemy.
+	# No immediate attack: Move toward the nearest enemy.
 	# ---------------------------
-	# Pick a random enemy.
-	var random_index: int = randi() % enemies.size()
-	var target_enemy = enemies[random_index]
-	var enemy_pos: Vector2i = target_enemy.tile_pos
+	# Find the nearest enemy based on Manhattan distance.
+	var nearest_enemy: Node = null
+	var min_dist: float = INF
+	for enemy in enemies:
+		if enemy == self:
+			continue
+		# Using Manhattan distance.
+		var d: float = abs(self.tile_pos.x - enemy.tile_pos.x) + abs(self.tile_pos.y - enemy.tile_pos.y)
+		if d < min_dist:
+			min_dist = d
+			nearest_enemy = enemy
+
+	# Debug: Print which enemy is nearest.
+	if nearest_enemy:
+		print("Nearest enemy found at:", nearest_enemy.tile_pos, "with distance:", min_dist)
+	else:
+		print("No nearest enemy found!")
+		clear_unit_ai_executing_flag()
+		return
+
+	# Use the nearest enemy's tile as the target for movement.
+	var enemy_pos: Vector2i = nearest_enemy.tile_pos
+	# Get an adjacent tile toward that enemy (returns a Vector2i).
 	var enemy_adjacent_tile: Vector2i = get_adjacent_tile(enemy_pos)
-	
+	print("Nearest enemy adjacent tile:", enemy_adjacent_tile)
+
+	# Optionally, focus the camera on our current position.
 	if camera:
 		await camera.focus_on_position(tilemap.map_to_local(self.tile_pos))
-	
-	# Calculate the full path from our current tile to the enemy's adjacent tile.
-	var full_path: PackedVector2Array = astar.get_point_path(self.tile_pos, enemy_adjacent_tile)
-	var path_array: Array[Vector2i] = []
-	for pos in full_path:
-		path_array.append(Vector2i(pos.x, pos.y))
-	
-	# Determine our movement target tile along the path (limited by our movement_range).
-	var target_tile: Vector2i = self.tile_pos
-	var target_index: int = 0
-	if path_array.size() > 0:
-		target_index = min(movement_range, path_array.size() - 1)
-		target_tile = path_array[target_index]
 
-	print("AI moving toward enemy adjacent tile; target tile:", target_tile)
-	
-	# (Optional) Highlight the movement path.
+	# Now use our calculate_path() methodology to compute the path.
+	calculate_path(enemy_adjacent_tile)
+	# The calculate_path() function sets current_path and prints it.
+
+	# (Optional) Highlight the movement path for visual feedback.
 	var path_highlights: Array[Node2D] = []
-	if path_array.size() > 0:
-		for i in range(target_index + 1):
+	if current_path.size() > 0:
+		for i in range(current_path.size()):
 			var highlight: Node2D = movement_tile_scene.instantiate() as Node2D
-			highlight.position = tilemap.map_to_local(path_array[i])
+			highlight.position = tilemap.map_to_local(current_path[i])
 			tilemap.add_child(highlight)
 			path_highlights.append(highlight)
-	await get_tree().create_timer(0.5).timeout
-	for highlight in path_highlights:
-		highlight.queue_free()
-	
+		await get_tree().create_timer(0.5).timeout
+		for highlight in path_highlights:
+			highlight.queue_free()
+
 	# Move the unit along the calculated path.
-	await move_player_to_target(target_tile)
-	while current_path.size() > 0:
-		await get_tree().create_timer(0.1).timeout
+	print("Moving unit to target tile:", enemy_adjacent_tile)
+	await move_player_to_target(enemy_adjacent_tile)
+	print("Movement complete. New tile:", self.tile_pos)
 
 	# ---------------------------
 	# Post-Move Attack Check
@@ -1231,7 +1233,6 @@ func execute_ai_turn() -> void:
 		
 	await get_tree().create_timer(1).timeout
 	clear_unit_ai_executing_flag()
-
 
 # Modified start function for AI-controlled units.
 func start_ai_turn() -> void:

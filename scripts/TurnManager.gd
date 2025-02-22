@@ -85,7 +85,7 @@ func end_current_turn() -> void:
 	# If all non-AI units have used their turns and zombies haven't been triggered, fire the zombie event.
 	if used_turns_count >= max_turn_count and not trigger_zombies:
 		# Optionally, spawn zombies:
-		# await zombie_spawn_manager.spawn_zombies()
+		await zombie_spawn_manager.spawn_zombies()
 		GlobalManager.zombies_processed = 0
 		GlobalManager.zombie_queue.clear()
 		await get_tree().create_timer(0.1).timeout        
@@ -123,6 +123,35 @@ func end_current_turn() -> void:
 		# Reset the player units for a new turn.
 		reset_player_units()
 		check_if_end_map()
+
+
+func end_current_turn_from_button():
+	# Among AI-controlled player units, build a list of candidates sorted by proximity.
+	var all_ai_player_units = get_tree().get_nodes_in_group("unitAI")
+	var candidates = []
+	for ai in all_ai_player_units:
+		var min_dist = INF
+		# Check distance to all non-AI player units.
+		for unit in get_tree().get_nodes_in_group("player_units"):
+			if unit != ai:
+				var d = abs(ai.tile_pos.x - unit.tile_pos.x) + abs(ai.tile_pos.y - unit.tile_pos.y)
+				if d < min_dist:
+					min_dist = d
+		# Check distance to zombies.
+		for zombie in get_tree().get_nodes_in_group("zombies"):
+			var d = abs(ai.tile_pos.x - zombie.tile_pos.x) + abs(ai.tile_pos.y - zombie.tile_pos.y)
+			if d < min_dist:
+				min_dist = d
+		candidates.append({ "ai": ai, "dist": min_dist })
+	
+	# Sort the candidates by distance (smallest first)
+	candidates.sort_custom(Callable(self, "_compare_candidates"))
+	
+	# Iterate through each candidate and trigger its AI turn.
+	for candidate in candidates:
+		var chosen_ai = candidate["ai"]
+		# Await each AI unit's turn to finish before moving to the next.
+		await chosen_ai.start_ai_turn()	
 
 # Add a player unit
 func add_player_unit(unit: Node) -> void:

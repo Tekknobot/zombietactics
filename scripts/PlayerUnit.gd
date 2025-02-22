@@ -120,6 +120,8 @@ var attack_range_visible: bool = false  # Variable to track if attack range is v
 var is_animation_playing = false  # Tracks whether the "move" animation is currently playing
 var reset_animation: bool = false
 
+var path_done: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -439,6 +441,7 @@ func calculate_path(target_tile: Vector2i) -> void:
 
 # Update the AStar grid and calculate the path
 func move_player_to_target(target_tile: Vector2i) -> void:
+	path_done = false
 	reset_animation = false  # Allow animation reset after this movement
 	
 	update_astar_grid()  # Ensure AStar grid is up to date
@@ -446,7 +449,6 @@ func move_player_to_target(target_tile: Vector2i) -> void:
 		
 	# Once the path is calculated, move the player to the target (will also update selected_player state)
 	await move_along_path(get_process_delta_time())  # This ensures movement happens immediately
-	
 	
 # Function to move the soldier along the path
 func move_along_path(delta: float) -> void:
@@ -494,7 +496,7 @@ func move_along_path(delta: float) -> void:
 		if not reset_animation:
 			get_child(0).play("default")  # Play default animation
 			reset_animation = true  # Prevent further resets
-		
+			path_done = true
 		print("No more tiles to move to.")	
 	
 # Visualize all walkable (non-solid) tiles in the A* grid
@@ -1191,26 +1193,43 @@ func execute_ai_turn() -> void:
 	calculate_path(enemy_adjacent_tile)
 	# The calculate_path() function sets current_path and prints it.
 
+	# Move the unit along the calculated path.
+	print("Moving unit to target tile:", enemy_adjacent_tile)
+	move_player_to_target(enemy_adjacent_tile)
+	print("Movement complete. New tile:", self.tile_pos)
+
 	# (Optional) Highlight the movement path for visual feedback.
 	var path_highlights: Array[Node2D] = []
+	print("Current Path Size: ", current_path.size())
 	if current_path.size() > 0:
 		for i in range(current_path.size()):
 			var highlight: Node2D = movement_tile_scene.instantiate() as Node2D
 			highlight.position = tilemap.map_to_local(current_path[i])
 			tilemap.add_child(highlight)
 			path_highlights.append(highlight)
-		await get_tree().create_timer(0.5).timeout
+		# Wait until movement is complete.
+		while not path_done:
+			await get_tree().create_timer(0.1).timeout
+
+		# Now that movement is done, remove the path highlights.
 		for highlight in path_highlights:
 			highlight.queue_free()
 
-	# Move the unit along the calculated path.
-	print("Moving unit to target tile:", enemy_adjacent_tile)
-	await move_player_to_target(enemy_adjacent_tile)
-	print("Movement complete. New tile:", self.tile_pos)
+
 
 	# ---------------------------
 	# Post-Move Attack Check
 	# ---------------------------
+	all_enemies.clear()
+	all_enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	
+	enemies.clear()
+	enemies = []	
+	
+	for enemy in all_enemies:
+		if not enemy.is_in_group("unitAI"):
+			enemies.append(enemy)
+				
 	var post_move_attack_target = null
 	min_attack_distance = INF
 	for enemy in enemies:
@@ -1228,6 +1247,9 @@ func execute_ai_turn() -> void:
 		await get_tree().create_timer(0.5).timeout  # Visual delay.
 		clear_attack_range_tiles()
 		await attack(post_move_attack_target.tile_pos)
+		await get_tree().create_timer(1).timeout
+		clear_unit_ai_executing_flag()
+		return  # End turn; no further movement or attack.
 	else:
 		print("No attackable enemy in aligned range after moving.")
 		

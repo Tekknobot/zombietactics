@@ -97,7 +97,10 @@ func _create_explosion() -> void:
 
 	# Check for any zombie units in the target area and destroy them
 	_check_for_zombies_at_target()
-	_check_for_players_at_target()
+	if self.is_in_group("unitAI"):
+		pass
+	elif self.is_in_group("player_units"):
+		_check_for_players_at_target()
 	_check_for_structure_at_target()
 	
 	queue_free()  # Destroy the projectile
@@ -131,13 +134,15 @@ func _check_for_zombies_at_target() -> void:
 			# Apply damage to the zombie
 			zombie.apply_damage(damage)
 
-			zombie.second_audio_player.stream = zombie.hurt_audio
-			zombie.second_audio_player.play()				
+			if get_parent().is_in_group("unitAI"):					
+				zombie.second_audio_player.stream = zombie.hurt_audio
+				zombie.second_audio_player.play()				
 			
 			# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent (to HUDManager)
 			var hud_manager = get_parent().get_parent().get_node("HUDManager")
-			hud_manager.update_hud_zombie(zombie)  # Pass the selected unit to the HUDManager # Pass the current unit (self) to the HUDManager
-
+			if self.is_in_group("unitAI"):
+				hud_manager.update_hud(zombie)
+				
 func _check_for_players_at_target() -> void:
 	# Find all nodes in the group "player_units"
 	for player in get_tree().get_nodes_in_group("player_units"):

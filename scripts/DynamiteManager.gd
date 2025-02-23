@@ -358,6 +358,16 @@ func _trigger_explosion(last_point: Vector2):
 			var hud_manager = get_parent().get_node("HUDManager") 
 			hud_manager.update_hud_zombie(zombie)
 
+	for player in get_tree().get_nodes_in_group("unitAI"):
+		if player.position.distance_to(last_point) <= explosion_radius:	
+			player.flash_damage()
+			player.apply_damage(player.attack_damage)
+					
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+			var hud_manager = get_parent().get_node("HUDManager") 
+			hud_manager.update_hud(player)	
+
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:

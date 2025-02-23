@@ -175,7 +175,7 @@ func dash_along_trajectory(trajectory: Array):
 
 func find_enemy_at_position(position: Vector2) -> Node:
 	# Check for enemies in the specified position
-	var enemies = get_tree().get_nodes_in_group("zombies")
+	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for enemy in enemies:
 		if enemy.global_position.distance_to(position) < 8:  # Adjust hitbox tolerance
 			#enable_bullet_time()
@@ -251,7 +251,7 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 # Check if there is a unit on the tile
 func is_zombie_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:

@@ -131,7 +131,7 @@ func _input(event: InputEvent) -> void:
 
 func find_closest_zombies(target_position: Vector2):
 	# Get all zombie positions
-	var zombies = get_tree().get_nodes_in_group("zombies")  # Custom function to fetch all zombies on the map
+	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")  # Custom function to fetch all zombies on the map
 	var zombie_positions = []
 	for zombie in zombies:
 		zombie_positions.append(zombie.global_position)

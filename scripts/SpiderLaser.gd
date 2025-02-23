@@ -117,7 +117,7 @@ func _input(event):
 							
 				# Find zombies in the vicinity
 				closest_zombies = get_zombies_in_scene() # Assume this is a function returning all zombies in the scene
-
+				
 				# Sort zombies by distance to the initial target
 				closest_zombies.sort_custom(func(a, b):
 					return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
@@ -159,7 +159,7 @@ func get_zombie_in_area():
 func get_zombies_in_scene() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)
 	var zombies = []
-	for node in get_tree().get_nodes_in_group("zombies"):
+	for node in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI"):
 		if node.is_inside_tree():
 			zombies.append(node)
 	return zombies			
@@ -323,19 +323,6 @@ func _trigger_explosion(last_point: Vector2):
 	# Explosion radius (adjust this as needed)
 	var explosion_radius = 8
 
-	# Check for PlayerUnit within explosion radius
-	for player in get_tree().get_nodes_in_group("player_units"):
-		if player.position.distance_to(last_point) <= explosion_radius:	
-			player.flash_damage()
-			player.apply_damage(player.attack_damage)
-			player.clear_movement_tiles()
-					
-			xp_awarded = true  # Mark XP as earned for this explosion
-
-			var hud_manager = get_node("/root/MapManager/HUDManager")
-			hud_manager.update_hud(player)
-			clear_segments()
-
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:	
@@ -349,6 +336,21 @@ func _trigger_explosion(last_point: Vector2):
 
 			var hud_manager = get_node("/root/MapManager/HUDManager")
 			hud_manager.update_hud_zombie(zombie)
+			clear_segments()
+
+	# Check for unitAI within explosion radius
+	for unit in get_tree().get_nodes_in_group("unitAI"):
+		if unit.position.distance_to(last_point) <= explosion_radius:	
+			unit.flash_damage()
+			for player in get_tree().get_nodes_in_group("unitAI"):
+				if player.player_name == "Sarah. Reese":
+					unit.apply_damage(player.attack_damage)
+					unit.clear_movement_tiles()
+					
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			hud_manager.update_hud(unit)
 			clear_segments()
 			
 	# Check for Structures within explosion radius
@@ -397,7 +399,7 @@ func clear_segments():
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:

@@ -483,7 +483,7 @@ func is_within_attack_range(target_tile: Vector2i) -> bool:
 	return false
 
 func _on_projectile_hit_target(area: Area2D) -> void:
-	if area.is_in_group("zombies"):
+	if area.is_in_group("zombies") or area.is_in_group("untiAI"):
 		print("Projectile hit an enemy!")
 		area.apply_damage(10)  # Example damage
 		await area.get_child(0).play("death")

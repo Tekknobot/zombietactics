@@ -1131,7 +1131,7 @@ func execute_ai_turn() -> void:
 	# Get the TileMap reference.
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	# Gather all enemies from "zombies" and "player_units".
-	var all_enemies: Array = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	var all_enemies: Array = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("unitAI")
 	# Filter out any nodes that are in the "unitAI" group.
 	var enemies: Array = []
 	for enemy in all_enemies:

@@ -112,7 +112,7 @@ func _check_for_zombies_at_target() -> void:
 		return
 			
 	# Find all nodes in the group "zombies"
-	for zombie in get_tree().get_nodes_in_group("zombies"):
+	for zombie in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI"):
 		if not zombie is Node2D:
 			continue  # Skip any non-Node2D members of the group
 		

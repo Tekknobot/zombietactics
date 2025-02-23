@@ -26,7 +26,7 @@ func _physics_process(delta: float) -> void:
 		dash_to_target(delta)
 
 func _process(delta):
-	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	
 	# Check if the barrage is complete and the turn has not ended
 	if claw_completed and zombies.size() > 0:
@@ -279,9 +279,9 @@ func check_and_attack_adjacent_zombies() -> void:
 		var adjacent_tile = current_tile + direction
 		var target = get_unit_at_tile(adjacent_tile)
 
-		if target and target.is_in_group("zombies"):  # Check if a zombie is present
+		if target and (target.is_in_group("zombies") or target.is_in_group("unitAI")):  # Check if a zombie is present
 			print("Zombie found at tile:", adjacent_tile)
-			
+
 			# Attack the zombie
 			var target_world_pos = tilemap.map_to_local(target.tile_pos)
 
@@ -306,7 +306,7 @@ func check_and_attack_adjacent_zombies() -> void:
 			await get_tree().create_timer(0.5).timeout
 
 	# Reset the "been_attacked" state for all zombies in the group after the loop
-	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for zombie in zombies:
 		if zombie.has_meta("been_attacked"):
 			zombie.set_meta("been_attacked", false)  # Reset been_attacked flag
@@ -319,7 +319,7 @@ func check_and_attack_adjacent_zombies() -> void:
 func get_unit_at_tile(tile_pos: Vector2i) -> Node:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var world_pos = tilemap.map_to_local(tile_pos)
-	var units = get_tree().get_nodes_in_group("zombies")
+	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 
 	for unit in units:
 		if unit.tile_pos == tile_pos:

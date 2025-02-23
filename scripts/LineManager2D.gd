@@ -252,17 +252,6 @@ func _trigger_explosion(last_point: Vector2):
 	# Variable to track if XP should be added (only once per explosion)
 	var xp_awarded = false
 
-	# Check for PlayerUnit within explosion radius
-	for player in get_tree().get_nodes_in_group("player_units"):
-		if player.position.distance_to(last_point) <= explosion_radius:	
-			player.flash_damage()
-			player.apply_damage(player.attack_damage)
-					
-			xp_awarded = true  # Mark XP as earned for this explosion
-
-			var hud_manager = get_parent().get_node("HUDManager") 
-			hud_manager.update_hud(player)
-
 	# Check for ZombieUnit within explosion radius
 	for zombie in get_tree().get_nodes_in_group("zombies"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:	
@@ -275,6 +264,17 @@ func _trigger_explosion(last_point: Vector2):
 
 			var hud_manager = get_parent().get_node("HUDManager") 
 			hud_manager.update_hud_zombie(zombie)
+
+	# Check for unitAI within explosion radius
+	for player in get_tree().get_nodes_in_group("unitAI"):
+		if player.position.distance_to(last_point) <= explosion_radius:	
+			player.flash_damage()
+			player.apply_damage(player.attack_damage)
+					
+			xp_awarded = true  # Mark XP as earned for this explosion
+
+			var hud_manager = get_parent().get_node("HUDManager") 
+			hud_manager.update_hud(player)
 			
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):

@@ -207,7 +207,7 @@ func is_structure(tile_pos: Vector2i) -> bool:
 
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
-	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(tilemap.to_local(unit.global_position))
@@ -217,7 +217,7 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 	
 # Check if there is a unit on the tile
 func clear_tiles():
-	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	for unit in all_units:
 		unit.clear_movement_tiles()

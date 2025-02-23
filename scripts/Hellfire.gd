@@ -132,7 +132,7 @@ func _input(event):
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:
@@ -209,7 +209,7 @@ func spawn_explosion(position):
 # Deal damage to units within the area of effect
 func damage_units_in_area(center_position):
 	# Find units in the area (adapt to your collision system)
-	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("structures")
+	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("structures") + get_tree().get_nodes_in_group("unitAI")
 	for unit in units:
 		if unit.global_position.distance_to(center_position) <= explosion_radius:
 			if unit.has_method("apply_damage"):

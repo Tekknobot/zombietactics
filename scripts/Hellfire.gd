@@ -209,7 +209,7 @@ func spawn_explosion(position):
 # Deal damage to units within the area of effect
 func damage_units_in_area(center_position):
 	# Find units in the area (adapt to your collision system)
-	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("structures") + get_tree().get_nodes_in_group("unitAI")
+	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("structures") + get_tree().get_nodes_in_group("unitAI")
 	for unit in units:
 		if unit.global_position.distance_to(center_position) <= explosion_radius:
 			if unit.has_method("apply_damage"):

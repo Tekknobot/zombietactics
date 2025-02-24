@@ -91,7 +91,7 @@ func _input(event):
 						
 		# Ensure hover_tile exists and "Sarah Reese" is selected
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Aleks. Ducat" and GlobalManager.claw_toggle_active == true:
-			if get_parent().is_in_group("unitAI") and !get_parent().dead:
+			if get_parent().is_in_group("unitAI") or get_parent().dead:
 				return	
 				
 			#var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -160,7 +160,7 @@ func dash_to_target(delta: float) -> void:
 	get_parent().current_path.clear()
 
 func update_hover_tiles():
-	if get_parent().is_in_group("unitAI"):
+	if get_parent().is_in_group("unitAI") or get_parent().dead:
 		return	
 			
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

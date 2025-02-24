@@ -106,7 +106,7 @@ func _input(event):
 		# Your dash logic: for example, check if the hovered tile is valid for a dash.
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active:
 			# If the parent is an AI unit, ignore input.
-			if get_parent().is_in_group("unitAI") and !get_parent().dead:
+			if get_parent().is_in_group("unitAI") or get_parent().dead:
 				return
 				
 			# Recalculate mouse tile position (if needed).
@@ -126,7 +126,7 @@ func _input(event):
 			blade_dash_strike(mouse_pos)
 	
 func update_hover_tiles():
-	if get_parent().is_in_group("unitAI"):
+	if get_parent().is_in_group("unitAI") or get_parent().dead:
 		return	
 			
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")

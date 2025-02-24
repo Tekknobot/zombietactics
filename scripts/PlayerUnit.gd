@@ -754,10 +754,21 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		print("Slash toggle is off, ignoring landmine attack.")
 		return	
 
-	# Check if the target is within the attack range
-	#if not is_within_attack_range(target_tile):
-		#print("Target is out of range")
-		#return
+	if GlobalManager.prowler_toggle_active:
+		print("Prowler toggle is off, ignoring landmine attack.")
+		return
+
+	if GlobalManager.claw_toggle_active:
+		print("Claw toggle is off, ignoring landmine attack.")
+		return
+
+	if GlobalManager.thread_toggle_active:
+		print("Thread toggle is off, ignoring landmine attack.")
+		return
+
+	if GlobalManager.octoblast_toggle_active:
+		print("Thread toggle is off, ignoring landmine attack.")
+		return
 
 	# Check if projectile_scene is set correctly
 	if projectile_scene == null:

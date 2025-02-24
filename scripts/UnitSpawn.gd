@@ -242,7 +242,7 @@ func reset_level():
 	
 func spawn_zombies(zombie_zones: Array):
 	var zombie_count = max(map_manager.grid_width, map_manager.grid_height)
-	var zombie_count_per_zone = 1 #zombie_count / zombie_zones.size()
+	var zombie_count_per_zone = zombie_count / zombie_zones.size()
 	zombie_names.shuffle()  # Shuffle zombie names
 
 	for zone in zombie_zones:

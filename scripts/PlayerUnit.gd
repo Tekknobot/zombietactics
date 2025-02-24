@@ -1057,7 +1057,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 				# Update the HUD to reflect new stats
 				var hud_manager = get_parent().get_parent().get_node("HUDManager")
 				if !self.is_in_group("unitAI"):
-					hud_manager.update_hud(zombie)
+					pass
 				else:
 					hud_manager.update_hud_zombie(zombie)
 

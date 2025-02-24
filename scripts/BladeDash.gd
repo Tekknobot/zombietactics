@@ -61,57 +61,69 @@ func _process(delta):
 	is_mouse_over_gui()
 	
 func _input(event):
-	# Check for mouse motion or click
+	# Handle mouse motion for updating hover tiles.
 	if event is InputEventMouseMotion:
 		if GlobalManager.dash_toggle_active:
-			update_hover_tiles()	
-				
-	# Check for mouse click
+			update_hover_tiles()
+			
+	# Process mouse click.
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		# Block gameplay input if the mouse is over GUI
+		# Block gameplay input if the mouse is over GUI.
 		if is_mouse_over_gui():
 			print("Input blocked by GUI.")
-			return  # Prevent further input handling
+			return
 			
-		# Reference the TileMap node
+		# Reference the TileMap node.
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+		# Get the boundaries of the map's used rectangle.
+		var map_size = tilemap.get_used_rect()  # Rect2 with position and size.
+		var map_origin_x = map_size.position.x
+		var map_origin_y = map_size.position.y
+		var map_width = map_size.size.x
+		var map_height = map_size.size.y
 
-		# Get the boundaries of the map's used rectangle
-		var map_size = tilemap.get_used_rect()  # Rect2: position and size of the used tiles
-		var map_origin_x = map_size.position.x  # Starting x-coordinate of the used rectangle
-		var map_origin_y = map_size.position.y  # Starting y-coordinate of the used rectangle
-		var map_width = map_size.size.x         # Width of the map in tiles
-		var map_height = map_size.size.y        # Height of the map in tiles
-
-		var global_mouse_position = get_global_mouse_position() 
+		# Get the global mouse position and adjust if needed.
+		var global_mouse_position = get_global_mouse_position()
 		global_mouse_position.y += 8
+		# Convert the global mouse position to tile coordinates.
+		var mouse_tile = tilemap.local_to_map(global_mouse_position)
+		
+		# Check if the mouse is outside the bounds of the used rectangle.
+		if mouse_tile.x < map_origin_x or mouse_tile.x >= map_origin_x + map_width or \
+		   mouse_tile.y < map_origin_y or mouse_tile.y >= map_origin_y + map_height:
+			return  # Exit if the mouse is outside the map.
 			
-		# Convert the global mouse position to tile coordinates
-		var mouse_local = tilemap.local_to_map(global_mouse_position)
-
-		# Check if the mouse is outside the bounds of the used rectangle
-		if mouse_local.x < map_origin_x or mouse_local.x >= map_origin_x + map_width or \
-		   mouse_local.y < map_origin_y or mouse_local.y >= map_origin_y + map_height:
-			return  # Exit the function if the mouse is outside the map
-									
-		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active == true:
+		# --- New: Check if the clicked tile is occupied by a unit ---
+		# If any unit from "zombies" or "player_units" is at this tile, block input.
+		for unit in get_tree().get_nodes_in_group("zombies"):
+			if unit.tile_pos == mouse_tile:
+				return
+		for unit in get_tree().get_nodes_in_group("player_units"):
+			if unit.tile_pos == mouse_tile:
+				return
+		# ---------------------------------------------------------------
+		
+		# Your dash logic: for example, check if the hovered tile is valid for a dash.
+		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Chuck. Genius" and GlobalManager.dash_toggle_active:
+			# If the parent is an AI unit, ignore input.
 			if get_parent().is_in_group("unitAI"):
-				return	
-			
-			var mouse_position = get_global_mouse_position() 
+				return
+				
+			# Recalculate mouse tile position (if needed).
+			var mouse_position = get_global_mouse_position()
 			mouse_position.y += 8
 			var mouse_pos = tilemap.local_to_map(mouse_position)
 			
-			# Camera focuses on the active zombie
+			# Focus the camera on the active unit.
 			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
-			camera.focus_on_position(get_parent().position) 	
+			camera.focus_on_position(get_parent().position)
 			
 			GlobalManager.dash_toggle_active = false
 			dash_initiated = true
-			clear_hover_tiles()	
-					
+			clear_hover_tiles()
+			
 			await fade_out(get_parent())
-			blade_dash_strike(mouse_pos)	
+			blade_dash_strike(mouse_pos)
 	
 func update_hover_tiles():
 	if get_parent().is_in_group("unitAI"):

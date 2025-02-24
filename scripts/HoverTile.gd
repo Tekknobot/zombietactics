@@ -97,7 +97,7 @@ func is_tile_occupied_by_unit(tile_pos: Vector2i) -> bool:
 
 # Handles right-click to toggle between attack and movement range display
 func handle_right_click() -> void:
-	if selected_player:
+	if selected_player and !selected_player.is_in_group("unitAI"):
 		toggle_attack_mode()
 		last_selected_player = selected_player
 

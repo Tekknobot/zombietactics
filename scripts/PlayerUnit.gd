@@ -992,7 +992,7 @@ func mek_melee(selected_unit: Area2D) -> void:
 	
 	# Iterate over each adjacent tile to check for zombies
 	for tile_pos in adjacent_tiles:
-		var zombies = get_tree().get_nodes_in_group("zombies")
+		var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 		for zombie in zombies:
 			var zombie_tile_pos = tilemap.local_to_map(zombie.position)
 			if tile_pos == zombie_tile_pos:
@@ -1024,12 +1024,18 @@ func mek_melee(selected_unit: Area2D) -> void:
 				zombie.flash_damage()
 				zombie.apply_damage(selected_unit.get_attack_damage())
 				
-				zombie.second_audio_player.stream = zombie.hurt_audio
-				zombie.second_audio_player.play()
+				if !self.is_in_group("unitAI"):
+					pass
+				else:
+					zombie.second_audio_player.stream = zombie.hurt_audio
+					zombie.second_audio_player.play()
 				
 				# Update the HUD to reflect new stats
 				var hud_manager = get_parent().get_parent().get_node("HUDManager")
-				hud_manager.update_hud_zombie(zombie)
+				if !self.is_in_group("unitAI"):
+					hud_manager.update_hud(zombie)
+				else:
+					hud_manager.update_hud_zombie(zombie)
 
 				await get_tree().create_timer(1).timeout
 				hud_manager.update_hud(selected_unit)		

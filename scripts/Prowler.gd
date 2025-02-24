@@ -102,7 +102,7 @@ func activate_prowler(target_zombie):
 
 func find_nearest_zombies(max_count: int) -> Array:
 	var zombies_in_range = []
-	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	var current_position = get_parent().tile_pos
 
 	# Manual bubble sort based on distance to `current_position`
@@ -236,9 +236,12 @@ func dash_forward(target):
 	# Calculate the intended dash position 3 tiles ahead in the direction of the target
 	var dash_target_tile = player_tile + direction * dash_distance
 
-	# Play SFX
-	target.audio_player.stream = target.zombie_audio
-	target.audio_player.play()
+	if target.is_in_group("unitAI"):
+		pass
+	else:
+		# Play SFX
+		target.audio_player.stream = target.zombie_audio
+		target.audio_player.play()
 			
 	target.apply_damage(get_parent().attack_damage)
 	target.flash_damage()
@@ -352,7 +355,7 @@ func is_structure(tile_pos: Vector2i) -> bool:
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:
@@ -362,7 +365,7 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 # Check if there is a unit on the tile
 func is_zombie_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("zombies")
+	var all_units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:
@@ -370,7 +373,7 @@ func is_zombie_present(tile_pos: Vector2i) -> bool:
 	return false
 
 func get_zombie_at_tile(tile_pos: Vector2i):
-	var zombies = get_tree().get_nodes_in_group("zombies")
+	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	for zombie in zombies:
 		if zombie.tile_pos == tile_pos:
 			return zombie

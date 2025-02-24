@@ -1073,7 +1073,8 @@ func check_end_turn_conditions() -> void:
 		if zombies.size() <= 0:
 			reset_player_units()
 				
-		end_turn()
+		if !is_in_group("unitAI"):
+			end_turn()
 
 func end_turn() -> void:
 	if turn_manager:
@@ -1116,7 +1117,7 @@ func clear_unit_ai_executing_flag() -> void:
 func execute_ai_turn() -> void:
 	# Ensure this unit is AI-controlled.
 	if not is_in_group("unitAI") or self.dead:
-		return
+		return	
 
 	# Wait until no other unitAI is executing.
 	while get_tree().has_meta("unit_ai_executing") and get_tree().get_meta("unit_ai_executing"):
@@ -1179,6 +1180,8 @@ func execute_ai_turn() -> void:
 		await attack(immediate_attack_target.tile_pos)
 		await get_tree().create_timer(1).timeout
 		clear_unit_ai_executing_flag()
+		self.has_attacked = true
+		self.has_moved = true
 		return  # End turn; no further movement or attack.
 
 	# ---------------------------
@@ -1239,6 +1242,8 @@ func execute_ai_turn() -> void:
 		# Now that movement is done, remove the path highlights.
 		for highlight in path_highlights:
 			highlight.queue_free()
+			self.has_attacked = true
+			self.has_moved = true
 
 	# ---------------------------
 	# Post-Move Attack Check
@@ -1272,6 +1277,8 @@ func execute_ai_turn() -> void:
 		await attack(post_move_attack_target.tile_pos)
 		await get_tree().create_timer(1).timeout
 		clear_unit_ai_executing_flag()
+		self.has_attacked = true
+		self.has_moved = true
 		return  # End turn; no further movement or attack.
 	else:
 		print("No attackable enemy in aligned range after moving.")

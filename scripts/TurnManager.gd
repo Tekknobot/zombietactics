@@ -86,6 +86,9 @@ func end_current_turn() -> void:
 	if used_turns_count >= max_turn_count and not trigger_zombies:
 		# Optionally, spawn zombies:
 		await zombie_spawn_manager.spawn_zombies()
+		on_player_action_completed()
+		
+func start_player_ai_turn() -> void:		
 		GlobalManager.zombies_processed = 0
 		GlobalManager.zombie_queue.clear()
 		await get_tree().create_timer(0.1).timeout        
@@ -151,6 +154,8 @@ func end_current_turn_from_button():
 	for candidate in candidates:
 		var chosen_ai = candidate["ai"]
 		# Await each AI unit's turn to finish before moving to the next.
+		if chosen_ai.has_attacked or chosen_ai.has_moved:
+			return
 		await chosen_ai.start_ai_turn()	
 
 	trigger_zombies = true

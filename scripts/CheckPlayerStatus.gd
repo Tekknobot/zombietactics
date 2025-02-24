@@ -23,18 +23,21 @@ func check_player_status():
 	var player_in_group = false
 	
 	for player in players:
+		# Only consider non-AI player units.
+		if player.is_in_group("unitAI"):
+			continue
 		if player_name == player.player_name:  # Match player_name
 			player_in_group = true
 			
-			# Find the sibling ProgressBar
+			# Update the sibling ProgressBar.
 			var progress_bar = get_node_or_null("../ProgressBar")
 			if progress_bar and player.player_name == progress_bar.player_name:
 				progress_bar.value = player.current_health
 				progress_bar.max_value = player.max_health
 			else:
 				print("Error: ProgressBar not found for player:", player_name)
-
-			# Find the sibling XPBar
+			
+			# Update the sibling XPBar.
 			var xp_bar = get_node_or_null("../XPBar")
 			if xp_bar and player.player_name == xp_bar.player_name:
 				xp_bar.value = player.current_xp
@@ -42,15 +45,15 @@ func check_player_status():
 			else:
 				print("Error: XPBar not found for player:", player_name)
 			
-			# Update modulate based on player's state
+			# Update modulate based on the player's state.
 			if player.has_moved and player.has_attacked:
-				self.modulate = Color(0.35, 0.35, 0.35, 1)  # Dim for completed actions
+				self.modulate = Color(0.35, 0.35, 0.35, 1)  # Dimmed for completed actions.
 			else:
-				self.modulate = Color(1, 1, 1, 1)  # Normal for active players
+				self.modulate = Color(1, 1, 1, 1)  # Normal for active players.
 
-	# If the loop completes without finding the player, they are not in the group
+	# If no matching non-AI player was found, set the modulate to red.
 	if not player_in_group:
-		self.modulate = Color(1, 0, 0, 1)  # Red for players not in the group
+		self.modulate = Color(1, 0, 0, 1)
 
 # Detect when this TextureRect is clicked
 func _gui_input(event: InputEvent) -> void:

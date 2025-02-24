@@ -23,6 +23,8 @@ var secret_item_found: bool = false
 var zombies_cleared: bool = false
 var players_killed: bool = false
 
+var unit_ai_cleared: bool = false
+
 var current_map_index: int = 1 # Level 
 
 var gameover: bool = false

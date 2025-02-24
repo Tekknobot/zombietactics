@@ -881,6 +881,9 @@ func die() -> void:
 		_create_explosion()
 		
 	self.remove_from_group("player_units")
+	
+	if self.is_in_group("unitAI"):
+		self.remove_from_group("unitAI")
 		
 	self.visible = false
 	print("Player has died")	
@@ -889,6 +892,12 @@ func die() -> void:
 	if all_players.size() <= 0:
 		GlobalManager.players_killed = true
 		mission_manager.check_mission_manager()	
+
+	var unit_ai = get_tree().get_nodes_in_group("unitAI")
+	if unit_ai.size() <= 0:
+		reset_player_units()	
+		GlobalManager.unit_ai_cleared = true
+		mission_manager.check_mission_manager()
 		
 	dead = true	
 

@@ -102,30 +102,42 @@ func shadow_slash(direction: Vector2):
 		print("Parent unit not found!")
 		return
 
-	# Reference the TileMap node
+	# Reference the TileMap node.
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 
-	# Get the global mouse position converted to the TileMap's local position
+	# Get the global mouse position converted to the TileMap's local coordinates.
 	var mouse_position = get_global_mouse_position()
 	mouse_position.y += 8
 	var mouse_local = tilemap.local_to_map(mouse_position)
 	var end_position = tilemap.map_to_local(mouse_local)  # Convert tile coordinates back to local space
 
-	# Calculate the trajectory
+	# Check if the end_position tile is occupied by any unit (except the parent unit).
+	for unit in get_tree().get_nodes_in_group("player_units"):
+		if unit != parent_unit and tilemap.local_to_map(unit.global_position) == mouse_local:
+			print("Cannot shadow slash: tile is occupied by a player unit.")
+			return
+	for unit in get_tree().get_nodes_in_group("zombies"):
+		if tilemap.local_to_map(unit.global_position) == mouse_local:
+			print("Cannot shadow slash: tile is occupied by a zombie.")
+			return
+
+	# Calculate the trajectory from the parent's global position to the end_position.
 	var trajectory = calculate_line_positions(parent_unit.global_position, end_position)
 	
-	# Dash along the trajectory
+	# Dash along the trajectory.
 	is_slashing = true
 	await dash_along_trajectory(trajectory)
 
-	#disable_bullet_time()
+	# Optional: wait briefly after dashing.
 	await get_tree().create_timer(0.1).timeout
 	is_slashing = false
 	
+	# Award XP and check for level up.
 	get_parent().current_xp += 25
 	if get_parent().current_xp >= get_parent().xp_for_next_level:
 		get_parent().level_up()	
 	
+	# Play default animation and update turn state.
 	get_parent().get_child(0).play("default")
 	get_parent().has_moved = true
 	get_parent().has_attacked = true

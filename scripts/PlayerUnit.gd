@@ -735,7 +735,7 @@ func clear_attack_range_tiles() -> void:
 		tile.queue_free()
 	attack_range_tiles.clear()
 
-func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_attack: bool = false) -> void:
+func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_attack: bool = false, is_slash_attack: bool = false) -> void:
 	# Block gameplay input if the mouse is over GUI
 	if is_mouse_over_gui():
 		print("Input blocked by GUI.")
@@ -748,6 +748,10 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 
 	if is_landmine_attack and not GlobalManager.landmine_toggle_active:
 		print("Landmine toggle is off, ignoring landmine attack.")
+		return	
+
+	if GlobalManager.slash_toggle_active:
+		print("Slash toggle is off, ignoring landmine attack.")
 		return	
 
 	# Check if the target is within the attack range

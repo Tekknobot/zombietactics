@@ -113,7 +113,7 @@ func _input(event: InputEvent) -> void:
 				# Get the current facing direction of the parent (1 for right, -1 for left)
 				var current_facing = 1 if get_parent().scale.x > 0 else -1
 
-				if position_matches_tile:	
+				if position_matches_tile and is_unit_present(mouse_local):	
 					# Determine sprite flip based on target_position relative to the parent
 					if get_global_mouse_position().x > global_position.x and current_facing == 1:
 						get_parent().scale.x = -abs(get_parent().scale.x)  # Flip to face left
@@ -128,6 +128,15 @@ func _input(event: InputEvent) -> void:
 					hud_manager.hide_special_buttons()
 					clear_zombie_tiles()
 
+# Check if there is a unit on the tile
+func is_unit_present(tile_pos: Vector2i) -> bool:
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	var all_units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
+	for unit in all_units:
+		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
+		if tile_pos == unit_tile_pos:
+			return true
+	return false
 
 func find_closest_zombies(target_position: Vector2):
 	# Get all zombie positions

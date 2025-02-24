@@ -158,7 +158,16 @@ func spawn_ai_units():
 		print("Error: Could not initialize zones for AI spawning.")
 		return
 
-	# Randomly select one zone for AI spawning
+	# Remove the player's zone from available zones if it exists.
+	if player_zone != null:
+		# Erase the player's zone. (Ensure that player_zone exactly matches one of the zones from initialize_zones().)
+		zones.erase(player_zone)
+
+	if zones.is_empty():
+		print("Error: No alternate zones available for AI spawning after removing the player zone.")
+		return
+
+	# Randomly select one zone for AI spawning from the remaining zones.
 	var ai_zone = zones.pop_at(randi() % zones.size())
 
 	# Set minimum distance between AI spawns (adjust as needed)

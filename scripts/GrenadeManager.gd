@@ -157,6 +157,38 @@ func find_closest_zombies(target_position: Vector2):
 		get_parent().get_child(0).play("attack")		
 		await get_tree().create_timer(0.1).timeout
 		start_trajectory(zombie_pos, get_parent().position)
+
+func find_closest_zombies_for_ai(target_position: Vector2) -> void:
+	# Get all enemies from "zombies" and "player_units"
+	var all_enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	var candidates = []
+	# Filter out any enemies that are in the "unitAI" group.
+	for enemy in all_enemies:
+		if not enemy.is_in_group("unitAI"):
+			candidates.append(enemy)
+	
+	# If no candidate is found, do nothing.
+	if candidates.size() == 0:
+		print("No enemy available for grenade special attack.")
+		return
+
+	# Sort the candidates by their Euclidean distance from the target_position.
+	candidates.sort_custom(func(a, b):
+		return target_position.distance_to(a.global_position) < target_position.distance_to(b.global_position)
+	)
+
+	# Select the 7 closest candidates.
+	var closest_candidates = candidates.slice(0, min(7, candidates.size()))
+
+	get_parent().display_special_attack_tiles()
+
+	# Trigger trajectories towards the closest candidates sequentially.
+	for enemy in closest_candidates:
+		get_parent().get_child(0).play("attack")
+		await get_tree().create_timer(0.1).timeout
+		start_trajectory(enemy.global_position, get_parent().position)
+
+	get_parent().clear_special_tiles()	
 		
 func _compare_distance_to_target(zombie_a: Node2D, zombie_b: Node2D, target_position: Vector2) -> bool:
 	return zombie_a.position.distance_to(target_position) < zombie_b.position.distance_to(target_position)
@@ -446,3 +478,49 @@ func is_mouse_over_gui() -> bool:
 				return true
 	#print("Mouse is NOT over any button.")
 	return false
+
+# Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
+func find_closest_target() -> Node:
+	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	var target = null
+	var min_distance = INF
+	var parent_pos = get_parent().position  # Assume parent's position is used for measuring distance
+	for candidate in candidates:
+		if candidate.is_in_group("unitAI"):
+			continue
+		var d = parent_pos.distance_to(candidate.position)
+		if d < min_distance:
+			min_distance = d
+			target = candidate
+	return target
+
+func execute_logan_raines_ai_turn() -> void:
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await get_parent().execute_ai_turn()
+	else:
+		# If standard AI hasn't resulted in an attack…
+		if not get_parent().has_attacked:
+			print("Random choice: Executing Logan Raines special missile attack.")
+			# Get the missile manager by its node path.
+			var missile_manager = get_node("/root/MapManager/MissileManager")
+			
+			# Focus the camera on the current position.
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(self.tile_pos))
+			
+			# Find the closest target (zombie or player unit not in unitAI)
+			var target = find_closest_target()
+			if target:
+				# Execute the special missile attack via the missile manager.
+				await find_closest_zombies_for_ai(target.position)
+			else:
+				print("No valid target found for Logan Raines special attack.")
+			
+			# Mark the turn as complete.
+			get_parent().has_attacked = true
+			get_parent().has_moved = true

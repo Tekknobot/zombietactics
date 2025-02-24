@@ -115,11 +115,18 @@ func start_player_ai_turn() -> void:
 		# Sort the candidates by distance (smallest first)
 		candidates.sort_custom(Callable(self, "_compare_candidates"))
 		
-		# Iterate through each candidate and trigger its AI turn.
+		# Iterate through each candidate and trigger its AI turn sequentially.
 		for candidate in candidates:
 			var chosen_ai = candidate["ai"]
-			# Await each AI unit's turn to finish before moving to the next.
-			await chosen_ai.start_ai_turn()
+			if chosen_ai.is_in_group("unitAI"):
+				if chosen_ai.player_name == "Dutch. Major":
+					await chosen_ai.execute_dutch_major_ai_turn()
+				if chosen_ai.player_name == "Yoshida. Boi":
+					await chosen_ai.execute_yoshida_ai_turn()
+				if chosen_ai.player_name == "Logan. Raines":
+					await chosen_ai.get_child(7).execute_logan_raines_ai_turn()
+										
+			#await chosen_ai.start_ai_turn()
 
 		trigger_zombies = true
 
@@ -150,13 +157,19 @@ func end_current_turn_from_button():
 	# Sort the candidates by distance (smallest first)
 	candidates.sort_custom(Callable(self, "_compare_candidates"))
 	
-	# Iterate through each candidate and trigger its AI turn.
+	# Iterate through each candidate and trigger its AI turn sequentially.
 	for candidate in candidates:
 		var chosen_ai = candidate["ai"]
-		# Await each AI unit's turn to finish before moving to the next.
-		if chosen_ai.has_attacked or chosen_ai.has_moved:
-			return
-		await chosen_ai.start_ai_turn()	
+		if chosen_ai.is_in_group("unitAI"):
+			if chosen_ai.player_name == "Dutch. Major":
+				await chosen_ai.execute_dutch_major_ai_turn()
+			if chosen_ai.player_name == "Yoshida. Boi":
+				await chosen_ai.execute_yoshida_ai_turn()
+			if chosen_ai.player_name == "Logan. Raines":
+				await chosen_ai.execute_logan_raines_ai_turn()				
+
+			
+		#await chosen_ai.start_ai_turn()	
 
 	trigger_zombies = true
 

@@ -253,7 +253,7 @@ func process_zombie_queue() -> void:
 		GlobalManager.zombies_processed = 0  # Reset the counter for the next turn
 		
 		await turn_manager.start_player_ai_turn()
-		turn_manager.end_current_turn_from_button()
+		#turn_manager.end_current_turn()
 		return
 	
 	# Process the next zombie

@@ -322,10 +322,7 @@ func display_has_moved_tiles() -> void:
 
 
 # Display movement tiles within range
-func display_special_attack_tiles() -> void:
-	if is_in_group("unitAI"):
-		return
-		
+func display_special_attack_tiles() -> void:		
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false
@@ -1323,3 +1320,54 @@ func start_ai_turn() -> void:
 		# Delay briefly before executing the AI routine.
 		await get_tree().create_timer(1).timeout
 		execute_ai_turn()
+
+func execute_dutch_major_ai_turn() -> void: 
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await execute_ai_turn()
+	else:
+	
+		# After standard AI execution, if no attack was performed…
+		if not self.has_attacked:
+			print("Standard AI did not attack. Executing Dutch. Major dynamite special attack.")
+			# Get a reference to the dynamite_manager (assumed to be at this path).
+			var dynamite_manager = get_node("/root/MapManager/DynamiteManager")
+			
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			# Focus the camera on our current position.
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(self.tile_pos))	
+					
+			# Call a new helper that wraps the dynamite special attack logic.
+			await dynamite_manager.execute_special_attack()
+			# Mark the turn as completed.
+			self.has_attacked = true
+			self.has_moved = true 			
+
+func execute_yoshida_ai_turn() -> void: 
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await execute_ai_turn()
+	else:
+		# After standard AI execution, if no attack was performed…
+		if not self.has_attacked:
+			print("Standard AI did not attack. Executing Yoshida. Boi dynamite special attack.")
+			# Get a reference to the dynamite_manager (assumed to be at this path).
+			var dynamite_manager = get_node("/root/MapManager/DynamiteManager")
+			
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			# Focus the camera on our current position.
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(self.tile_pos))	
+					
+			# Call a new helper that wraps the dynamite special attack logic.
+			await missile_manager.execute_special_attack()
+			# Mark the turn as completed.
+			self.has_attacked = true
+			self.has_moved = true 		

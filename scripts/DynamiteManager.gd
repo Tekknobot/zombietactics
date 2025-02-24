@@ -343,30 +343,26 @@ func _trigger_explosion(last_point: Vector2):
 			hud_manager.update_hud(player)	
 
 	# Check for ZombieUnit within explosion radius
-	for zombie in get_tree().get_nodes_in_group("zombies"):
+	for zombie in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:			
 			zombie.flash_damage()
 			# Check for PlayerUnit within explosion radius
 			for player in get_tree().get_nodes_in_group("player_units"):
-				if player.player_name == "Dutch. Major":			
-					zombie.apply_damage(player.attack_damage)	
+				if player.player_name == "Dutch. Major":	
+					if player.is_in_group("unitAI"):		
+						zombie.apply_damage(player.attack_damage)	
+					else:
+						pass
 						
 			print("Zombie Unit removed from explosion")
 			
 			xp_awarded = true
-			
-			var hud_manager = get_parent().get_node("HUDManager") 
-			hud_manager.update_hud_zombie(zombie)
 
 	for player in get_tree().get_nodes_in_group("unitAI"):
 		if player.position.distance_to(last_point) <= explosion_radius:	
 			player.flash_damage()
-			player.apply_damage(player.attack_damage)
-					
+			player.apply_damage(player.attack_damage)					
 			xp_awarded = true  # Mark XP as earned for this explosion
-
-			var hud_manager = get_parent().get_node("HUDManager") 
-			hud_manager.update_hud(player)	
 
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
@@ -427,3 +423,65 @@ func is_mouse_over_gui() -> bool:
 				return true
 	#print("Mouse is NOT over any button.")
 	return false
+
+func execute_special_attack() -> void:
+	var players = get_tree().get_nodes_in_group("player_units")
+	var ai_player
+	for player in players:
+		if player.is_in_group("unitAI") and player.player_name == "Dutch. Major":
+			# Get a reference to Dutch. Major (the parent, assumed to be a PlayerUnit)
+			ai_player = player
+			ai_player.display_special_attack_tiles()
+			break
+	
+	# Get the set of attack range tiles defined by the PlayerUnit’s method.
+	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
+	
+	# Gather enemies from both "zombies" and "player_units".
+	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	
+	# Filter out any nodes that are also in the "unitAI" group.
+	var valid_enemies = []
+	for enemy in enemies:
+		if not enemy.is_in_group("unitAI"):
+			valid_enemies.append(enemy)
+	
+	# From the valid enemies, pick only those whose tile positions are in the attack range.
+	var candidates = []
+	for enemy in valid_enemies:
+		# Assume each enemy has a tile_pos property.
+		if enemy.tile_pos in attack_tiles:
+			candidates.append(enemy)
+	
+	# If no candidate is found, do nothing.
+	if candidates.size() == 0:
+		print("No enemy within special attack range.")
+		return
+	
+	var target_enemy = null
+	var min_distance = INF
+	for enemy in candidates:
+		var dx = ai_player.tile_pos.x - enemy.tile_pos.x
+		var dy = ai_player.tile_pos.y - enemy.tile_pos.y
+		var d = sqrt(dx * dx + dy * dy)
+		if d < min_distance:
+			min_distance = d
+			target_enemy = enemy
+			
+	if target_enemy == null:
+		print("No target enemy found within special attack tiles.")
+		return
+	
+	var target_pos = target_enemy.position
+	var start_pos = ai_player.position
+	
+	print("Dynamite special attack: launching from", start_pos, "to", target_pos)
+
+	await get_tree().create_timer(0.5).timeout 
+	ai_player.clear_special_tiles()
+
+	# Launch the trajectory; this function uses a Bézier curve and awaits the dynamite animation.
+	await start_trajectory(target_pos, start_pos)
+	
+	# Optionally, add a short delay.
+	await get_tree().create_timer(0.5).timeout

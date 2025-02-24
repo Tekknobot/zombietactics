@@ -217,7 +217,7 @@ func deploy_laser(target_position: Vector2, zombie):
 				height_offset = structure.layer
 
 		# Check overlap with units
-		var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies")
+		var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 		for unit in all_units:
 			if Rect2(unit.global_position, Vector2(32, 32)).intersects(segment_rect):
 				segment_color = laser_color_3
@@ -324,35 +324,20 @@ func _trigger_explosion(last_point: Vector2):
 	var explosion_radius = 8
 
 	# Check for ZombieUnit within explosion radius
-	for zombie in get_tree().get_nodes_in_group("zombies"):
+	for zombie in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI"):
 		if zombie.position.distance_to(last_point) <= explosion_radius:	
 			zombie.flash_damage()
 			for player in get_tree().get_nodes_in_group("player_units"):
-				if player.player_name == "Sarah. Reese":
+				if player.player_name == "Sarah. Reese" and player.is_in_group("unitAI"):
 					zombie.apply_damage(player.attack_damage)
 					zombie.clear_movement_tiles()
 					
 			xp_awarded = true  # Mark XP as earned for this explosion
 
 			var hud_manager = get_node("/root/MapManager/HUDManager")
-			hud_manager.update_hud_zombie(zombie)
+			#hud_manager.update_hud_zombie(zombie)
 			clear_segments()
-
-	# Check for unitAI within explosion radius
-	for unit in get_tree().get_nodes_in_group("unitAI"):
-		if unit.position.distance_to(last_point) <= explosion_radius:	
-			unit.flash_damage()
-			for player in get_tree().get_nodes_in_group("unitAI"):
-				if player.player_name == "Sarah. Reese":
-					unit.apply_damage(player.attack_damage)
-					unit.clear_movement_tiles()
-					
-			xp_awarded = true  # Mark XP as earned for this explosion
-
-			var hud_manager = get_node("/root/MapManager/HUDManager")
-			hud_manager.update_hud(unit)
-			clear_segments()
-			
+				
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):
 		if structure.position.distance_to(last_point) <= explosion_radius:

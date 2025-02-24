@@ -8,7 +8,7 @@ var current_unit_index: int = 0  # Index of the current unit in the current grou
 
 var trigger_zombies: bool = false
 var used_turns_count: int = 0
-var max_turn_count: int = 1
+var max_turn_count: int = 9
 
 signal player_action_completed
 
@@ -80,7 +80,7 @@ func end_current_turn() -> void:
 		if player.has_used_turn:
 			used_turns_count += 1
 	
-	max_turn_count = all_non_ai_players.size()
+	var max_turn_count = all_non_ai_players.size()
 	
 	# If all non-AI units have used their turns and zombies haven't been triggered, fire the zombie event.
 	if used_turns_count >= max_turn_count and not trigger_zombies:
@@ -117,7 +117,7 @@ func end_current_turn() -> void:
 			var chosen_ai = candidate["ai"]
 			# Await each AI unit's turn to finish before moving to the next.
 			await chosen_ai.start_ai_turn()
-		
+
 		trigger_zombies = true
 
 		# Reset the player units for a new turn.
@@ -153,6 +153,12 @@ func end_current_turn_from_button():
 		# Await each AI unit's turn to finish before moving to the next.
 		await chosen_ai.start_ai_turn()	
 
+	trigger_zombies = true
+
+	# Reset the player units for a new turn.
+	reset_player_units()
+	check_if_end_map()
+		
 # Add a player unit
 func add_player_unit(unit: Node) -> void:
 	if not player_units.has(unit):

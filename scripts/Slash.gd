@@ -158,8 +158,8 @@ func dash_along_trajectory(trajectory: Array):
 			await get_tree().create_timer(0.5).timeout
 			enemy.flash_damage()
 			
-			enemy.audio_player.stream = enemy.zombie_audio
-			enemy.audio_player.play()
+			#enemy.audio_player.stream = enemy.zombie_audio
+			#enemy.audio_player.play()
 			
 			enemy.apply_damage(get_parent().attack_damage)
 
@@ -241,7 +241,7 @@ func is_structure(tile_pos: Vector2i) -> bool:
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
-	var all_units = get_tree().get_nodes_in_group("player_units")
+	var all_units = get_tree().get_nodes_in_group("player_units") + get_tree().get_nodes_in_group("unitAI")
 	for unit in all_units:
 		var unit_tile_pos = tilemap.local_to_map(unit.global_position)
 		if tile_pos == unit_tile_pos:
@@ -285,7 +285,7 @@ func display_slash_attack_range():
 				break  # Stop if out of bounds
 
 			# Check if the tile is movable or occupied
-			if is_structure(current_pos) or is_unit_present(current_pos) or is_water_tile_at_position(current_pos):
+			if is_structure(current_pos) or is_water_tile_at_position(current_pos):
 				break
 			highlight_attack_tile(current_pos, tilemap)
 

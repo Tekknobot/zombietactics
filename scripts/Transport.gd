@@ -57,7 +57,7 @@ func _input(event):
 		var mouse_local = tilemap.local_to_map(global_mouse_position)
 
 		if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "John. Doom" and GlobalManager.transport_toggle_active == true:
-			if get_parent().is_in_group("unitAI"):
+			if get_parent().is_in_group("unitAI") and !get_parent().dead:
 				return	
 			
 			if is_tile_movable(mouse_local) == false:

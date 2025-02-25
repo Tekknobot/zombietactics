@@ -112,7 +112,13 @@ func start_player_ai_turn() -> void:
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
-					
+			"John. Doom":
+				await ai.get_child(7).execute_john_doom_ai_turn()					
+			"Sarah. Reese":
+				await ai.get_child(7).execute_sarah_reese_ai_turn()	
+			"Annie. Switch":
+				await ai.get_child(7).execute_annie_switch_ai_turn()
+													
 	trigger_zombies = true
 	
 	# Reset the player units for a new turn and check the map state.
@@ -134,13 +140,15 @@ func end_current_turn_from_button():
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
-				#await ai.get_child(8).turn_completed  # This awaits the turn completion signal.
 			"Aleks. Ducat":
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
-				#await ai.get_child(8).turn_completed  # Likewise for Aleks.
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
-					
+			"John. Doom":
+				await ai.get_child(7).execute_john_doom_ai_turn()		
+			"Annie. Switch":
+				await ai.get_child(7).execute_annie_switch_ai_turn()
+											
 	trigger_zombies = true
 	
 	# Reset the player units for a new turn and check the map state.

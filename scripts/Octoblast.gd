@@ -57,7 +57,7 @@ func _input(event):
 			# Ensure hover_tile exists and "Sarah Reese" is selected
 			if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "Annie. Switch" and GlobalManager.octoblast_toggle_active == true:
 				get_parent().clear_special_tiles()	
-				activate_ability()
+				activate_ability(global_mouse_position)
 
 # Check if there is a unit on the tile
 func is_unit_present(tile_pos: Vector2i) -> bool:
@@ -69,7 +69,7 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 			return true
 	return false
 				
-func trigger_octoblast():
+func trigger_octoblast(target: Vector2):
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	
 	var mouse_position = get_global_mouse_position() 
@@ -91,24 +91,43 @@ func trigger_octoblast():
 	# Trigger trajectory to the initial position
 	missile_manager.start_trajectory(mouse_position, get_parent().position)
 	
-	# Get all zombie positions
-	var zombies = get_zombies_on_map()  # Custom function to fetch all zombies on the map
-	var zombie_positions = []
-	for zombie in zombies:
-		zombie_positions.append(zombie.global_position)
+	if get_parent().is_in_group("unitAI"):
+		var zombies = get_zombies_on_map_ai()
+		var zombie_positions = []
+		for zombie in zombies:
+			zombie_positions.append(zombie.global_position)
 
-	# Sort zombies by distance from the trigger location
-	zombie_positions.sort_custom(func(a, b):
-		return mouse_position.distance_to(a) < mouse_position.distance_to(b))
+		# Sort zombies by distance from the trigger location
+		zombie_positions.sort_custom(func(a, b):
+			return mouse_position.distance_to(a) < mouse_position.distance_to(b))
 
-	# Select the 7 closest zombies
-	var closest_zombies = zombie_positions.slice(0, min(7, zombie_positions.size()))
+		# Select the 7 closest zombies
+		var closest_zombies = zombie_positions.slice(0, min(7, zombie_positions.size()))
 
-	# Trigger trajectories towards the closest zombies sequentially
-	for zombie_pos in closest_zombies:
-		get_parent().get_child(0).play("attack")		
-		await get_tree().create_timer(0.3).timeout
-		missile_manager.start_trajectory(zombie_pos, get_parent().position)
+		# Trigger trajectories towards the closest zombies sequentially
+		for zombie_pos in closest_zombies:
+			get_parent().get_child(0).play("attack")		
+			await get_tree().create_timer(0.3).timeout
+			missile_manager.start_trajectory(zombie_pos, get_parent().position)
+	else:
+		# Get all zombie positions
+		var zombies = get_zombies_on_map()  # Custom function to fetch all zombies on the map
+		var zombie_positions = []
+		for zombie in zombies:
+			zombie_positions.append(zombie.global_position)
+
+		# Sort zombies by distance from the trigger location
+		zombie_positions.sort_custom(func(a, b):
+			return mouse_position.distance_to(a) < mouse_position.distance_to(b))
+
+		# Select the 7 closest zombies
+		var closest_zombies = zombie_positions.slice(0, min(7, zombie_positions.size()))
+
+		# Trigger trajectories towards the closest zombies sequentially
+		for zombie_pos in closest_zombies:
+			get_parent().get_child(0).play("attack")		
+			await get_tree().create_timer(0.3).timeout
+			missile_manager.start_trajectory(zombie_pos, get_parent().position)
 
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 	hud_manager.hide_special_buttons()	
@@ -134,6 +153,19 @@ func get_zombies_on_map() -> Array:
 			zombies.append(entity)
 	return zombies	
 
+func get_zombies_on_map_ai() -> Array:
+	var zombies = []
+	var all_entities = get_node("/root/MapManager/UnitSpawn").get_children()  # Adjust path as needed.
+	for entity in all_entities:
+		# If entity is in "zombies", add it.
+		if entity.is_in_group("zombies"):
+			zombies.append(entity)
+		# If entity is in "player_units" but not in "unitAI", add it.
+		elif entity.is_in_group("player_units") and not entity.is_in_group("unitAI"):
+			zombies.append(entity)
+	return zombies
+
+
 # Deal damage to units within the area of effect
 func damage_units_in_area(center_position):
 	# Find units in the area (adapt to your collision system)
@@ -148,8 +180,8 @@ func damage_units_in_area(center_position):
 				unit.get_child(0).play("demolished")
 				
 # Optional: Call this method to activate Hellfire from external scripts
-func activate_ability():
-	trigger_octoblast()
+func activate_ability(target: Vector2):
+	trigger_octoblast(target)
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position
@@ -167,3 +199,95 @@ func is_mouse_over_gui() -> bool:
 				return true
 	#print("Mouse is NOT over any button.")
 	return false
+
+func execute_annie_switch_ai_turn() -> void:
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await get_parent().execute_ai_turn()
+	else:
+		# Only perform the special attack if the unit hasn't attacked yet.
+		if not get_parent().has_attacked:
+			print("Executing Annie Switch Octoblast special attack.")
+			
+			# Focus the camera on the unit's current position.
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
+			
+			# Optionally display special attack range tiles for visual feedback.
+			get_parent().display_special_attack_tiles()
+			
+			# Clear the special attack tiles (if needed) before triggering octoblast.
+			get_parent().clear_special_tiles()
+			
+			var target = find_closest_target()
+			
+			# Execute the octoblast ability.
+			trigger_octoblast(target.position)
+			
+			# Optionally wait a moment for effects to finish.
+			await get_tree().create_timer(explosion_delay).timeout
+			
+			# Mark the turn as complete.
+			get_parent().has_attacked = true
+			get_parent().has_moved = true
+			get_parent().check_end_turn_conditions()
+
+# Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
+func find_closest_target() -> Node:
+	# Find Dutch. Major among the player_units that are AI-controlled.
+	var ai_player = null
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if player.is_in_group("unitAI") and player.player_name == "Annie. Switch":
+			ai_player = player
+			# Optionally display the special attack tiles for feedback.
+			ai_player.display_special_attack_tiles()
+			break
+			
+	if ai_player == null:
+		print("Angel. Charlie not found.")
+		return null
+
+	# Optionally, use the valid_range parameter. Here we'll override it with the attack range
+	# defined by Dutch. Major's method.
+	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
+
+	# Gather enemies from both groups.
+	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	
+	# Filter out any nodes that are AI-controlled.
+	var valid_enemies = []
+	for enemy in enemies:
+		if not enemy.is_in_group("unitAI"):
+			valid_enemies.append(enemy)
+	
+	# From valid enemies, pick only those whose tile positions are in the attack range.
+	var candidates = []
+	for enemy in valid_enemies:
+		# Assume each enemy has a 'tile_pos' property.
+		if enemy.tile_pos in attack_tiles:
+			candidates.append(enemy)
+	
+	if candidates.size() == 0:
+		print("No enemy within special attack range.")
+		return null
+	
+	# Find the candidate with the minimum Manhattan distance.
+	var target_enemy = null
+	var min_distance = INF
+	for enemy in candidates:
+		var dx = abs(ai_player.tile_pos.x - enemy.tile_pos.x)
+		var dy = abs(ai_player.tile_pos.y - enemy.tile_pos.y)
+		var d = dx + dy  # Manhattan distance calculation.
+		if d < min_distance:
+			min_distance = d
+			target_enemy = enemy
+
+	if target_enemy == null:
+		print("No target enemy found within special attack tiles.")
+		return null
+
+	return target_enemy

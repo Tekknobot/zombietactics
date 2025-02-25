@@ -164,6 +164,17 @@ func get_zombies_in_scene() -> Array:
 			zombies.append(node)
 	return zombies			
 
+
+func get_zombies_in_scene_ai() -> Array:
+	# Returns a list of zombies in the scene (to be implemented)
+	var zombies = []
+	for node in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units"):
+		if node.is_in_group("unitAI"):
+			continue
+		if node.is_inside_tree():
+			zombies.append(node)
+	return zombies	
+	
 func deploy_laser(target_position: Vector2, zombie):
 	# Camera focus
 	var camera: Camera2D = get_node("/root/MapManager/Camera2D")
@@ -274,7 +285,10 @@ func _on_pulse_timer_timeout():
 	if current_segment_index == laser_segments.size() - 1:  # Last segment
 		# Get the endpoint of the last segment and trigger the explosion
 		var last_point = current_segment.to_global(current_segment.get_point_position(1))
-		_trigger_explosion(last_point)
+		if get_parent().is_in_group("unitAI"):
+			_trigger_explosion_ai(last_point)
+		else:
+			_trigger_explosion(last_point)
 		get_parent().get_child(0).play("default")
 
 		# Reset spark emitter after finishing
@@ -348,6 +362,60 @@ func _trigger_explosion(last_point: Vector2):
 		
 	clear_segments()	
 	get_zombie_in_area()			
+
+func _trigger_explosion_ai(last_point: Vector2):
+	print("Explosion triggered at position:", last_point)
+	
+	# Instantiate the explosion effect at the target's position.
+	var explosion_instance = explosion_scene.instantiate()
+	get_parent().add_child(explosion_instance)
+	last_point.y += 8
+	explosion_instance.global_position = last_point
+	print("Explosion instance added to scene at:", last_point)
+	
+	# Explosion parameters.
+	var explosion_radius = 8
+	var explosion_damage = 25  # Set the damage value as desired.
+	
+	# Gather all zombies.
+	var zombie_targets = get_tree().get_nodes_in_group("zombies")
+	
+	# Gather player units that are NOT in the "unitAI" group.
+	var non_ai_player_units = []
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if not player.is_in_group("unitAI"):
+			non_ai_player_units.append(player)
+	
+	# Combine targets: all zombies plus non-AI player units.
+	var targets = zombie_targets + non_ai_player_units
+	
+	# Loop through each target and apply damage if within the explosion radius.
+	for target in targets:
+		if target.position.distance_to(last_point) <= explosion_radius:
+			# Show damage feedback.
+			target.flash_damage()
+			# Apply damage; adjust the method or damage value as needed.
+			target.apply_damage(explosion_damage)
+			# Optionally clear movement tiles.
+			target.clear_movement_tiles()
+			xp_awarded = true  # Mark XP as earned for this explosion
+			
+			# Optionally update the HUD.
+			var hud_manager = get_node("/root/MapManager/HUDManager")
+			# hud_manager.update_hud_zombie(target)  # Uncomment if you have such a method.
+			clear_segments()
+	
+	# Check for Structures within the explosion radius.
+	for structure in get_tree().get_nodes_in_group("structures"):
+		if structure.position.distance_to(last_point) <= explosion_radius:
+			structure.get_child(0).play("demolished")  # Play collapse/demolish animation.
+			print("Structure removed from explosion")
+			xp_awarded = true
+			clear_segments()
+		
+	clear_segments()	
+	get_zombie_in_area()
+
 				
 func add_xp():
 	# Add XP
@@ -407,3 +475,121 @@ func is_mouse_over_gui() -> bool:
 				return true
 	#print("Mouse is NOT over any button.")
 	return false
+
+func _compare_by_distance(a, b) -> int:
+	var d1 = laser_target.distance_to(a.position)
+	var d2 = laser_target.distance_to(b.position)
+	if d1 < d2:
+		return -1
+	elif d1 > d2:
+		return 1
+	return 0
+
+func execute_sarah_reese_ai_turn() -> void:
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await get_parent().execute_ai_turn()
+	else:	
+		# Forcing the special attack branch (choice = 1)
+		# Only execute if the unit hasn't attacked yet.
+		if not get_parent().has_attacked:
+			print("Executing Sarah Reese special laser attack.")
+			
+			# Focus the camera on the current position.
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
+			
+			# Display special attack range tiles (for visual feedback).
+			get_parent().display_special_attack_tiles()
+			
+			# Find the closest target using your helper function.
+			# (Assumes find_closest_target() filters out AI-controlled units and uses special attack range.)
+			var target = find_closest_target()
+			if target:
+				# Convert the target's position to tile coordinates and then back to local coordinates.
+				var target_tile: Vector2i = tilemap.local_to_map(target.position)
+				laser_target = tilemap.map_to_local(target_tile)
+				explosion_target = laser_target
+				
+				# Clear special attack range tiles.
+				get_parent().clear_special_tiles()
+				
+				# Depending on whether the parent is AI-controlled or not, choose the appropriate zombies list.
+				if !get_parent().is_in_group("unitAI"):
+					closest_zombies = get_zombies_in_scene_ai()
+				else:
+					closest_zombies = get_zombies_in_scene()
+				
+				# Sort the closest zombies by distance to the laser target.
+				closest_zombies.sort_custom(Callable(self, "_compare_by_distance"))
+				
+				# Clear the special tiles again, then start deploying the laser.
+				get_parent().clear_special_tiles()
+				get_zombie_in_area()
+				laser_active = true
+			else:
+				print("No valid target found for Sarah Reese special attack.")
+			
+			# Mark the turn as complete.
+			get_parent().has_attacked = true
+			get_parent().has_moved = true
+
+# Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
+func find_closest_target() -> Node:
+	# Find Dutch. Major among the player_units that are AI-controlled.
+	var ai_player = null
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if player.is_in_group("unitAI") and player.player_name == "Sarah. Reese":
+			ai_player = player
+			# Optionally display the special attack tiles for feedback.
+			ai_player.display_special_attack_tiles()
+			break
+			
+	if ai_player == null:
+		print("Angel. Charlie not found.")
+		return null
+
+	# Optionally, use the valid_range parameter. Here we'll override it with the attack range
+	# defined by Dutch. Major's method.
+	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
+
+	# Gather enemies from both groups.
+	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	
+	# Filter out any nodes that are AI-controlled.
+	var valid_enemies = []
+	for enemy in enemies:
+		if not enemy.is_in_group("unitAI"):
+			valid_enemies.append(enemy)
+	
+	# From valid enemies, pick only those whose tile positions are in the attack range.
+	var candidates = []
+	for enemy in valid_enemies:
+		# Assume each enemy has a 'tile_pos' property.
+		if enemy.tile_pos in attack_tiles:
+			candidates.append(enemy)
+	
+	if candidates.size() == 0:
+		print("No enemy within special attack range.")
+		return null
+	
+	# Find the candidate with the minimum Manhattan distance.
+	var target_enemy = null
+	var min_distance = INF
+	for enemy in candidates:
+		var dx = abs(ai_player.tile_pos.x - enemy.tile_pos.x)
+		var dy = abs(ai_player.tile_pos.y - enemy.tile_pos.y)
+		var d = dx + dy  # Manhattan distance calculation.
+		if d < min_distance:
+			min_distance = d
+			target_enemy = enemy
+
+	if target_enemy == null:
+		print("No target enemy found within special attack tiles.")
+		return null
+
+	return target_enemy

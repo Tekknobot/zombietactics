@@ -15,6 +15,8 @@ extends Node2D
 var hover_tiles_visible = false  # Whether hover tiles are currently displayed
 var hover_tiles = []  # Store references to dynamically created hover tiles
 
+var hellfire_target
+
 func _process(delta):
 	# Check if the barrage toggle is active
 	if GlobalManager.hellfire_toggle_active:
@@ -124,7 +126,7 @@ func _input(event):
 		if position_matches_tile:										
 			# Ensure hover_tile exists and "Sarah Reese" is selected
 			if hover_tile and hover_tile.selected_player and hover_tile.selected_player.player_name == "John. Doom" and 	GlobalManager.hellfire_toggle_active == true:
-				activate_ability()
+				activate_ability(global_mouse_position)
 				get_parent().clear_special_tiles()	
 				await get_tree().create_timer(0.01).timeout
 				GlobalManager.hellfire_toggle_active = false
@@ -140,15 +142,21 @@ func is_unit_present(tile_pos: Vector2i) -> bool:
 	return false
 			
 # Trigger Hellfire ability
-func trigger_hellfire():
+func trigger_hellfire(target: Vector2):
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	
 	var mouse_position = get_global_mouse_position() 
 	mouse_position.y += 8
 	var mouse_pos = tilemap.local_to_map(mouse_position)
-		
-	# Get the current position in tile coordinates
-	var current_position = mouse_pos
+	
+	if get_parent().is_in_group("unitAI"):
+		var target_pos = tilemap.local_to_map(target)
+		var current_position = target_pos
+		hellfire_target = current_position
+	else:	
+		# Get the current position in tile coordinates
+		var current_position = mouse_pos
+		hellfire_target = current_position
 
 	# Get the current facing direction of the parent (1 for right, -1 for left)
 	var current_facing = 1 if get_parent().scale.x > 0 else -1
@@ -161,7 +169,10 @@ func trigger_hellfire():
 
 	get_parent().get_child(0).play("attack")
 
-	await missile_manager.start_trajectory(mouse_position, get_parent().position)
+	if get_parent().is_in_group("unitAI"):
+		await missile_manager.start_trajectory(target, get_parent().position)
+	else:	
+		await missile_manager.start_trajectory(mouse_position, get_parent().position)
 
 	# Define offsets for the 8 surrounding tiles (including the center tile)
 	var offsets = [
@@ -173,7 +184,7 @@ func trigger_hellfire():
 	# Trigger explosions on the 8 surrounding tiles
 	for offset in offsets:
 		# Calculate target tile coordinates
-		var target_tile_coords = current_position + offset
+		var target_tile_coords = hellfire_target + offset
 		
 		# Convert the tile coordinates to a local position
 		var target_position = tilemap.map_to_local(target_tile_coords)
@@ -220,8 +231,8 @@ func damage_units_in_area(center_position):
 				unit.get_child(0).play("demolished")
 				
 # Optional: Call this method to activate Hellfire from external scripts
-func activate_ability():
-	trigger_hellfire()
+func activate_ability(target: Vector2):
+	trigger_hellfire(target)
 
 func is_mouse_over_gui() -> bool:
 	# Get global mouse position
@@ -240,3 +251,90 @@ func is_mouse_over_gui() -> bool:
 				return true
 	#print("Mouse is NOT over any button.")
 	return false
+
+func execute_john_doom_ai_turn() -> void:
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await get_parent().execute_ai_turn()
+	else:
+		# If standard AI hasn't resulted in an attack…
+		if not get_parent().has_attacked:
+			print("Random choice: Executing Logan Raines special missile attack.")
+			# Get the missile manager by its node path.
+			var missile_manager = get_node("/root/MapManager/MissileManager")
+			
+			# Focus the camera on the current position.
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
+			
+			# Find the closest target (zombie or player unit not in unitAI)
+			var target = find_closest_target()
+			if target:
+				# Execute the special missile attack via the missile manager.
+				await trigger_hellfire(target.position)
+			else:
+				print("No valid target found for John Doom special attack.")
+			
+			# Mark the turn as complete.
+			get_parent().has_attacked = true
+			get_parent().has_moved = true
+			
+# Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
+func find_closest_target() -> Node:
+	# Find Dutch. Major among the player_units that are AI-controlled.
+	var ai_player = null
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if player.is_in_group("unitAI") and player.player_name == "John. Doom":
+			ai_player = player
+			# Optionally display the special attack tiles for feedback.
+			ai_player.display_special_attack_tiles()
+			break
+			
+	if ai_player == null:
+		print("John. Doom not found.")
+		return null
+
+	# Optionally, use the valid_range parameter. Here we'll override it with the attack range
+	# defined by Dutch. Major's method.
+	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
+
+	# Gather enemies from both groups.
+	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	
+	# Filter out any nodes that are AI-controlled.
+	var valid_enemies = []
+	for enemy in enemies:
+		if not enemy.is_in_group("unitAI"):
+			valid_enemies.append(enemy)
+	
+	# From valid enemies, pick only those whose tile positions are in the attack range.
+	var candidates = []
+	for enemy in valid_enemies:
+		# Assume each enemy has a 'tile_pos' property.
+		if enemy.tile_pos in attack_tiles:
+			candidates.append(enemy)
+	
+	if candidates.size() == 0:
+		print("No enemy within special attack range.")
+		return null
+	
+	# Find the candidate with the minimum Manhattan distance.
+	var target_enemy = null
+	var min_distance = INF
+	for enemy in candidates:
+		var dx = abs(ai_player.tile_pos.x - enemy.tile_pos.x)
+		var dy = abs(ai_player.tile_pos.y - enemy.tile_pos.y)
+		var d = dx + dy  # Manhattan distance calculation.
+		if d < min_distance:
+			min_distance = d
+			target_enemy = enemy
+
+	if target_enemy == null:
+		print("No target enemy found within special attack tiles.")
+		return null
+
+	return target_enemy		

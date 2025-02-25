@@ -125,8 +125,12 @@ func _input(event: InputEvent) -> void:
 					elif get_global_mouse_position().x < global_position.x and current_facing == -1:
 						get_parent().scale.x = abs(get_parent().scale.x)  # Flip to face right
 					
-					get_parent().clear_special_tiles()						
-					await find_closest_zombies(get_global_mouse_position())  # Find 2 closest zombies
+					get_parent().clear_special_tiles()	
+					
+					if get_parent().is_in_group("untiAI"):
+						pass
+					else:						
+						await find_closest_zombies(get_global_mouse_position())  # Find 2 closest zombies
 
 					# Hide special buttons and trigger zombie actions
 					var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")

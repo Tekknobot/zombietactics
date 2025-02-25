@@ -192,7 +192,7 @@ func _on_grenade_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Logan. Raines":
+			if player.player_name == "Logan. Raines" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()
 	else:
 		GlobalManager.grenade_toggle_active = false  # Set the flag to false

@@ -114,7 +114,7 @@ func update_hover_tiles():
 	
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:
-		if player.player_name == "Yoshida. Boi":
+		if player.player_name == "Yoshida. Boi" and !player.is_in_group("unitAI"):
 			yoshida = player
 	
 	var start_tile = yoshida.tile_pos  # Unit's current tile position

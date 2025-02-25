@@ -327,6 +327,9 @@ func display_has_moved_tiles() -> void:
 
 # Display movement tiles within range
 func display_special_attack_tiles() -> void:		
+	if self.is_in_group("unitAI"):
+		return	
+	
 	# Check if any zombie in the "zombies" group is moving
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	var zombies_moving = false

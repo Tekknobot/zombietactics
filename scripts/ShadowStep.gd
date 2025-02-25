@@ -3,7 +3,7 @@ extends Node2D
 # Configuration variables
 var max_targets = 7 # Maximum number of zombies to attack
 var attack_damage = 50 # Damage dealt per attack
-var fade_duration = 0.5 # Duration for fade out and in
+var fade_duration = 0.2 # Duration for fade out and in
 var cooldown = 3.0 # Cooldown for the ability
 
 var targeted_zombies = [] # List of zombies to attack
@@ -118,33 +118,63 @@ func find_nearest_zombies(max_count: int) -> Array:
 	# Start with all nodes in the "zombies" group.
 	var zombies = get_tree().get_nodes_in_group("zombies")
 	
-	# Get all player units.
-	var player_units = get_tree().get_nodes_in_group("player_units")
-	# Add only those player units that are NOT in the "unitAI" group.
-	for unit in player_units:
-		if not unit.is_in_group("unitAI"):
-			zombies.append(unit)
-			
-	var current_position = get_parent().tile_pos
+	if self.is_in_group("unitAI"):
+		# Get all player units.
+		var player_units = get_tree().get_nodes_in_group("player_units")
+		# Add only those player units that are NOT in the "unitAI" group.
+		for unit in player_units:
+			if not unit.is_in_group("unitAI"):
+				zombies.append(unit)
+				
+		var current_position = get_parent().tile_pos	
 
-	# Manual bubble sort based on distance to `current_position`
-	for i in range(zombies.size()):
-		for j in range(0, zombies.size() - i - 1):
-			var dist_a = current_position.distance_to(zombies[j].tile_pos)
-			var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
-			if dist_a > dist_b:
-				# Swap the zombies
-				var temp = zombies[j]
-				zombies[j] = zombies[j + 1]
-				zombies[j + 1] = temp
+		# Manual bubble sort based on distance to `current_position`
+		for i in range(zombies.size()):
+			for j in range(0, zombies.size() - i - 1):
+				var dist_a = current_position.distance_to(zombies[j].tile_pos)
+				var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
+				if dist_a > dist_b:
+					# Swap the zombies
+					var temp = zombies[j]
+					zombies[j] = zombies[j + 1]
+					zombies[j + 1] = temp
 
-	# Collect the nearest zombies up to max_count.
-	for zombie in zombies:
-		zombies_in_range.append(zombie)
-		if zombies_in_range.size() >= max_count:
-			break
+		# Collect the nearest zombies up to max_count.
+		for zombie in zombies:
+			zombies_in_range.append(zombie)
+			if zombies_in_range.size() >= max_count:
+				break
 
-	return zombies_in_range
+		return zombies_in_range
+					
+	else:
+		# Get all player units.
+		var player_units = get_tree().get_nodes_in_group("player_units")
+		# Add only those player units that are NOT in the "unitAI" group.
+		for unit in player_units:
+			if unit.is_in_group("unitAI"):
+				zombies.append(unit)
+				
+		var current_position = get_parent().tile_pos
+
+		# Manual bubble sort based on distance to `current_position`
+		for i in range(zombies.size()):
+			for j in range(0, zombies.size() - i - 1):
+				var dist_a = current_position.distance_to(zombies[j].tile_pos)
+				var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
+				if dist_a > dist_b:
+					# Swap the zombies
+					var temp = zombies[j]
+					zombies[j] = zombies[j + 1]
+					zombies[j + 1] = temp
+
+		# Collect the nearest zombies up to max_count.
+		for zombie in zombies:
+			zombies_in_range.append(zombie)
+			if zombies_in_range.size() >= max_count:
+				break
+
+		return zombies_in_range
 
 func _compare_distance(a, b) -> int:
 	var dist_a = _current_position.distance_to(a.tile_pos)
@@ -312,7 +342,7 @@ func is_zombie_present(tile_pos: Vector2i) -> bool:
 			return true
 	return false
 
-func fade_out(sprite: Node, duration: float = 0.2) -> void:
+func fade_out(sprite: Node, duration: float = fade_duration) -> void:
 	"""
 	Fades the sprite out over the specified duration.
 	:param sprite: The sprite to fade out.
@@ -334,12 +364,12 @@ func fade_out(sprite: Node, duration: float = 0.2) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 0
-	await tween.tween_property(sprite, "modulate:a", 0.2, duration)
+	await tween.tween_property(sprite, "modulate:a", fade_duration, duration)
 
 	# Wait for the tween to finish
 	await tween.finished
 
-func fade_in(sprite: Node, duration: float = 0.2) -> void:
+func fade_in(sprite: Node, duration: float = fade_duration) -> void:
 	"""
 	Fades the sprite in over the specified duration.
 	:param sprite: The sprite to fade in.
@@ -366,7 +396,7 @@ func fade_in(sprite: Node, duration: float = 0.2) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 1
-	await tween.tween_property(sprite, "modulate:a", 0.2, duration)
+	await tween.tween_property(sprite, "modulate:a", fade_duration, duration)
 
 	# Wait for the tween to finish
 	await tween.finished
@@ -390,13 +420,11 @@ func is_mouse_over_gui() -> bool:
 
 # Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
 func find_closest_target() -> Node:
-	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	var target = null
 	var min_distance = INF
 	var parent_pos = get_parent().position  # Assume parent's position is used for measuring distance
 	for candidate in candidates:
-		if candidate.is_in_group("unitAI"):
-			continue
 		var d = parent_pos.distance_to(candidate.position)
 		if d < min_distance:
 			min_distance = d
@@ -405,7 +433,7 @@ func find_closest_target() -> Node:
 
 func execute_chuck_genius_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = randi() % 2
+	var choice = 0 #randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()

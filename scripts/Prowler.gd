@@ -4,7 +4,7 @@ extends Node2D
 var max_targets = 8 # Maximum number of zombies to attack
 var attack_damage = 50 # Damage dealt per attack
 var dash_distance = 2 # Distance to dash in tiles
-var fade_duration = 0.5 # Duration for fade out and in
+var fade_duration = 0.2 # Duration for fade out and in
 var cooldown = 3.0 # Cooldown for the ability
 
 var targeted_zombies = [] # List of zombies to attack
@@ -291,7 +291,7 @@ func dash_forward(target):
 		print("Cannot dash: Target tile is not movable.")
 		return
 
-func fade_out(sprite: Node, duration: float = 0.2) -> void:
+func fade_out(sprite: Node, duration: float = fade_duration) -> void:
 	"""
 	Fades the sprite out over the specified duration.
 	:param sprite: The sprite to fade out.
@@ -313,12 +313,12 @@ func fade_out(sprite: Node, duration: float = 0.2) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 0
-	tween.tween_property(sprite, "modulate:a", 0.2, duration)
+	tween.tween_property(sprite, "modulate:a", fade_duration, duration)
 
 	# Wait for the tween to finish
 	await tween.finished
 
-func fade_in(sprite: Node, duration: float = 0.2) -> void:
+func fade_in(sprite: Node, duration: float = fade_duration) -> void:
 	"""
 	Fades the sprite in over the specified duration.
 	:param sprite: The sprite to fade in.
@@ -344,7 +344,7 @@ func fade_in(sprite: Node, duration: float = 0.2) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 1
-	tween.tween_property(sprite, "modulate:a", 0.2, duration)
+	tween.tween_property(sprite, "modulate:a", fade_duration, duration)
 
 	# Wait for the tween to finish
 	await tween.finished
@@ -417,7 +417,7 @@ func get_zombie_at_tile(tile_pos: Vector2i):
 	
 func execute_aleks_ducat_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = randi() % 2
+	var choice = 1 #randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()

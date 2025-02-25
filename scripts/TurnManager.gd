@@ -125,8 +125,9 @@ func start_player_ai_turn() -> void:
 					await chosen_ai.execute_yoshida_ai_turn()
 				if chosen_ai.player_name == "Logan. Raines":
 					await chosen_ai.get_child(7).execute_logan_raines_ai_turn()
-										
-			#await chosen_ai.start_ai_turn()
+				if chosen_ai.player_name == "Chuck. Genius":
+					await chosen_ai.get_child(8).execute_chuck_genius_ai_turn()
+					await chosen_ai.get_child(8).turn_completed						
 
 		trigger_zombies = true
 
@@ -166,9 +167,11 @@ func end_current_turn_from_button():
 			if chosen_ai.player_name == "Yoshida. Boi":
 				await chosen_ai.execute_yoshida_ai_turn()
 			if chosen_ai.player_name == "Logan. Raines":
-				await chosen_ai.execute_logan_raines_ai_turn()				
-
-			
+				await chosen_ai.get_child(7).execute_logan_raines_ai_turn()				
+			if chosen_ai.player_name == "Chuck. Genius":
+				await chosen_ai.get_child(8).execute_chuck_genius_ai_turn()
+				await chosen_ai.get_child(8).turn_completed
+				
 		#await chosen_ai.start_ai_turn()	
 
 	trigger_zombies = true

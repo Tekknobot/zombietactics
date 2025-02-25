@@ -322,7 +322,7 @@ func animate_grenade_trajectory(grenade_inst: Node2D, points: Array) -> void:
 		var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
 			
-		camera.focus_on_trajectory(points[i])
+		await camera.focus_on_trajectory(points[i])
 					
 		while elapsed_time < step_time:
 			# Calculate the time ratio
@@ -339,7 +339,7 @@ func animate_grenade_trajectory(grenade_inst: Node2D, points: Array) -> void:
 	# Ensure grenade reaches the final point exactly
 	grenade_inst.global_position = points[points.size() - 1]
 	
-	_trigger_explosion(points[points.size() - 1])
+	await _trigger_explosion(points[points.size() - 1])
 	var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 					
 	# Access the 'special' button within HUDManager

@@ -211,6 +211,7 @@ func spawn_ai_units():
 				unit_instance.modulate = Color8(255, 110, 255)
 				# Add the unit to the "unitAI" group
 				unit_instance.add_to_group("unitAI")
+				unit_instance.is_mek = true
 				ai_positions.append(spawn_position)
 		else:
 			print("Error: No valid position found even after fallback for AI unit:", unit_type)

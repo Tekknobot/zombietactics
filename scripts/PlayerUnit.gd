@@ -123,6 +123,8 @@ var reset_animation: bool = false
 var path_done: bool = false
 var dead: bool = false
 
+signal turn_completed
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if tilemap == null:
@@ -132,6 +134,8 @@ func _ready() -> void:
 	update_tile_position()
 	setup_astar()
 	visualize_walkable_tiles()
+
+	get_parent().connect("turn_completed", Callable(self, "_on_turn_completed"))	
 	
 # Called every frame
 func _process(delta: float) -> void:		
@@ -1209,8 +1213,6 @@ func execute_ai_turn() -> void:
 		clear_unit_ai_executing_flag()
 		self.has_attacked = true
 		self.has_moved = true
-		if self.player_name == "Aleks. Ducat" or self.player_name == "Chuck. Genius":
-			self.get_child(8)._on_turn_completed()
 		return  # End turn; no further movement or attack.
 
 	# ---------------------------
@@ -1307,13 +1309,13 @@ func execute_ai_turn() -> void:
 		await get_tree().create_timer(1).timeout
 		clear_unit_ai_executing_flag()
 		self.has_attacked = true
-		self.has_moved = true
-		
-		if self.player_name == "Aleks. Ducat" or self.player_name == "Chuck. Genius":
-			self.get_child(8)._on_turn_completed()	
+		self.has_moved = true	
 		return  # End turn; no further movement or attack.
 	else:
 		print("No attackable enemy in aligned range after moving.")
+		
+	# Get all AI-controlled units (unitAI group)
+	var all_ai_units = get_tree().get_nodes_in_group("unitAI")	
 		
 	await get_tree().create_timer(1).timeout
 	clear_unit_ai_executing_flag()
@@ -1376,3 +1378,8 @@ func execute_yoshida_ai_turn() -> void:
 			# Mark the turn as completed.
 			self.has_attacked = true
 			self.has_moved = true 		
+
+func _on_turn_completed():
+	print("Turn has completed!")
+	emit_signal("turn_completed")
+	

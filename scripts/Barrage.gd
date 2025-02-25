@@ -187,6 +187,7 @@ func activate_ability(mouse_on_tile: Vector2):
 
 	# Mark the barrage as completed
 	barrage_completed = true
+
 	print("Barrage completed.")
 	
 func start_firing(mouse_on_tile: Vector2):
@@ -304,3 +305,97 @@ func is_mouse_over_gui() -> bool:
 				return true
 	#print("Mouse is NOT over any button.")
 	return false
+
+func execute_angel_charlie_ai_turn() -> void:
+	# Randomly decide which branch to execute:
+	# 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Angel Charlie.")
+		await get_parent().execute_ai_turn()
+	else:
+		# Only perform the special attack if this unit hasn't attacked yet.
+		if not get_parent().has_attacked:
+			print("Random choice: Executing Angel Charlie special missile attack.")
+			
+			# Focus the camera on the current position.
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
+			
+			# Show special attack range (for visual feedback).
+			get_parent().display_special_attack_tiles()
+			
+			# Get the set of valid attack range tiles from the parent.
+			var attack_tiles: Array[Vector2i] = get_parent().get_special_tiles()
+			
+			# Find the closest valid target whose tile position is in the special attack range.
+			var target = find_closest_target_in_range(attack_tiles)
+			if target:
+				# Execute the special missile ability using the target's position.
+				await activate_ability(target.position)
+			else:
+				print("No valid target found for Angel Charlie special attack.")
+			
+			# Mark the turn as complete.
+			get_parent().has_attacked = true
+			get_parent().has_moved = true
+			
+			get_parent().clear_special_tiles()
+
+
+func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
+	# Find Dutch. Major among the player_units that are AI-controlled.
+	var ai_player = null
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if player.is_in_group("unitAI") and player.player_name == "Angel. Charlie":
+			ai_player = player
+			# Optionally display the special attack tiles for feedback.
+			ai_player.display_special_attack_tiles()
+			break
+			
+	if ai_player == null:
+		print("Angel. Charlie not found.")
+		return null
+
+	# Optionally, use the valid_range parameter. Here we'll override it with the attack range
+	# defined by Dutch. Major's method.
+	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
+
+	# Gather enemies from both groups.
+	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	
+	# Filter out any nodes that are AI-controlled.
+	var valid_enemies = []
+	for enemy in enemies:
+		if not enemy.is_in_group("unitAI"):
+			valid_enemies.append(enemy)
+	
+	# From valid enemies, pick only those whose tile positions are in the attack range.
+	var candidates = []
+	for enemy in valid_enemies:
+		# Assume each enemy has a 'tile_pos' property.
+		if enemy.tile_pos in attack_tiles:
+			candidates.append(enemy)
+	
+	if candidates.size() == 0:
+		print("No enemy within special attack range.")
+		return null
+	
+	# Find the candidate with the minimum Manhattan distance.
+	var target_enemy = null
+	var min_distance = INF
+	for enemy in candidates:
+		var dx = abs(ai_player.tile_pos.x - enemy.tile_pos.x)
+		var dy = abs(ai_player.tile_pos.y - enemy.tile_pos.y)
+		var d = dx + dy  # Manhattan distance calculation.
+		if d < min_distance:
+			min_distance = d
+			target_enemy = enemy
+
+	if target_enemy == null:
+		print("No target enemy found within special attack tiles.")
+		return null
+
+	return target_enemy

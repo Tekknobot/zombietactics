@@ -39,10 +39,15 @@ var xp_added: bool = false
 
 var is_mouse_over_gui_flag = false
 
+signal turn_completed
+var candidate_size
+	
 # Ensure input is processed by this node and its parent
 func _ready() -> void:
 	Map = get_node("/root/MapManager/TileMap")
 	#debug_ui_rectangles()
+	
+	get_parent().connect("turn_completed", Callable(self, "_on_turn_completed"))
 
 # Called every frame to process input and update hover tile position
 func _process(delta: float) -> void:
@@ -167,6 +172,8 @@ func find_closest_zombies_for_ai(target_position: Vector2) -> void:
 		if not enemy.is_in_group("unitAI"):
 			candidates.append(enemy)
 	
+	candidate_size = candidates.size()
+	
 	# If no candidate is found, do nothing.
 	if candidates.size() == 0:
 		print("No enemy available for grenade special attack.")
@@ -188,7 +195,7 @@ func find_closest_zombies_for_ai(target_position: Vector2) -> void:
 		await get_tree().create_timer(0.1).timeout
 		start_trajectory(enemy.global_position, get_parent().position)
 
-	get_parent().clear_special_tiles()	
+	get_parent().clear_special_tiles()
 		
 func _compare_distance_to_target(zombie_a: Node2D, zombie_b: Node2D, target_position: Vector2) -> bool:
 	return zombie_a.position.distance_to(target_position) < zombie_b.position.distance_to(target_position)
@@ -524,3 +531,8 @@ func execute_logan_raines_ai_turn() -> void:
 			# Mark the turn as complete.
 			get_parent().has_attacked = true
 			get_parent().has_moved = true
+
+func _on_turn_completed():
+	print("Turn has completed!")
+	emit_signal("turn_completed")
+	

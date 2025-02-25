@@ -134,7 +134,7 @@ func _on_missile_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Yoshida. Boi":
+			if player.player_name == "Yoshida. Boi" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()		
 	else:
 		GlobalManager.missile_toggle_active = false  # Set the flag to false
@@ -232,7 +232,7 @@ func _on_shadows_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Chuck. Genius":
+			if player.player_name == "Chuck. Genius" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()
 	else:
 		GlobalManager.shadows_toggle_active = false  # Set the flag to false
@@ -249,7 +249,7 @@ func _on_thread_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Sarah. Reese":
+			if player.player_name == "Sarah. Reese" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()
 	else:
 		GlobalManager.thread_toggle_active = false  # Set the flag to false
@@ -278,7 +278,7 @@ func _on_prowler_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Aleks. Ducat":
+			if player.player_name == "Aleks. Ducat" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()
 	else:
 		GlobalManager.prowler_toggle_active = false  # Set the flag to false
@@ -331,7 +331,7 @@ func _on_hellfire_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "John. Doom":
+			if player.player_name == "John. Doom" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()
 	else:
 		GlobalManager.hellfire_toggle_active = false  # Set the flag to false
@@ -348,7 +348,7 @@ func _on_barrage_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Angel. Charlie":
+			if player.player_name == "Angel. Charlie" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()	
 	else:
 		GlobalManager.barrage_toggle_active = false  # Set the flag to false
@@ -365,7 +365,7 @@ func _on_octoblast_toggled(button_pressed: bool) -> void:
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:
 			player.clear_attack_range_tiles()	
-			if player.player_name == "Annie. Switch":
+			if player.player_name == "Annie. Switch" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()	
 	else:
 		GlobalManager.octoblast_toggle_active = false  # Set the flag to false

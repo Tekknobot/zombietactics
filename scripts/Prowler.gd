@@ -84,8 +84,11 @@ func _input(event):
 				if target_zombie:
 					var hud_manager = get_parent().get_parent().get_parent().get_node("HUDManager")  # Adjust the path if necessary
 					hud_manager.hide_special_buttons()	
-					get_parent().clear_special_tiles()							
-					activate_prowler(target_zombie)
+					get_parent().clear_special_tiles()
+					if get_parent().is_in_group("unitAI"):
+						pass
+					else:						
+						activate_prowler(target_zombie)
 
 func activate_prowler(target_zombie):
 	# Reset variables for this ability use
@@ -93,9 +96,14 @@ func activate_prowler(target_zombie):
 	attack_index = 0
 	is_prowler_active = true
 
-	# Find nearby zombies (excluding the clicked zombie)
-	var nearby_zombies = find_nearest_zombies(max_targets - 1)
-	targeted_zombies.append_array(nearby_zombies)
+	if get_parent().is_in_group("unitAI"):
+		# Find nearby zombies (excluding the clicked zombie)
+		var nearby_zombies = find_nearest_zombies(max_targets - 1)
+		targeted_zombies.append_array(nearby_zombies)
+	else:
+		# Find nearby zombies (excluding the clicked zombie)
+		var nearby_zombies = find_nearest_zombies_ai(max_targets - 1)
+		targeted_zombies.append_array(nearby_zombies)			
 
 	if targeted_zombies.is_empty():
 		print("No zombies found for Prowler Step.")
@@ -114,6 +122,30 @@ func find_nearest_zombies(max_count: int) -> Array:
 	for unit in player_units:
 		if not unit.is_in_group("unitAI"):
 			zombies.append(unit)
+	var current_position = get_parent().tile_pos
+
+	# Manual bubble sort based on distance to `current_position`
+	for i in range(zombies.size()):
+		for j in range(0, zombies.size() - i - 1):
+			var dist_a = current_position.distance_to(zombies[j].tile_pos)
+			var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
+			if dist_a > dist_b:
+				# Swap the zombies
+				var temp = zombies[j]
+				zombies[j] = zombies[j + 1]
+				zombies[j + 1] = temp
+
+	# Collect the nearest zombies up to max_count
+	for zombie in zombies:
+		zombies_in_range.append(zombie)
+		if zombies_in_range.size() >= max_count:
+			break
+
+	return zombies_in_range
+
+func find_nearest_zombies_ai(max_count: int) -> Array:
+	var zombies_in_range = []
+	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
 	var current_position = get_parent().tile_pos
 
 	# Manual bubble sort based on distance to `current_position`
@@ -259,7 +291,7 @@ func dash_forward(target):
 		print("Cannot dash: Target tile is not movable.")
 		return
 
-func fade_out(sprite: Node, duration: float = 1.5) -> void:
+func fade_out(sprite: Node, duration: float = 0.2) -> void:
 	"""
 	Fades the sprite out over the specified duration.
 	:param sprite: The sprite to fade out.
@@ -286,7 +318,7 @@ func fade_out(sprite: Node, duration: float = 1.5) -> void:
 	# Wait for the tween to finish
 	await tween.finished
 
-func fade_in(sprite: Node, duration: float = 1.5) -> void:
+func fade_in(sprite: Node, duration: float = 0.2) -> void:
 	"""
 	Fades the sprite in over the specified duration.
 	:param sprite: The sprite to fade in.
@@ -312,7 +344,7 @@ func fade_in(sprite: Node, duration: float = 1.5) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 1
-	tween.tween_property(sprite, "modulate:a", 1.0, duration)
+	tween.tween_property(sprite, "modulate:a", 0.2, duration)
 
 	# Wait for the tween to finish
 	await tween.finished

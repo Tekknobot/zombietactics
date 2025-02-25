@@ -312,7 +312,7 @@ func is_zombie_present(tile_pos: Vector2i) -> bool:
 			return true
 	return false
 
-func fade_out(sprite: Node, duration: float = 1) -> void:
+func fade_out(sprite: Node, duration: float = 0.2) -> void:
 	"""
 	Fades the sprite out over the specified duration.
 	:param sprite: The sprite to fade out.
@@ -339,7 +339,7 @@ func fade_out(sprite: Node, duration: float = 1) -> void:
 	# Wait for the tween to finish
 	await tween.finished
 
-func fade_in(sprite: Node, duration: float = 1) -> void:
+func fade_in(sprite: Node, duration: float = 0.2) -> void:
 	"""
 	Fades the sprite in over the specified duration.
 	:param sprite: The sprite to fade in.
@@ -366,7 +366,7 @@ func fade_in(sprite: Node, duration: float = 1) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 1
-	await tween.tween_property(sprite, "modulate:a", 1.0, duration)
+	await tween.tween_property(sprite, "modulate:a", 0.2, duration)
 
 	# Wait for the tween to finish
 	await tween.finished

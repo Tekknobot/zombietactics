@@ -96,9 +96,11 @@ func start_player_ai_turn() -> void:
 	
 	# Get all AI-controlled units (unitAI group)
 	var all_ai_units = get_tree().get_nodes_in_group("unitAI")
-	
+	var shuffled_units = all_ai_units.duplicate()
+	shuffled_units.shuffle()
+		
 	# Loop through each AI unit and call its AI turn based on its player_name.
-	for ai in all_ai_units:
+	for ai in shuffled_units:
 		match ai.player_name:
 			"Dutch. Major":
 				await ai.execute_dutch_major_ai_turn()
@@ -108,16 +110,17 @@ func start_player_ai_turn() -> void:
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
+				await get_tree().create_timer(3.5).timeout
 			"Aleks. Ducat":
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
+				await get_tree().create_timer(3.5).timeout
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
-				await ai.get_child(7).execute_john_doom_ai_turn()					
-			"Sarah. Reese":
-				await ai.get_child(7).execute_sarah_reese_ai_turn()	
+				await ai.get_child(7).execute_john_doom_ai_turn()		
 			"Annie. Switch":
 				await ai.get_child(7).execute_annie_switch_ai_turn()
+				await get_tree().create_timer(4).timeout
 													
 	trigger_zombies = true
 	
@@ -128,9 +131,11 @@ func start_player_ai_turn() -> void:
 func end_current_turn_from_button():
 	# Get all AI-controlled units (unitAI group)
 	var all_ai_units = get_tree().get_nodes_in_group("unitAI")
-	
+	var shuffled_units = all_ai_units.duplicate()
+	shuffled_units.shuffle()
+		
 	# Loop through each AI unit and call its AI turn based on its player_name.
-	for ai in all_ai_units:
+	for ai in shuffled_units:
 		match ai.player_name:
 			"Dutch. Major":
 				await ai.execute_dutch_major_ai_turn()
@@ -140,14 +145,17 @@ func end_current_turn_from_button():
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
+				await get_tree().create_timer(3.5).timeout
 			"Aleks. Ducat":
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
+				await get_tree().create_timer(3.5).timeout
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
 				await ai.get_child(7).execute_john_doom_ai_turn()		
 			"Annie. Switch":
 				await ai.get_child(7).execute_annie_switch_ai_turn()
+				await get_tree().create_timer(4).timeout
 											
 	trigger_zombies = true
 	

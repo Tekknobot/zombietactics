@@ -18,6 +18,12 @@ var attacked_zombies = []  # List to track already attacked zombies
 var WATER_TILE_ID = 0
 @onready var map_manager = get_parent().get_node("/root/MapManager")
 
+signal turn_completed
+var shadow_step_complete
+
+func _ready() -> void:
+	get_parent().connect("turn_completed", Callable(self, "_on_turn_completed"))
+	
 func _process(delta: float) -> void:
 	if map_manager.map_1:
 		WATER_TILE_ID = 0
@@ -92,8 +98,9 @@ func activate_prowler(target_zombie):
 	targeted_zombies.append_array(nearby_zombies)
 
 	if targeted_zombies.is_empty():
-		print("No zombies found for Shadow Step.")
-		is_prowler_active = false	
+		print("No zombies found for Prowler Step.")
+		is_prowler_active = false
+		_on_turn_completed()	
 		return
 
 	await get_tree().create_timer(0.1).timeout
@@ -102,7 +109,11 @@ func activate_prowler(target_zombie):
 
 func find_nearest_zombies(max_count: int) -> Array:
 	var zombies_in_range = []
-	var zombies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
+	var zombies = get_tree().get_nodes_in_group("zombies")
+	var player_units = get_tree().get_nodes_in_group("player_units")
+	for unit in player_units:
+		if not unit.is_in_group("unitAI"):
+			zombies.append(unit)
 	var current_position = get_parent().tile_pos
 
 	# Manual bubble sort based on distance to `current_position`
@@ -235,13 +246,6 @@ func dash_forward(target):
 	
 	# Calculate the intended dash position 3 tiles ahead in the direction of the target
 	var dash_target_tile = player_tile + direction * dash_distance
-
-	if target.is_in_group("unitAI"):
-		pass
-	else:
-		# Play SFX
-		target.audio_player.stream = target.zombie_audio
-		target.audio_player.play()
 			
 	target.apply_damage(get_parent().attack_damage)
 	target.flash_damage()
@@ -378,3 +382,59 @@ func get_zombie_at_tile(tile_pos: Vector2i):
 		if zombie.tile_pos == tile_pos:
 			return zombie
 	return null
+	
+func execute_aleks_ducat_ai_turn() -> void:
+	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
+	var choice = randi() % 2
+	if choice == 0:
+		print("Random choice: Executing standard AI turn for Logan Raines.")
+		await get_parent().execute_ai_turn()
+	else:
+		# If standard AI hasn't resulted in an attack…
+		if not get_parent().has_attacked:
+			print("Random choice: Executing Logan Raines special missile attack.")
+			# Get the missile manager by its node path.
+			var missile_manager = get_node("/root/MapManager/MissileManager")
+			
+			# Focus the camera on the current position.
+			var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+			var camera: Camera2D = get_node("/root/MapManager/Camera2D")
+			if camera:
+				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
+			
+			# Find the closest target (zombie or player unit not in unitAI)
+			var target = find_closest_target()
+			if target:
+				# Execute the special missile attack via the missile manager.
+				await activate_prowler(target)
+			else:
+				print("No valid target found for Logan Raines special attack.")
+			
+			# Mark the turn as complete.
+			get_parent().has_attacked = true
+			get_parent().has_moved = true
+
+func find_closest_target() -> Node:
+	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
+	var target = null
+	var min_distance = INF
+	var parent_pos = get_parent().position  # Using parent's position as reference
+	for candidate in candidates:
+		# Skip self
+		if candidate == get_parent():
+			continue
+		# Skip units in the "unitAI" group
+		if candidate.is_in_group("unitAI"):
+			continue
+		var d = parent_pos.distance_to(candidate.position)
+		if d < min_distance:
+			min_distance = d
+			target = candidate
+	return target
+
+
+func _on_turn_completed():
+	print("Turn has completed!")
+	shadow_step_complete = true
+	emit_signal("turn_completed")
+	

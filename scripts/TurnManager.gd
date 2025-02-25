@@ -88,95 +88,60 @@ func end_current_turn() -> void:
 		await zombie_spawn_manager.spawn_zombies()
 		on_player_action_completed()
 		
-func start_player_ai_turn() -> void:		
-		GlobalManager.zombies_processed = 0
-		GlobalManager.zombie_queue.clear()
-		await get_tree().create_timer(0.1).timeout        
-		GlobalManager.reset_global_manager()
-		
-		# Among AI-controlled player units, build a list of candidates sorted by proximity.
-		var all_ai_player_units = get_tree().get_nodes_in_group("unitAI")
-		var candidates = []
-		for ai in all_ai_player_units:
-			var min_dist = INF
-			# Check distance to all non-AI player units.
-			for unit in get_tree().get_nodes_in_group("player_units"):
-				if unit != ai:
-					var d = abs(ai.tile_pos.x - unit.tile_pos.x) + abs(ai.tile_pos.y - unit.tile_pos.y)
-					if d < min_dist:
-						min_dist = d
-			# Check distance to zombies.
-			for zombie in get_tree().get_nodes_in_group("zombies"):
-				var d = abs(ai.tile_pos.x - zombie.tile_pos.x) + abs(ai.tile_pos.y - zombie.tile_pos.y)
-				if d < min_dist:
-					min_dist = d
-			candidates.append({ "ai": ai, "dist": min_dist })
-		
-		# Sort the candidates by distance (smallest first)
-		candidates.sort_custom(Callable(self, "_compare_candidates"))
-		
-		# Iterate through each candidate and trigger its AI turn sequentially.
-		for candidate in candidates:
-			var chosen_ai = candidate["ai"]
-			if chosen_ai.is_in_group("unitAI"):
-				if chosen_ai.player_name == "Dutch. Major":
-					await chosen_ai.execute_dutch_major_ai_turn()
-				if chosen_ai.player_name == "Yoshida. Boi":
-					await chosen_ai.execute_yoshida_ai_turn()
-				if chosen_ai.player_name == "Logan. Raines":
-					await chosen_ai.get_child(7).execute_logan_raines_ai_turn()
-				if chosen_ai.player_name == "Chuck. Genius":
-					await chosen_ai.get_child(8).execute_chuck_genius_ai_turn()
-					await chosen_ai.get_child(8).turn_completed						
-
-		trigger_zombies = true
-
-		# Reset the player units for a new turn.
-		reset_player_units()
-		check_if_end_map()
-
+func start_player_ai_turn() -> void:
+	GlobalManager.zombies_processed = 0
+	GlobalManager.zombie_queue.clear()
+	await get_tree().create_timer(0.1).timeout        
+	GlobalManager.reset_global_manager()
+	
+	# Get all AI-controlled units (unitAI group)
+	var all_ai_units = get_tree().get_nodes_in_group("unitAI")
+	
+	# Loop through each AI unit and call its AI turn based on its player_name.
+	for ai in all_ai_units:
+		match ai.player_name:
+			"Dutch. Major":
+				await ai.execute_dutch_major_ai_turn()
+			"Yoshida. Boi":
+				await ai.execute_yoshida_ai_turn()
+			"Logan. Raines":
+				await ai.get_child(7).execute_logan_raines_ai_turn()
+			"Chuck. Genius":
+				await ai.get_child(8).execute_chuck_genius_ai_turn()
+				await ai.get_child(8).turn_completed  # This awaits the turn completion signal.
+			"Aleks. Ducat":
+				await ai.get_child(8).execute_aleks_ducat_ai_turn()
+				await ai.get_child(8).turn_completed  # Likewise for Aleks.
+	
+	trigger_zombies = true
+	
+	# Reset the player units for a new turn and check the map state.
+	reset_player_units()
+	check_if_end_map()
 
 func end_current_turn_from_button():
-	# Among AI-controlled player units, build a list of candidates sorted by proximity.
-	var all_ai_player_units = get_tree().get_nodes_in_group("unitAI")
-	var candidates = []
-	for ai in all_ai_player_units:
-		var min_dist = INF
-		# Check distance to all non-AI player units.
-		for unit in get_tree().get_nodes_in_group("player_units"):
-			if unit != ai:
-				var d = abs(ai.tile_pos.x - unit.tile_pos.x) + abs(ai.tile_pos.y - unit.tile_pos.y)
-				if d < min_dist:
-					min_dist = d
-		# Check distance to zombies.
-		for zombie in get_tree().get_nodes_in_group("zombies"):
-			var d = abs(ai.tile_pos.x - zombie.tile_pos.x) + abs(ai.tile_pos.y - zombie.tile_pos.y)
-			if d < min_dist:
-				min_dist = d
-		candidates.append({ "ai": ai, "dist": min_dist })
+	# Get all AI-controlled units (unitAI group)
+	var all_ai_units = get_tree().get_nodes_in_group("unitAI")
 	
-	# Sort the candidates by distance (smallest first)
-	candidates.sort_custom(Callable(self, "_compare_candidates"))
+	# Loop through each AI unit and call its AI turn based on its player_name.
+	for ai in all_ai_units:
+		match ai.player_name:
+			"Dutch. Major":
+				await ai.execute_dutch_major_ai_turn()
+			"Yoshida. Boi":
+				await ai.execute_yoshida_ai_turn()
+			"Logan. Raines":
+				await ai.get_child(7).execute_logan_raines_ai_turn()
+			"Chuck. Genius":
+				await ai.get_child(8).execute_chuck_genius_ai_turn()
+				await ai.get_child(8).turn_completed  # This awaits the turn completion signal.
+			"Aleks. Ducat":
+				await ai.get_child(8).execute_aleks_ducat_ai_turn()
+				await ai.get_child(8).turn_completed  # Likewise for Aleks.
 	
-	# Iterate through each candidate and trigger its AI turn sequentially.
-	for candidate in candidates:
-		var chosen_ai = candidate["ai"]
-		if chosen_ai.is_in_group("unitAI"):
-			if chosen_ai.player_name == "Dutch. Major":
-				await chosen_ai.execute_dutch_major_ai_turn()
-			if chosen_ai.player_name == "Yoshida. Boi":
-				await chosen_ai.execute_yoshida_ai_turn()
-			if chosen_ai.player_name == "Logan. Raines":
-				await chosen_ai.get_child(7).execute_logan_raines_ai_turn()				
-			if chosen_ai.player_name == "Chuck. Genius":
-				await chosen_ai.get_child(8).execute_chuck_genius_ai_turn()
-				await chosen_ai.get_child(8).turn_completed
-				
-		#await chosen_ai.start_ai_turn()	
-
 	trigger_zombies = true
-
-	# Reset the player units for a new turn.
+	
+	# Reset the player units for a new turn and check the map state.
 	reset_player_units()
 	check_if_end_map()
 		

@@ -1209,6 +1209,8 @@ func execute_ai_turn() -> void:
 		clear_unit_ai_executing_flag()
 		self.has_attacked = true
 		self.has_moved = true
+		if self.player_name == "Aleks. Ducat" or self.player_name == "Chuck. Genius":
+			self.get_child(8)._on_turn_completed()
 		return  # End turn; no further movement or attack.
 
 	# ---------------------------
@@ -1306,6 +1308,9 @@ func execute_ai_turn() -> void:
 		clear_unit_ai_executing_flag()
 		self.has_attacked = true
 		self.has_moved = true
+		
+		if self.player_name == "Aleks. Ducat" or self.player_name == "Chuck. Genius":
+			self.get_child(8)._on_turn_completed()	
 		return  # End turn; no further movement or attack.
 	else:
 		print("No attackable enemy in aligned range after moving.")

@@ -285,16 +285,6 @@ func _trigger_explosion(last_point: Vector2):
 					
 			xp_awarded = true  # Mark XP as earned for this explosion
 
-	# Check for unitAI within explosion radius
-	for player in get_tree().get_nodes_in_group("unitAI"):
-		if player.position.distance_to(last_point) <= explosion_radius:	
-			player.flash_damage()
-			if player.is_in_group("player_units") and not player.is_in_group("unitAI"):
-				pass
-			else:			
-				player.apply_damage(player.attack_damage)
-					
-			xp_awarded = true  # Mark XP as earned for this explosion
 			
 	# Check for Structures within explosion radius
 	for structure in get_tree().get_nodes_in_group("structures"):

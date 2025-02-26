@@ -211,7 +211,10 @@ func spawn_explosion(position):
 		explosion_instance.global_position = get_parent().to_local(position)
 		get_parent().add_child(explosion_instance)
 		# Damage any units in the area
-		damage_units_in_area(position)
+		if get_parent().is_in_group("unitAI"):
+			damage_units_in_area(position)
+		else:
+			damage_units_in_area_ai(position)
 		
 		# Camera focuses on the active zombie
 		var camera: Camera2D = get_node("/root/MapManager/Camera2D")
@@ -220,7 +223,20 @@ func spawn_explosion(position):
 # Deal damage to units within the area of effect
 func damage_units_in_area(center_position):
 	# Find units in the area (adapt to your collision system)
-	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("structures") + get_tree().get_nodes_in_group("unitAI")
+	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("structures") + get_tree().get_nodes_in_group("unitAI") + get_tree().get_nodes_in_group("player_units")
+	for unit in units:
+		if unit.global_position.distance_to(center_position) <= explosion_radius:
+			if unit.has_method("apply_damage"):
+				unit.flash_damage()
+				unit.apply_damage(get_parent().attack_damage)
+			elif unit.structure_type == "Building" or unit.structure_type == "Tower" or unit.structure_type == "District" or unit.structure_type == "Stadium":
+				unit.is_demolished = true
+				unit.get_child(0).play("demolished")
+
+# Deal damage to units within the area of effect
+func damage_units_in_area_ai(center_position):
+	# Find units in the area (adapt to your collision system)
+	var units = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("structures") + get_tree().get_nodes_in_group("player_units")
 	for unit in units:
 		if unit.global_position.distance_to(center_position) <= explosion_radius:
 			if unit.has_method("apply_damage"):
@@ -230,6 +246,7 @@ func damage_units_in_area(center_position):
 				unit.is_demolished = true
 				unit.get_child(0).play("demolished")
 				
+								
 # Optional: Call this method to activate Hellfire from external scripts
 func activate_ability(target: Vector2):
 	trigger_hellfire(target)

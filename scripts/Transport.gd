@@ -27,11 +27,26 @@ var hover_tiles = []  # Store references to instantiated hover tiles
 var last_hovered_tile = null  # Track the last hovered tile to avoid redundant updates
 
 var check_level_up = false
+# Constants
+var WATER_TILE_ID = 0  # Replace with the actual tile ID for water
+
 	
 func _ready() -> void:
 	pathfinder = get_node_or_null("/root/MapManager/Pathfinder") # Ensure you have a pathfinder node in your scene
 
 func _process(delta: float) -> void:
+	if map_manager.map_1:
+		WATER_TILE_ID = 0
+	elif map_manager.map_2:
+		WATER_TILE_ID = 9
+	elif map_manager.map_3:
+		WATER_TILE_ID = 15
+	elif map_manager.map_4:
+		WATER_TILE_ID = 21
+	else:
+		print("Error: No map selected, defaulting WATER to 0.")
+		WATER_TILE_ID = 0  # Fallback value if no map is selected
+		
 	if GlobalManager.transport_toggle_active:		
 		update_hover_tiles()
 	else:
@@ -71,6 +86,9 @@ func _input(event):
 			unit_on_board = false
 			boarded_unit = null			
 			clear_hover_tiles()	
+
+			if tilemap.get_cell_source_id(0, get_parent().tile_pos) == WATER_TILE_ID:
+				return			
 			calcualte_transport_path(mouse_local)	
 
 # Transport ability
@@ -93,7 +111,7 @@ func calcualte_transport_path(target_tile: Vector2i) -> void:
 	if assigned == false:
 		original_pos = get_parent().tile_pos
 		assigned = true
-
+			
 	# Dash to the target position along the path
 	move_to_transport(get_process_delta_time())
 	get_parent().get_child(0).play("move")

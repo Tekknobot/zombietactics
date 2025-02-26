@@ -140,6 +140,8 @@ func reset_level():
 	print("Resetting level...")
 
 func generate_map():
+	GlobalManager.reset_global_manager()
+	
 	clear_existing_structures()  # Clear previous structures
 	structure_coordinates.clear()  # Clear the structure coordinates array
 	water_coordinates.clear()  # Clear the water coordinates array

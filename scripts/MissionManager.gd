@@ -12,7 +12,7 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func check_mission_manager():
-	if GlobalManager.players_killed: # or GlobalManager.secret_item_destroyed:
+	if GlobalManager.players_killed or GlobalManager.secret_item_destroyed:
 		GlobalManager.gameover = true
 		audio_player.stream = gameover_audio
 		audio_player.play()

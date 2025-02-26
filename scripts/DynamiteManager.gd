@@ -434,6 +434,9 @@ func execute_special_attack() -> void:
 			ai_player.display_special_attack_tiles()
 			break
 	
+	if ai_player == null:
+		return
+		
 	# Get the set of attack range tiles defined by the PlayerUnit’s method.
 	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
 	

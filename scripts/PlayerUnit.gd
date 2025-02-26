@@ -783,9 +783,13 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		return		
 
 	if GlobalManager.hellfire_toggle_active:
-		print("Shadows toggle is off, ignoring landmine attack.")
+		print("Hellfire toggle is off, ignoring landmine attack.")
 		return	
 
+	if GlobalManager.mek_toggle_active:
+		print("Mek toggle is off, ignoring landmine attack.")
+		return	
+		
 	# Check if projectile_scene is set correctly
 	if projectile_scene == null:
 		print("Error: projectile_scene is not assigned!")
@@ -1198,6 +1202,10 @@ func execute_ai_turn() -> void:
 	# ---------------------------
 	# Pre-Move Attack Check
 	# ---------------------------
+	
+	if self.has_moved == true:
+		return
+		
 	var immediate_attack_target = null
 	var min_attack_distance: int = INF
 
@@ -1288,7 +1296,7 @@ func execute_ai_turn() -> void:
 		# Now that movement is done, remove the path highlights.
 		for highlight in path_highlights:
 			highlight.queue_free()
-			self.has_attacked = true
+			#self.has_attacked = true
 			self.has_moved = true
 
 	# ---------------------------

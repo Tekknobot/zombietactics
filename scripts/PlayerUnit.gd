@@ -1328,6 +1328,8 @@ func execute_ai_turn() -> void:
 		return  # End turn; no further movement or attack.
 	else:
 		print("No attackable enemy in aligned range after moving.")
+		if self.has_attacked == false:
+			turn_manager.end_current_turn_from_button()
 		
 	# Get all AI-controlled units (unitAI group)
 	var all_ai_units = get_tree().get_nodes_in_group("unitAI")	
@@ -1350,7 +1352,6 @@ func execute_dutch_major_ai_turn() -> void:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await execute_ai_turn()
 	else:
-	
 		# After standard AI execution, if no attack was performed…
 		if not self.has_attacked:
 			print("Standard AI did not attack. Executing Dutch. Major dynamite special attack.")

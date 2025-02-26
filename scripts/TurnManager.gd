@@ -115,9 +115,10 @@ func start_player_ai_turn() -> void:
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
-				await ai.get_child(7).execute_john_doom_ai_turn()		
+				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
 				await ai.get_child(7).execute_annie_switch_ai_turn()
+
 													
 	trigger_zombies = true
 	
@@ -147,9 +148,10 @@ func end_current_turn_from_button():
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
-				await ai.get_child(7).execute_john_doom_ai_turn()		
+				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
 				await ai.get_child(7).execute_annie_switch_ai_turn()
+
 											
 	trigger_zombies = true
 	

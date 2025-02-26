@@ -18,11 +18,13 @@ var WATER_TILE_ID = 0
 
 var attacked_zombies = []  # List to track already attacked zombies
 
-signal turn_completed
+var turn_completed
 var shadow_step_complete
 
 func _ready() -> void:
-	get_parent().connect("turn_completed", Callable(self, "_on_turn_completed"))
+	var err = self.connect("turn_completed", Callable(self, "_on_turn_completed"))
+	if err != OK:
+		push_error("Failed to connect to 'turn_completed' signal: Error code %d" % err)
 
 func _process(delta: float) -> void:
 	if map_manager.map_1:
@@ -103,7 +105,7 @@ func shadow_step(target_zombie):
 	if targeted_zombies.is_empty():
 		print("No zombies found for Shadow Step.")
 		is_shadow_step_active = false
-		_on_turn_completed()
+		turn_completed = true
 		return
 
 	await get_tree().create_timer(0.1).timeout
@@ -442,5 +444,4 @@ func execute_chuck_genius_ai_turn() -> void:
 
 func _on_turn_completed():
 	print("Turn has completed!")
-	shadow_step_complete = true
 	emit_signal("turn_completed")

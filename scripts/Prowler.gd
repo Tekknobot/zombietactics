@@ -22,7 +22,9 @@ signal turn_completed
 var shadow_step_complete
 
 func _ready() -> void:
-	get_parent().connect("turn_completed", Callable(self, "_on_turn_completed"))
+	var err = get_parent().connect("turn_completed", Callable(self, "_on_turn_completed"))
+	if err != OK:
+		push_error("Failed to connect to 'turn_completed' signal: Error code %d" % err)
 	
 func _process(delta: float) -> void:
 	if map_manager.map_1:
@@ -108,7 +110,6 @@ func activate_prowler(target_zombie):
 	if targeted_zombies.is_empty():
 		print("No zombies found for Prowler Step.")
 		is_prowler_active = false
-		_on_turn_completed()	
 		return
 
 	await get_tree().create_timer(0.1).timeout
@@ -173,9 +174,16 @@ func attack_next_zombie():
 		GlobalManager.prowler_toggle_active = false
 		
 		get_parent().current_xp += 25
+		# Optional: Check for level up, if applicable
+		if get_parent().current_xp >= get_parent().xp_for_next_level:
+			get_parent().level_up()	
+			
 		get_parent().has_attacked = true
 		get_parent().has_moved = true	
-		get_parent().check_end_turn_conditions()					
+		get_parent().check_end_turn_conditions()	
+		
+		_on_turn_completed()	
+						
 		return
 	
 	var target = targeted_zombies[attack_index]
@@ -464,6 +472,5 @@ func find_closest_target() -> Node:
 
 func _on_turn_completed():
 	print("Turn has completed!")
-	shadow_step_complete = true
 	emit_signal("turn_completed")
 	

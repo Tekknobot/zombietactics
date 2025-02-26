@@ -53,8 +53,8 @@ var direction: Vector2  # Direction the projectile should move in
 signal player_action_completed
 
 # Player's health properties
-var max_health: int = 100
-var current_health: int = 100
+var max_health: int = 200
+var current_health: int = 200
 
 # Player's portrait texture
 @export var portrait_texture: Texture
@@ -773,6 +773,18 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	if GlobalManager.octoblast_toggle_active:
 		print("Thread toggle is off, ignoring landmine attack.")
 		return
+		
+	if GlobalManager.dynamite_toggle_active:
+		print("Dynamite toggle is off, ignoring landmine attack.")
+		return		
+
+	if GlobalManager.shadows_toggle_active:
+		print("Shadows toggle is off, ignoring landmine attack.")
+		return		
+
+	if GlobalManager.hellfire_toggle_active:
+		print("Shadows toggle is off, ignoring landmine attack.")
+		return	
 
 	# Check if projectile_scene is set correctly
 	if projectile_scene == null:

@@ -346,12 +346,11 @@ func execute_angel_charlie_ai_turn() -> void:
 
 
 func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
-	# Find Dutch. Major among the player_units that are AI-controlled.
+	# Find the AI-controlled player (attacker) for reference.
 	var ai_player = null
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.is_in_group("unitAI") and player.player_name == "Angel. Charlie":
 			ai_player = player
-			# Optionally display the special attack tiles for feedback.
 			ai_player.display_special_attack_tiles()
 			break
 			
@@ -359,24 +358,21 @@ func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
 		print("Angel. Charlie not found.")
 		return null
 
-	# Optionally, use the valid_range parameter. Here we'll override it with the attack range
-	# defined by Dutch. Major's method.
-	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
-
-	# Gather enemies from both groups.
-	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
-	
-	# Filter out any nodes that are AI-controlled.
-	var valid_enemies = []
-	for enemy in enemies:
-		if not enemy.is_in_group("unitAI"):
-			valid_enemies.append(enemy)
-	
-	# From valid enemies, pick only those whose tile positions are in the attack range.
+	# Build a unique list of potential enemy targets from both groups.
+	var enemies = []
+	for group in ["zombies", "player_units"]:
+		for enemy in get_tree().get_nodes_in_group(group):
+			# Optionally, exclude the attacker itself:
+			if enemy == ai_player:
+				continue
+			if enemy not in enemies:
+				enemies.append(enemy)
+				
+	# If you previously filtered out unitAI to avoid friendly fire but now want to affect all units, simply remove that check.
 	var candidates = []
-	for enemy in valid_enemies:
+	for enemy in enemies:
 		# Assume each enemy has a 'tile_pos' property.
-		if enemy.tile_pos in attack_tiles:
+		if enemy.tile_pos in ai_player.get_special_tiles():
 			candidates.append(enemy)
 	
 	if candidates.size() == 0:
@@ -389,7 +385,7 @@ func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
 	for enemy in candidates:
 		var dx = abs(ai_player.tile_pos.x - enemy.tile_pos.x)
 		var dy = abs(ai_player.tile_pos.y - enemy.tile_pos.y)
-		var d = dx + dy  # Manhattan distance calculation.
+		var d = dx + dy  # Manhattan distance.
 		if d < min_distance:
 			min_distance = d
 			target_enemy = enemy

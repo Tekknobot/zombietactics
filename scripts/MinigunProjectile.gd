@@ -97,10 +97,7 @@ func _create_explosion() -> void:
 
 	# Check for any zombie units in the target area and destroy them
 	_check_for_zombies_at_target()
-	if self.is_in_group("unitAI"):
-		pass
-	elif self.is_in_group("player_units"):
-		_check_for_players_at_target()
+	_check_for_players_at_target()
 	_check_for_structure_at_target()
 	
 	queue_free()  # Destroy the projectile

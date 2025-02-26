@@ -199,7 +199,6 @@ func update_unit_ui():
 	xp_ui.value = current_xp
 	xp_ui.max_value = max_xp
 
-# Function to update the AStar grid based on the current tilemap state
 func update_astar_grid() -> void:
 	# Get the tilemap and determine its grid size
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
@@ -221,15 +220,22 @@ func update_astar_grid() -> void:
 			var tile_position = Vector2i(x, y)
 			var tile_id = tilemap.get_cell_source_id(0, tile_position)
 			
-			# Determine if the tile should be walkable
-			var is_solid = (tile_id == -1 or tile_id == WATER_TILE_ID 
+			var is_solid: bool
+			# For John. Doom, only tiles that are structures or have a unit present are solid
+			if self.player_name == "John. Doom":
+				is_solid = is_structure(tile_position) or is_unit_present(tile_position)
+			else:
+				# Default behavior for other players: mark as solid if tile is invalid, water,
+				# or there's a structure or unit present.
+				is_solid = (tile_id == -1 or tile_id == WATER_TILE_ID 
 							or is_structure(tile_position) 
 							or is_unit_present(tile_position))
 			
 			# Mark the tile in the AStar grid
 			astar.set_point_solid(tile_position, is_solid)
-
+	
 	print("AStar grid updated with size:", grid_width, "x", grid_height)
+
 
 # Setup the AStarGrid2D with walkable tiles
 func setup_astar() -> void:
@@ -371,8 +377,12 @@ func clear_special_tiles() -> void:
 func is_tile_movable(tile_pos: Vector2i) -> bool:
 	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
 	var tile_id = tilemap.get_cell_source_id(0, tile_pos)
-	if is_water_tile(tile_id):
-		return false
+	if self.player_name == "John. Doom":
+		if is_water_tile(tile_id):
+			return true	
+	else:	
+		if is_water_tile(tile_id):
+			return false
 	if is_structure(tile_pos) or is_unit_present(tile_pos):
 		return false
 	return true

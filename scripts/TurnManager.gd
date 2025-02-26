@@ -108,21 +108,21 @@ func start_player_ai_turn() -> void:
 				await ai.execute_yoshida_ai_turn()
 			"Logan. Raines":
 				await ai.get_child(7).execute_logan_raines_ai_turn()
-				await get_tree().create_timer(1).timeout
+				await get_tree().create_timer(3.25).timeout
 			"Chuck. Genius":
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				await get_tree().create_timer(0.5).timeout
 			"Aleks. Ducat":
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
-				await get_tree().create_timer(4).timeout
+				await get_tree().create_timer(6).timeout
 			"Angel. Charlie":
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
-				await get_tree().create_timer(2).timeout
+				await get_tree().create_timer(0.5).timeout
 			"John. Doom":
 				await ai.get_child(7).execute_john_doom_ai_turn()		
 			"Annie. Switch":
 				await ai.get_child(7).execute_annie_switch_ai_turn()
-				await get_tree().create_timer(4).timeout
+				await get_tree().create_timer(3.25).timeout
 													
 	trigger_zombies = true
 	

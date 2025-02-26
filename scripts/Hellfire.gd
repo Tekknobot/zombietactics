@@ -254,7 +254,7 @@ func is_mouse_over_gui() -> bool:
 
 func execute_john_doom_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = randi() % 2
+	var choice = 1 #randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()

@@ -4,7 +4,7 @@ extends Node2D
 @onready var hover_tile = get_node_or_null(hover_tile_path)
 
 # Exported variables for customization in the editor
-@export var attack_damage: int = 50 # Damage per explosion
+@export var attack_damage: int = 25 # Damage per explosion
 @export var explosion_radius: float = 1.5 # Radius of each explosion effect
 @export var explosion_delay: float = 0.2 # Delay between explosions
 @export var explosion_effect_scene: PackedScene # Path to explosion effect scene
@@ -202,7 +202,7 @@ func is_mouse_over_gui() -> bool:
 
 func execute_annie_switch_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = randi() % 2
+	var choice = 1 #randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()

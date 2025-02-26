@@ -103,20 +103,36 @@ func start_player_ai_turn() -> void:
 	for ai in shuffled_units:
 		match ai.player_name:
 			"Dutch. Major":
+				if ai.has_attacked or ai.has_moved:
+					return
 				await ai.execute_dutch_major_ai_turn()
 			"Yoshida. Boi":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.execute_yoshida_ai_turn()
 			"Logan. Raines":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 			"Aleks. Ducat":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 			"Angel. Charlie":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
+				if ai.has_attacked or ai.has_moved:
+					return				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 
 													

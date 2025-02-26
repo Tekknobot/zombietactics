@@ -803,6 +803,10 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	if GlobalManager.grenade_toggle_active:
 		print("Mek toggle is off, ignoring landmine attack.")
 		return	
+
+	if GlobalManager.transport_toggle_active:
+		print("Mek toggle is off, ignoring landmine attack.")
+		return	
 				
 	# Check if projectile_scene is set correctly
 	if projectile_scene == null:

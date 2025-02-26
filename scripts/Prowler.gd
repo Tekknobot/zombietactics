@@ -321,7 +321,7 @@ func fade_out(sprite: Node, duration: float = fade_duration) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 0
-	tween.tween_property(sprite, "modulate:a", fade_duration, duration)
+	tween.tween_property(sprite, "modulate:a", 1, duration)
 
 	# Wait for the tween to finish
 	await tween.finished
@@ -352,7 +352,7 @@ func fade_in(sprite: Node, duration: float = fade_duration) -> void:
 	get_parent().get_child(2).play()
 
 	# Tween the alpha value of the sprite's modulate property to 1
-	tween.tween_property(sprite, "modulate:a", fade_duration, duration)
+	tween.tween_property(sprite, "modulate:a", 0, duration)
 
 	# Wait for the tween to finish
 	await tween.finished

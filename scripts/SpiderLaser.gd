@@ -533,10 +533,7 @@ func execute_sarah_reese_ai_turn() -> void:
 				laser_active = true
 			else:
 				print("No valid target found for Sarah Reese special attack.")
-			
-			# Mark the turn as complete.
-			get_parent().has_attacked = true
-			get_parent().has_moved = true
+				get_parent().execute_ai_turn()
 
 # Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
 func find_closest_target() -> Node:

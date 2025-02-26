@@ -417,7 +417,7 @@ func get_zombie_at_tile(tile_pos: Vector2i):
 	
 func execute_aleks_ducat_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = 1 #randi() % 2
+	var choice = randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()
@@ -441,10 +441,7 @@ func execute_aleks_ducat_ai_turn() -> void:
 				await activate_prowler(target)
 			else:
 				print("No valid target found for Logan Raines special attack.")
-			
-			# Mark the turn as complete.
-			get_parent().has_attacked = true
-			get_parent().has_moved = true
+				get_parent().execute_ai_turn()
 
 func find_closest_target() -> Node:
 	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")

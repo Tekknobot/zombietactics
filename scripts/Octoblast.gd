@@ -202,7 +202,7 @@ func is_mouse_over_gui() -> bool:
 
 func execute_annie_switch_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = 1 #randi() % 2
+	var choice = randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()
@@ -225,16 +225,14 @@ func execute_annie_switch_ai_turn() -> void:
 			
 			var target = find_closest_target()
 			
-			# Execute the octoblast ability.
-			trigger_octoblast(target.position)
+			if target != null:
+				# Execute the octoblast ability.
+				trigger_octoblast(target.position)
+			else:
+				get_parent().execute_ai_turn()
 			
 			# Optionally wait a moment for effects to finish.
 			await get_tree().create_timer(explosion_delay).timeout
-			
-			# Mark the turn as complete.
-			get_parent().has_attacked = true
-			get_parent().has_moved = true
-			get_parent().check_end_turn_conditions()
 
 # Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
 func find_closest_target() -> Node:

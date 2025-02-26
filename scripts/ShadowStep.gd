@@ -113,68 +113,44 @@ func shadow_step(target_zombie):
 var _current_position: Vector2
 
 func find_nearest_zombies(max_count: int) -> Array:
-	var zombies_in_range = []
+	var potential_targets = []
 	
-	# Start with all nodes in the "zombies" group.
-	var zombies = get_tree().get_nodes_in_group("zombies")
+	# Always add zombies
+	potential_targets.append_array(get_tree().get_nodes_in_group("zombies"))
 	
-	if self.is_in_group("unitAI"):
-		# Get all player units.
-		var player_units = get_tree().get_nodes_in_group("player_units")
-		# Add only those player units that are NOT in the "unitAI" group.
+	# Get all player units
+	var player_units = get_tree().get_nodes_in_group("player_units")
+	
+	if get_parent().is_in_group("unitAI"):
+		# If parent is AI-controlled, add only player units that are NOT AI (i.e. human-controlled)
 		for unit in player_units:
 			if not unit.is_in_group("unitAI"):
-				zombies.append(unit)
-				
-		var current_position = get_parent().tile_pos	
-
-		# Manual bubble sort based on distance to `current_position`
-		for i in range(zombies.size()):
-			for j in range(0, zombies.size() - i - 1):
-				var dist_a = current_position.distance_to(zombies[j].tile_pos)
-				var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
-				if dist_a > dist_b:
-					# Swap the zombies
-					var temp = zombies[j]
-					zombies[j] = zombies[j + 1]
-					zombies[j + 1] = temp
-
-		# Collect the nearest zombies up to max_count.
-		for zombie in zombies:
-			zombies_in_range.append(zombie)
-			if zombies_in_range.size() >= max_count:
-				break
-
-		return zombies_in_range
-					
+				potential_targets.append(unit)
 	else:
-		# Get all player units.
-		var player_units = get_tree().get_nodes_in_group("player_units")
-		# Add only those player units that are NOT in the "unitAI" group.
+		# If parent is NOT AI-controlled, add only player units that ARE AI-controlled.
 		for unit in player_units:
 			if unit.is_in_group("unitAI"):
-				zombies.append(unit)
-				
-		var current_position = get_parent().tile_pos
-
-		# Manual bubble sort based on distance to `current_position`
-		for i in range(zombies.size()):
-			for j in range(0, zombies.size() - i - 1):
-				var dist_a = current_position.distance_to(zombies[j].tile_pos)
-				var dist_b = current_position.distance_to(zombies[j + 1].tile_pos)
-				if dist_a > dist_b:
-					# Swap the zombies
-					var temp = zombies[j]
-					zombies[j] = zombies[j + 1]
-					zombies[j + 1] = temp
-
-		# Collect the nearest zombies up to max_count.
-		for zombie in zombies:
-			zombies_in_range.append(zombie)
-			if zombies_in_range.size() >= max_count:
-				break
-
-		return zombies_in_range
+				potential_targets.append(unit)
+	
+	# Get the parent's current tile position (assuming parent has a 'tile_pos' property)
+	var current_position = get_parent().tile_pos
+	
+	# Sort the potential targets based on distance to current_position
+	for i in range(potential_targets.size()):
+		for j in range(0, potential_targets.size() - i - 1):
+			var dist_a = current_position.distance_to(potential_targets[j].tile_pos)
+			var dist_b = current_position.distance_to(potential_targets[j + 1].tile_pos)
+			if dist_a > dist_b:
+				var temp = potential_targets[j]
+				potential_targets[j] = potential_targets[j + 1]
+				potential_targets[j + 1] = temp
+	
+	# Return up to max_count of the nearest targets
+	var result = []
+	for i in range(min(max_count, potential_targets.size())):
+		result.append(potential_targets[i])
+		
+	return result
 
 func _compare_distance(a, b) -> int:
 	var dist_a = _current_position.distance_to(a.tile_pos)
@@ -418,13 +394,18 @@ func is_mouse_over_gui() -> bool:
 	#print("Mouse is NOT over any button.")
 	return false
 
-# Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
 func find_closest_target() -> Node:
-	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI")
+	var candidates = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
 	var target = null
 	var min_distance = INF
-	var parent_pos = get_parent().position  # Assume parent's position is used for measuring distance
+	var parent_pos = get_parent().position  # Using parent's position as reference
 	for candidate in candidates:
+		# Skip self
+		if candidate == get_parent():
+			continue
+		# Skip units in the "unitAI" group
+		if candidate.is_in_group("unitAI"):
+			continue
 		var d = parent_pos.distance_to(candidate.position)
 		if d < min_distance:
 			min_distance = d
@@ -433,7 +414,7 @@ func find_closest_target() -> Node:
 
 func execute_chuck_genius_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
-	var choice = 0 #randi() % 2
+	var choice = randi() % 2
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()
@@ -457,10 +438,7 @@ func execute_chuck_genius_ai_turn() -> void:
 				await shadow_step(target)
 			else:
 				print("No valid target found for Logan Raines special attack.")
-			
-			# Mark the turn as complete.
-			get_parent().has_attacked = true
-			get_parent().has_moved = true
+				get_parent().execute_ai_turn()
 
 func _on_turn_completed():
 	print("Turn has completed!")

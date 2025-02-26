@@ -193,7 +193,8 @@ func start_trajectory(start: Vector2, target: Vector2):
 	await animate_trajectory(line_inst, points)
 	
 	# Cleanup: Remove Line2D after animation
-	line_inst.queue_free()
+	if line_inst != null:
+		line_inst.queue_free()
 
 	missiles_launched = 0
 	
@@ -217,7 +218,11 @@ func generate_bezier_curve(start: Vector2, control1: Vector2, control2: Vector2,
 func animate_trajectory(line_inst: Line2D, points: Array):
 	print("Animating missile trajectory with", points.size(), "points.")
 	for i in range(points.size()):
-		line_inst.clear_points()  # Clear existing points to update Line2D path
+		if line_inst != null:	
+			line_inst.clear_points()  # Clear existing points to update Line2D path
+		else:
+			break
+			
 		for j in range(i):
 			line_inst.add_point(points[j])
 			

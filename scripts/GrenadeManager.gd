@@ -531,10 +531,7 @@ func execute_logan_raines_ai_turn() -> void:
 				await find_closest_zombies_for_ai(target.position)
 			else:
 				print("No valid target found for Logan Raines special attack.")
-			
-			# Mark the turn as complete.
-			get_parent().has_attacked = true
-			get_parent().has_moved = true
+				get_parent().execute_ai_turn()
 
 func _on_turn_completed():
 	print("Turn has completed!")

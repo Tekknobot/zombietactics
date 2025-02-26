@@ -1336,8 +1336,6 @@ func execute_ai_turn() -> void:
 		return  # End turn; no further movement or attack.
 	else:
 		print("No attackable enemy in aligned range after moving.")
-		if self.has_attacked == false and self.has_moved == true:
-			turn_manager.start_player_ai_turn()
 		
 	# Get all AI-controlled units (unitAI group)
 	var all_ai_units = get_tree().get_nodes_in_group("unitAI")	

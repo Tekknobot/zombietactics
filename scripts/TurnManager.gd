@@ -118,10 +118,12 @@ func start_player_ai_turn() -> void:
 				if ai.has_attacked or ai.has_moved:
 					return				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
+				await get_tree().create_timer(8).timeout 
 			"Aleks. Ducat":
 				if ai.has_attacked or ai.has_moved:
 					return				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
+				await get_tree().create_timer(8).timeout 
 			"Angel. Charlie":
 				if ai.has_attacked or ai.has_moved:
 					return				
@@ -167,10 +169,12 @@ func end_current_turn_from_button():
 				if ai.has_attacked or ai.has_moved:
 					return				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
+				await get_tree().create_timer(8).timeout 
 			"Aleks. Ducat":
 				if ai.has_attacked or ai.has_moved:
 					return				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
+				await get_tree().create_timer(8).timeout 
 			"Angel. Charlie":
 				if ai.has_attacked or ai.has_moved:
 					return				

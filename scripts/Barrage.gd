@@ -324,9 +324,6 @@ func execute_angel_charlie_ai_turn() -> void:
 			if camera:
 				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
 			
-			# Show special attack range (for visual feedback).
-			get_parent().display_special_attack_tiles()
-			
 			# Get the set of valid attack range tiles from the parent.
 			var attack_tiles: Array[Vector2i] = get_parent().get_special_tiles()
 			
@@ -338,8 +335,6 @@ func execute_angel_charlie_ai_turn() -> void:
 			else:
 				print("No valid target found for Angel Charlie special attack.")
 				get_parent().execute_ai_turn()
-				
-			get_parent().clear_special_tiles()
 
 
 func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
@@ -348,7 +343,7 @@ func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.is_in_group("unitAI") and player.player_name == "Angel. Charlie":
 			ai_player = player
-			ai_player.display_special_attack_tiles()
+			ai_player.display_special_attack_tiles()			
 			break
 			
 	if ai_player == null:
@@ -359,13 +354,17 @@ func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
 	var enemies = []
 	for group in ["zombies", "player_units"]:
 		for enemy in get_tree().get_nodes_in_group(group):
-			# Optionally, exclude the attacker itself:
+			# Exclude the attacker itself.
 			if enemy == ai_player:
 				continue
+			# Exclude any enemy that is a unitAI.
+			if enemy.is_in_group("unitAI") and enemy.dead == true:
+				continue
+			# Add the enemy if not already in the list.
 			if enemy not in enemies:
 				enemies.append(enemy)
 				
-	# If you previously filtered out unitAI to avoid friendly fire but now want to affect all units, simply remove that check.
+	# Filter enemies to only those in the special attack range.
 	var candidates = []
 	for enemy in enemies:
 		# Assume each enemy has a 'tile_pos' property.
@@ -391,4 +390,6 @@ func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
 		print("No target enemy found within special attack tiles.")
 		return null
 
+	get_parent().clear_special_tiles()
+	
 	return target_enemy

@@ -765,47 +765,39 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 		return	
 
 	if GlobalManager.slash_toggle_active:
-		print("Slash toggle is off, ignoring landmine attack.")
 		return	
 
 	if GlobalManager.prowler_toggle_active:
-		print("Prowler toggle is off, ignoring landmine attack.")
 		return
 
 	if GlobalManager.claw_toggle_active:
-		print("Claw toggle is off, ignoring landmine attack.")
 		return
 
 	if GlobalManager.thread_toggle_active:
-		print("Thread toggle is off, ignoring landmine attack.")
 		return
 
 	if GlobalManager.octoblast_toggle_active:
-		print("Thread toggle is off, ignoring landmine attack.")
 		return
 		
 	if GlobalManager.dynamite_toggle_active:
-		print("Dynamite toggle is off, ignoring landmine attack.")
 		return		
 
 	if GlobalManager.shadows_toggle_active:
-		print("Shadows toggle is off, ignoring landmine attack.")
 		return		
 
 	if GlobalManager.hellfire_toggle_active:
-		print("Hellfire toggle is off, ignoring landmine attack.")
 		return	
 
 	if GlobalManager.mek_toggle_active:
-		print("Mek toggle is off, ignoring landmine attack.")
 		return	
 
 	if GlobalManager.grenade_toggle_active:
-		print("Mek toggle is off, ignoring landmine attack.")
 		return	
 
 	if GlobalManager.transport_toggle_active:
-		print("Mek toggle is off, ignoring landmine attack.")
+		return	
+
+	if GlobalManager.dash_toggle_active:
 		return	
 				
 	# Check if projectile_scene is set correctly

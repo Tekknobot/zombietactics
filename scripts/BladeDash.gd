@@ -122,6 +122,10 @@ func _input(event):
 			dash_initiated = true
 			clear_hover_tiles()
 			
+			var target_pos = tilemap.local_to_map(mouse_position)
+			if !get_parent().is_tile_movable(target_pos):
+				return
+			
 			await fade_out(get_parent())
 			blade_dash_strike(mouse_pos)
 	

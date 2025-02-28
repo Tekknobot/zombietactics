@@ -150,7 +150,7 @@ func spawn_player_units():
 
 func spawn_ai_units():
 	# List of AI unit scenes for easier access – replace with your actual AI unit scene references
-	var ai_units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
+	var ai_units = [M1, M2, R1, R3, S2, S3, M1, M2, R1, R3, S2, S3]
 
 	# Divide the map into zones
 	var zones = initialize_zones()

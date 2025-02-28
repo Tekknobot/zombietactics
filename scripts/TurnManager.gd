@@ -137,7 +137,11 @@ func start_player_ai_turn() -> void:
 					return				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				await get_tree().create_timer(6).timeout
-
+			"Sarah. Reese":
+				if ai.has_attacked or ai.has_moved:
+					return				
+				await ai.get_child(7).execute_sarah_reese_ai_turn()
+				await get_tree().create_timer(2).timeout	
 													
 	trigger_zombies = true
 	
@@ -189,6 +193,12 @@ func end_current_turn_from_button():
 					return				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				await get_tree().create_timer(6).timeout
+			"Sarah. Reese":
+				if ai.has_attacked or ai.has_moved:
+					return				
+				await ai.get_child(7).execute_sarah_reese_ai_turn()	
+				await get_tree().create_timer(2).timeout		
+				
 
 											
 	trigger_zombies = true

@@ -156,7 +156,7 @@ func get_zombie_in_area():
 		var zombie_target = closest_zombies[zombie_index].position
 		deploy_laser(zombie_target, closest_zombies[zombie_index])
 
-func get_zombies_in_scene() -> Array:
+func get_zombies_in_scene_ai() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)
 	var zombies = []
 	for node in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI"):
@@ -165,7 +165,7 @@ func get_zombies_in_scene() -> Array:
 	return zombies			
 
 
-func get_zombies_in_scene_ai() -> Array:
+func get_zombies_in_scene() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)
 	var zombies = []
 	for node in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units"):
@@ -504,11 +504,14 @@ func execute_sarah_reese_ai_turn() -> void:
 				camera.focus_on_position(tilemap.map_to_local(get_parent().tile_pos))
 			
 			# Display special attack range tiles (for visual feedback).
-			get_parent().display_special_attack_tiles()
+			await get_parent().display_special_attack_tiles()
 			
+			# Get the set of valid attack range tiles from the parent.
+			var attack_tiles: Array[Vector2i] = get_parent().get_special_tiles()
+						
 			# Find the closest target using your helper function.
 			# (Assumes find_closest_target() filters out AI-controlled units and uses special attack range.)
-			var target = find_closest_target()
+			var target = find_closest_target_in_range(attack_tiles)
 			if target:
 				# Convert the target's position to tile coordinates and then back to local coordinates.
 				var target_tile: Vector2i = tilemap.local_to_map(target.position)
@@ -529,64 +532,74 @@ func execute_sarah_reese_ai_turn() -> void:
 				
 				# Clear the special tiles again, then start deploying the laser.
 				get_parent().clear_special_tiles()
+				
 				get_zombie_in_area()
-				laser_active = true
 			else:
 				print("No valid target found for Sarah Reese special attack.")
 				get_parent().execute_ai_turn()
 
 # Helper function to find the closest target (zombie or player unit) that isn't in the "unitAI" group.
-func find_closest_target() -> Node:
-	# Find Dutch. Major among the player_units that are AI-controlled.
+func find_closest_target_in_range(valid_range: Array[Vector2i]) -> Node:
+	# Get the TileMap for converting positions.
+	var tilemap: TileMap = get_node("/root/MapManager/TileMap")
+	
+	# Find the AI-controlled player (attacker) for reference.
 	var ai_player = null
 	for player in get_tree().get_nodes_in_group("player_units"):
 		if player.is_in_group("unitAI") and player.player_name == "Sarah. Reese":
 			ai_player = player
-			# Optionally display the special attack tiles for feedback.
-			ai_player.display_special_attack_tiles()
+			# (Optional) Show special attack tiles for debugging.
+			ai_player.display_special_attack_tiles()			
 			break
 			
 	if ai_player == null:
-		print("Angel. Charlie not found.")
+		print("Sarah. Reese not found.")
 		return null
 
-	# Optionally, use the valid_range parameter. Here we'll override it with the attack range
-	# defined by Dutch. Major's method.
-	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()
-
-	# Gather enemies from both groups.
-	var enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
-	
-	# Filter out any nodes that are AI-controlled.
-	var valid_enemies = []
-	for enemy in enemies:
-		if not enemy.is_in_group("unitAI"):
-			valid_enemies.append(enemy)
-	
-	# From valid enemies, pick only those whose tile positions are in the attack range.
+	# Build a unique list of potential enemy targets from both groups.
+	var enemies = []
+	for group in ["zombies", "player_units"]:
+		for enemy in get_tree().get_nodes_in_group(group):
+			# Exclude the attacker itself.
+			if enemy == ai_player:
+				continue
+			# Exclude any enemy that is a unitAI and dead.
+			if enemy.is_in_group("unitAI"):
+				continue
+			# Add the enemy if not already in the list.
+			if enemy not in enemies:
+				enemies.append(enemy)
+				
+	# Filter enemies to only those whose tile (converted from world position) is in the provided valid_range.
 	var candidates = []
-	for enemy in valid_enemies:
-		# Assume each enemy has a 'tile_pos' property.
-		if enemy.tile_pos in attack_tiles:
+	for enemy in enemies:
+		# Convert enemy's world position to tile coordinates.
+		var enemy_tile: Vector2i = tilemap.local_to_map(enemy.position)
+		if enemy_tile in valid_range:
 			candidates.append(enemy)
 	
 	if candidates.size() == 0:
-		print("No enemy within special attack range.")
+		print("No enemy within valid range.")
 		return null
 	
 	# Find the candidate with the minimum Manhattan distance.
 	var target_enemy = null
 	var min_distance = INF
+	# Convert AI player's position to tile coordinates.
+	var ai_tile: Vector2i = tilemap.local_to_map(ai_player.position)
 	for enemy in candidates:
-		var dx = abs(ai_player.tile_pos.x - enemy.tile_pos.x)
-		var dy = abs(ai_player.tile_pos.y - enemy.tile_pos.y)
-		var d = dx + dy  # Manhattan distance calculation.
+		var enemy_tile: Vector2i = tilemap.local_to_map(enemy.position)
+		var dx = abs(ai_tile.x - enemy_tile.x)
+		var dy = abs(ai_tile.y - enemy_tile.y)
+		var d = dx + dy  # Manhattan distance.
 		if d < min_distance:
 			min_distance = d
 			target_enemy = enemy
 
 	if target_enemy == null:
-		print("No target enemy found within special attack tiles.")
+		print("No target enemy found within valid range.")
 		return null
 
+	get_parent().clear_special_tiles()
+	
 	return target_enemy

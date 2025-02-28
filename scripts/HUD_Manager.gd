@@ -128,7 +128,7 @@ func _on_endturn_pressed() -> void:
 
 func _on_missile_toggled(button_pressed: bool) -> void:
 	if button_pressed:
-		GlobalManager.missile_toggle_active = true  # Set the flag to true
+		GlobalManager.landmine_toggle_active = true  # Set the flag to true
 		print("Missile toggle activated!")
 		landmine.button_pressed = false
 		var players = get_tree().get_nodes_in_group("player_units")
@@ -137,7 +137,7 @@ func _on_missile_toggled(button_pressed: bool) -> void:
 			if player.player_name == "Yoshida. Boi" and !player.is_in_group("unitAI"):
 				player.display_special_attack_tiles()		
 	else:
-		GlobalManager.missile_toggle_active = false  # Set the flag to false
+		GlobalManager.landmine_toggle_active = false  # Set the flag to false
 		print("Missile toggle deactivated!")	
 		var players = get_tree().get_nodes_in_group("player_units")
 		for player in players:

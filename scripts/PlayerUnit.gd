@@ -929,10 +929,14 @@ func die() -> void:
 	self.visible = false
 	print("Player has died")	
 	
-	var all_players = get_tree().get_nodes_in_group("player_units")
-	if all_players.size() <= 0:
-		GlobalManager.players_killed = true
-		mission_manager.check_mission_manager()	
+	var all_players_ai = get_tree().get_nodes_in_group("player_units")
+	for player in all_players_ai:
+		if player.is_in_group("unitAI"):
+			continue
+		if all_players_ai.size() <= 0:	
+			reset_player_units()	
+			GlobalManager.players_killed = true
+			mission_manager.check_mission_manager()
 
 	var unit_ai = get_tree().get_nodes_in_group("unitAI")
 	if unit_ai.size() <= 0:

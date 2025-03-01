@@ -929,11 +929,11 @@ func die() -> void:
 	self.visible = false
 	print("Player has died")	
 	
-	var all_players_ai = get_tree().get_nodes_in_group("player_units")
-	for player in all_players_ai:
+	var all_players = get_tree().get_nodes_in_group("player_units")
+	for player in all_players:
 		if player.is_in_group("unitAI"):
 			continue
-		if all_players_ai.size() <= 0:	
+		if all_players.size() <= 0:	
 			reset_player_units()	
 			GlobalManager.players_killed = true
 			mission_manager.check_mission_manager()
@@ -1312,10 +1312,34 @@ func execute_ai_turn() -> void:
 			highlight.queue_free()
 			#self.has_attacked = true
 			self.has_moved = true
-
+			
+	if self.has_moved:
+		if self.player_name == "Logan. Raines":
+			self.get_child(7).execute_logan_raines_ai_turn()		
+		if self.player_name == "Yoshida. Boi":
+			self.get_child(7).execute_yoshida_ai_turn()
+		if self.player_name == "Dutch. Major":
+			self.get_child(7).execute_dutch_major_ai_turn()
+		if self.player_name == "Chuck. Genius":
+			self.get_child(8).execute_chuck_genius_ai_turn()
+		if self.player_name == "Aleks. Ducat":
+			self.get_child(8).execute_aleks_ducat_ai_turn()
+		if self.player_name == "Annie. Switch":
+			self.get_child(7).execute_annie_switch_ai_turn()		
+		if self.player_name == "Sarah. Reese":
+			self.get_child(7).execute_sarah_reese_ai_turn()	
+		if self.player_name == "John. Doom":
+			self.get_child(7).execute_john_doom_ai_turn()	
+		if self.player_name == "Angel. Charlie":
+			self.get_child(7).execute_angel_charlie_ai_turn()																							
+			
 	# ---------------------------
 	# Post-Move Attack Check
 	# ---------------------------
+	
+	if self.has_attacked:
+		return
+	
 	all_enemies.clear()
 	all_enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
 	

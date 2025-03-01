@@ -167,7 +167,7 @@ func start_player_ai_turn() -> void:
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
-				await get_tree().create_timer(4).timeout	
+				await get_tree().create_timer(6).timeout		
 					
 				
 	info.text = "Player turn"	
@@ -247,7 +247,7 @@ func end_current_turn_from_button():
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
-				await get_tree().create_timer(4).timeout	
+				await get_tree().create_timer(6).timeout	
 				
 	info.text = "Player turn"	
 	info.visible = false

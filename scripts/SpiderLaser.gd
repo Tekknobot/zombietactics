@@ -154,7 +154,7 @@ func get_zombie_in_area():
 	# Deploy lasers to the nearest zombies
 	if zombie_index < closest_zombies.size():
 		var zombie_target = closest_zombies[zombie_index].position
-		deploy_laser(zombie_target, closest_zombies[zombie_index])
+		await deploy_laser(zombie_target, closest_zombies[zombie_index])
 
 func get_zombies_in_scene_ai() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)

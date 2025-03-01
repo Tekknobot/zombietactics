@@ -158,7 +158,7 @@ func get_zombie_in_area():
 		var zombie_target = closest_zombies[zombie_index].position
 		await deploy_laser(zombie_target, closest_zombies[zombie_index])
 
-func get_zombies_in_scene_ai() -> Array:
+func get_zombies_in_scene() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)
 	var zombies = []
 	for node in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("unitAI"):
@@ -167,7 +167,7 @@ func get_zombies_in_scene_ai() -> Array:
 	return zombies			
 
 
-func get_zombies_in_scene() -> Array:
+func get_zombies_in_scene_ai() -> Array:
 	# Returns a list of zombies in the scene (to be implemented)
 	var zombies = []
 	for node in get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units"):
@@ -525,7 +525,7 @@ func execute_sarah_reese_ai_turn() -> void:
 				get_parent().clear_special_tiles()
 				
 				# Depending on whether the parent is AI-controlled or not, choose the appropriate zombies list.
-				if !get_parent().is_in_group("unitAI"):
+				if get_parent().is_in_group("unitAI"):
 					closest_zombies = get_zombies_in_scene_ai()
 				else:
 					closest_zombies = get_zombies_in_scene()

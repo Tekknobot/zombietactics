@@ -16,6 +16,8 @@ signal player_action_completed
 @onready var mission_manager = get_node("/root/MapManager/MissionManager")
 @onready var hud_mananger = get_node("/root/MapManager/HUDManager")
 
+@export var info: RichTextLabel
+
 func _ready() -> void:
 	await get_tree().create_timer(1).timeout
 	
@@ -98,51 +100,65 @@ func start_player_ai_turn() -> void:
 	var all_ai_units = get_tree().get_nodes_in_group("unitAI")
 	var shuffled_units = all_ai_units.duplicate()
 	shuffled_units.shuffle()
+	
+	info.visible = true
 		
 	# Loop through each AI unit and call its AI turn based on its player_name.
 	for ai in shuffled_units:
 		match ai.player_name:
 			"Dutch. Major":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return
+					continue
 				await ai.execute_dutch_major_ai_turn()
 			"Yoshida. Boi":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.execute_yoshida_ai_turn()
 			"Logan. Raines":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Aleks. Ducat":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Angel. Charlie":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				await get_tree().create_timer(6).timeout
 			"Sarah. Reese":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()
 				await get_tree().create_timer(2).timeout	
-													
+				
+	info.text = "Player turn"	
+	info.visible = false
+												
 	trigger_zombies = true
 	
 	# Reset the player units for a new turn and check the map state.
@@ -154,53 +170,65 @@ func end_current_turn_from_button():
 	var all_ai_units = get_tree().get_nodes_in_group("unitAI")
 	var shuffled_units = all_ai_units.duplicate()
 	shuffled_units.shuffle()
-		
+	
+	info.visible = true
+	
 	# Loop through each AI unit and call its AI turn based on its player_name.
-	for ai in shuffled_units:
+	for ai in shuffled_units:		
 		match ai.player_name:
 			"Dutch. Major":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return
+					continue
 				await ai.execute_dutch_major_ai_turn()
 			"Yoshida. Boi":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.execute_yoshida_ai_turn()
 			"Logan. Raines":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Aleks. Ducat":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Angel. Charlie":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				await get_tree().create_timer(6).timeout
 			"Sarah. Reese":
+				info.text = "Enemy " + ai.player_name
 				if ai.has_attacked or ai.has_moved:
-					return				
+					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
 				await get_tree().create_timer(2).timeout		
 				
-
-											
+	info.text = "Player turn"	
+	info.visible = false
+										
 	trigger_zombies = true
 	
 	# Reset the player units for a new turn and check the map state.

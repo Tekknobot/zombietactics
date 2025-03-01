@@ -6,6 +6,9 @@ const RIGHT_MARGIN = 10  # Adjust this value to set the desired padding
 func _ready():
 	# Adjust size to fit content dynamically
 	adjust_size_to_content()
+	
+func _process(delta: float) -> void:	
+	adjust_size_to_content()
 
 func adjust_size_to_content():
 	# Get the required width and height to fit the content

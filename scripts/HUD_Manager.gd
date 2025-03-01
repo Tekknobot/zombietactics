@@ -400,14 +400,11 @@ func update_hud(character: PlayerUnit):
 
 	# Update the rest of the HUD elements
 	if character.portrait_texture and portrait:
-		portrait.texture = character.portrait_texture
-		# If the character is part of the unitAI group, modulate the texture color
-		if character.is_in_group("unitAI"):
-			portrait.modulate = Color8(25, 25, 25)	
+		if character.is_in_group("unitAI") or character.is_in_group("zombies"):
+			self.hide()
 		else:
-			portrait.modulate = Color(1, 1, 1, 1)  # Reset to default color if needed
-			
-		print("Portrait texture updated")
+			portrait.texture = character.portrait_texture	
+			print("Portrait texture updated")
 
 	# Update player name if the player_name label exists
 	if player_name:
@@ -494,8 +491,11 @@ func update_hud_zombie(character: ZombieUnit):
 		
 	# Update the rest of the HUD elements
 	if character.portrait_texture and portrait:
-		portrait.texture = character.portrait_texture
-		print("Portrait texture updated")
+		if character.is_in_group("unitAI") or character.is_in_group("zombies"):
+			self.hide()
+		else:
+			portrait.texture = character.portrait_texture	
+			print("Portrait texture updated")
 
 	# Update player name if the player_name label exists
 	if player_name:

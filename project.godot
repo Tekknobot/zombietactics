@@ -26,8 +26,9 @@ GlobalManager="*res://scripts/GlobalManager.gd"
 
 [display]
 
-window/size/viewport_height=728
-window/size/mode=2
+window/size/viewport_width=1460
+window/size/viewport_height=812
+window/size/mode=4
 window/stretch/mode="viewport"
 
 [editor]

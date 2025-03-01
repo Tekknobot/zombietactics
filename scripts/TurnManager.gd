@@ -104,57 +104,66 @@ func start_player_ai_turn() -> void:
 	info.visible = true
 		
 	# Loop through each AI unit and call its AI turn based on its player_name.
-	for ai in shuffled_units:
+	for ai in shuffled_units:		
 		match ai.player_name:
 			"Dutch. Major":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue
 				await ai.execute_dutch_major_ai_turn()
 			"Yoshida. Boi":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.execute_yoshida_ai_turn()
 			"Logan. Raines":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Aleks. Ducat":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Angel. Charlie":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				await get_tree().create_timer(6).timeout
 			"Sarah. Reese":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
-				await ai.get_child(7).execute_sarah_reese_ai_turn()
-				await get_tree().create_timer(2).timeout	
+				await ai.get_child(7).execute_sarah_reese_ai_turn()	
+				await get_tree().create_timer(2).timeout		
 				
 	info.text = "Player turn"	
 	info.visible = false
@@ -177,50 +186,59 @@ func end_current_turn_from_button():
 	for ai in shuffled_units:		
 		match ai.player_name:
 			"Dutch. Major":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue
 				await ai.execute_dutch_major_ai_turn()
 			"Yoshida. Boi":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.execute_yoshida_ai_turn()
 			"Logan. Raines":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 			"Chuck. Genius":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Aleks. Ducat":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 				await get_tree().create_timer(6).timeout 
 			"Angel. Charlie":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 			"John. Doom":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_john_doom_ai_turn()
 			"Annie. Switch":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				await get_tree().create_timer(6).timeout
 			"Sarah. Reese":
-				info.text = "Enemy " + ai.player_name
+				info.bbcode_enabled = true  # Ensure BBCode is enabled
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving.[/color]"
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	

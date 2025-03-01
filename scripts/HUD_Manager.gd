@@ -401,6 +401,12 @@ func update_hud(character: PlayerUnit):
 	# Update the rest of the HUD elements
 	if character.portrait_texture and portrait:
 		portrait.texture = character.portrait_texture
+		# If the character is part of the unitAI group, modulate the texture color
+		if character.is_in_group("unitAI"):
+			portrait.modulate = Color8(25, 25, 25)	
+		else:
+			portrait.modulate = Color(1, 1, 1, 1)  # Reset to default color if needed
+			
 		print("Portrait texture updated")
 
 	# Update player name if the player_name label exists

@@ -31,6 +31,10 @@ func _ready() -> void:
 		start_current_unit_turn()  # Start the first unit's turn
 	else:
 		print("No player units available to start.")
+	
+	for player in player_units:
+		if player.player_name == "Sarah. Reese":	
+			self.connect("special_completed", Callable(player.get_child(7), "special_completed"))	
 
 func check_if_end_map():
 	var zombies = get_tree().get_nodes_in_group("zombies")
@@ -163,7 +167,8 @@ func start_player_ai_turn() -> void:
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
-				await get_tree().create_timer(2).timeout		
+				await get_tree().create_timer(4).timeout	
+					
 				
 	info.text = "Player turn"	
 	info.visible = false
@@ -242,7 +247,7 @@ func end_current_turn_from_button():
 				if ai.has_attacked or ai.has_moved:
 					continue				
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
-				await get_tree().create_timer(2).timeout		
+				await get_tree().create_timer(4).timeout	
 				
 	info.text = "Player turn"	
 	info.visible = false

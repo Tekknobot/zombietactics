@@ -40,6 +40,8 @@ var segment
 var current_segment
 var laser_active: bool = false
 
+signal special_complete
+
 func _ready():
 	# Initialize color cycle
 	color_cycle = [laser_color_1, laser_color_2, laser_color_3]
@@ -123,7 +125,7 @@ func _input(event):
 					return laser_target.distance_to(a.position) < laser_target.distance_to(b.position))
 				
 				get_parent().clear_special_tiles()	
-				get_zombie_in_area()
+				await get_zombie_in_area()
 				laser_active = true
 			
 func get_zombie_in_area():
@@ -146,7 +148,7 @@ func get_zombie_in_area():
 		GlobalManager.thread_toggle_active = false  # Deactivate the special toggle
 		hud_manager.thread.button_pressed = false		
 		
-		laser_active = false	
+		laser_active = false
 		get_parent().check_end_turn_conditions()
 		return
 
@@ -289,6 +291,7 @@ func _on_pulse_timer_timeout():
 			_trigger_explosion_ai(last_point)
 		else:
 			_trigger_explosion(last_point)
+			
 		get_parent().get_child(0).play("default")
 
 		# Reset spark emitter after finishing
@@ -361,7 +364,7 @@ func _trigger_explosion(last_point: Vector2):
 			clear_segments()
 		
 	clear_segments()	
-	get_zombie_in_area()			
+	await get_zombie_in_area()			
 
 func _trigger_explosion_ai(last_point: Vector2):
 	print("Explosion triggered at position:", last_point)
@@ -414,7 +417,7 @@ func _trigger_explosion_ai(last_point: Vector2):
 			clear_segments()
 		
 	clear_segments()	
-	get_zombie_in_area()
+	await get_zombie_in_area()
 
 				
 func add_xp():
@@ -533,7 +536,7 @@ func execute_sarah_reese_ai_turn() -> void:
 				# Clear the special tiles again, then start deploying the laser.
 				get_parent().clear_special_tiles()
 				
-				get_zombie_in_area()
+				await get_zombie_in_area()
 			else:
 				print("No valid target found for Sarah Reese special attack.")
 				get_parent().execute_ai_turn()

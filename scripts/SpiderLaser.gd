@@ -136,7 +136,11 @@ func get_zombie_in_area():
 		# Add XP if at least one target was hit
 		if xp_awarded:
 			await get_tree().create_timer(1).timeout
-			add_xp()
+			if get_parent().is_in_group("player_units") and !get_parent().is_in_group("unitAI"):
+				add_xp()
+			elif get_parent().is_in_group("unitAI"):
+				add_xp_ai(get_parent())
+				
 
 		get_parent().has_attacked = true
 		get_parent().has_moved = true
@@ -444,6 +448,19 @@ func add_xp():
 				print("last_selected_player does not exist.")
 
 	hud_manager.update_hud(hover_tile.selected_player)
+
+func add_xp_ai(ai_unit):
+	# Add XP
+	if ai_unit:
+		ai_unit.current_xp += 25
+		# Update the HUD to reflect new stats	
+		print("Added 25 XP to", ai_unit, "new XP:", ai_unit.current_xp)		
+		
+		# Optional: Check for level up, if applicable
+		if ai_unit.current_xp >= ai_unit.xp_for_next_level:
+			ai_unit.level_up()			
+	else:
+		print("AI Unit does not exist.")
 
 func clear_segments():
 	# Clear previous laser segments

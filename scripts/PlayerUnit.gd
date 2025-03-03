@@ -944,7 +944,7 @@ func die() -> void:
 		GlobalManager.unit_ai_cleared = true
 		mission_manager.check_mission_manager()
 		
-	dead = true	
+	self.dead = true	
 
 func level_up() -> void:
 	# Play SFX

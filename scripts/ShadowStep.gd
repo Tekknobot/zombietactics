@@ -418,7 +418,7 @@ func find_closest_target() -> Node:
 			target = candidate
 	return target
 
-func execute_chuck_genius_ai_turn() -> void:
+func execute_chuck_genius_ai_turn() -> void:		
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
 	var choice = 1 #randi() % 2
 	if choice == 0:

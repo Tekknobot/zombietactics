@@ -508,6 +508,10 @@ func find_closest_target() -> Node:
 func execute_logan_raines_ai_turn() -> void:
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
 	var choice = randi() % 2
+	
+	if get_parent().has_moved:
+		choice = 1
+			
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()

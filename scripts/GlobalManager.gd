@@ -78,3 +78,4 @@ func reset_global_manager():
 	for player in players:	
 		player.has_attacked = false
 		player.has_moved = false
+		player.can_start_turn = true

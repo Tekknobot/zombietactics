@@ -1216,9 +1216,6 @@ func execute_ai_turn() -> void:
 	# ---------------------------
 	# Pre-Move Attack Check
 	# ---------------------------
-	
-	if self.has_moved == true:
-		return
 		
 	var immediate_attack_target = null
 	var min_attack_distance: int = INF
@@ -1239,18 +1236,21 @@ func execute_ai_turn() -> void:
 				min_attack_distance = d
 				immediate_attack_target = enemy
 
-	# If an immediate attack target is found, attack and finish the turn.
-	if immediate_attack_target:
-		print("Immediate attack on enemy at:", immediate_attack_target.tile_pos)
-		display_attack_range_tiles()
-		await get_tree().create_timer(0.5).timeout  # Visual delay.
-		clear_attack_range_tiles()
-		await attack(immediate_attack_target.tile_pos)
-		await get_tree().create_timer(1).timeout
-		clear_unit_ai_executing_flag()
-		self.has_attacked = true
-		self.has_moved = true
-		return  # End turn; no further movement or attack.
+	if self.has_moved == true:
+		return
+	else:
+		# If an immediate attack target is found, attack and finish the turn.
+		if immediate_attack_target:
+			print("Immediate attack on enemy at:", immediate_attack_target.tile_pos)
+			display_attack_range_tiles()
+			await get_tree().create_timer(0.5).timeout  # Visual delay.
+			clear_attack_range_tiles()
+			await attack(immediate_attack_target.tile_pos)
+			await get_tree().create_timer(1).timeout
+			clear_unit_ai_executing_flag()
+			self.has_attacked = true
+			self.has_moved = true
+			return  # End turn; no further movement or attack.
 
 	# ---------------------------
 	# No immediate attack: Move toward the nearest enemy.
@@ -1291,7 +1291,10 @@ func execute_ai_turn() -> void:
 
 	# Move the unit along the calculated path.
 	print("Moving unit to target tile:", enemy_adjacent_tile)
-	move_player_to_target(enemy_adjacent_tile)
+	if self.has_moved:
+		pass
+	else:	
+		move_player_to_target(enemy_adjacent_tile)
 	print("Movement complete. New tile:", self.tile_pos)
 
 	# (Optional) Highlight the movement path for visual feedback.
@@ -1313,7 +1316,7 @@ func execute_ai_turn() -> void:
 			#self.has_attacked = true
 			self.has_moved = true
 			
-	if self.has_moved:
+	if !self.has_attacked:
 		if self.player_name == "Logan. Raines":
 			self.get_child(7).execute_logan_raines_ai_turn()		
 		if self.player_name == "Yoshida. Boi":
@@ -1391,6 +1394,10 @@ func start_ai_turn() -> void:
 func execute_dutch_major_ai_turn() -> void: 
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
 	var choice = randi() % 2
+	
+	if self.has_moved:
+		choice = 1
+		
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await execute_ai_turn()
@@ -1416,6 +1423,10 @@ func execute_dutch_major_ai_turn() -> void:
 func execute_yoshida_ai_turn() -> void: 
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
 	var choice = randi() % 2
+
+	if self.has_moved:
+		choice = 1
+			
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await execute_ai_turn()

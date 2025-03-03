@@ -191,8 +191,6 @@ func find_closest_zombies_for_ai(target_position: Vector2) -> void:
 	# Select the 7 closest candidates.
 	var closest_candidates = candidates.slice(0, min(7, candidates.size()))
 
-	get_parent().display_special_attack_tiles()
-
 	# Trigger trajectories towards the closest candidates sequentially.
 	for enemy in closest_candidates:
 		get_parent().get_child(0).play("attack")

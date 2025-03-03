@@ -934,7 +934,7 @@ func die() -> void:
 		if player.is_in_group("unitAI"):
 			continue
 		if all_players.size() <= 0:	
-			reset_player_units()	
+			#reset_player_units()	
 			GlobalManager.players_killed = true
 			mission_manager.check_mission_manager()
 
@@ -1139,6 +1139,24 @@ func check_end_turn_conditions() -> void:
 				
 		if !is_in_group("unitAI"):
 			end_turn()
+			
+	# Build a filtered list that excludes units in the "unitAI" group.
+	var all_players = []
+	for player in get_tree().get_nodes_in_group("player_units"):
+		if not player.is_in_group("unitAI"):
+			all_players.append(player)
+
+	# Count dead players.
+	var dead_players = 0
+	for player in all_players:
+		if player.dead:
+			dead_players += 1
+
+	# If all filtered players are dead, trigger the mission manager.
+	if dead_players >= all_players.size():
+		GlobalManager.players_killed = true
+		mission_manager.check_mission_manager()
+	
 
 func end_turn() -> void:
 	if turn_manager:
@@ -1236,7 +1254,7 @@ func execute_ai_turn() -> void:
 				min_attack_distance = d
 				immediate_attack_target = enemy
 
-	if self.has_moved == true:
+	if self.has_moved:
 		return
 	else:
 		# If an immediate attack target is found, attack and finish the turn.

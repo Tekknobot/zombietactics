@@ -202,6 +202,7 @@ func end_current_turn_from_button():
 	var shuffled_units = all_ai_units.duplicate()
 	shuffled_units.shuffle()
 	
+	GlobalManager.reset_global_manager()
 	info.visible = true
 	
 	# Loop through each AI unit and call its AI turn based on its player_name.

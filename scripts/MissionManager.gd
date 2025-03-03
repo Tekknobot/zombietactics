@@ -20,7 +20,7 @@ func check_mission_manager():
 		hud_manager.visible = false
 		map_fader.fade_in()
 		
-	if GlobalManager.unit_ai_cleared or GlobalManager.zombies_cleared and GlobalManager.secret_items_found >= 3:		
+	if GlobalManager.unit_ai_cleared:		
 		GlobalManager.map_cleared = true
 		GlobalManager.reset_global_manager()
 		hud_manager.visible = false

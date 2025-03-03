@@ -74,7 +74,7 @@ func _ready():
 
 func spawn_player_units():
 	# List of unit scenes for easier access
-	var units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
+	var units = [unit_soldier]
 
 	# Divide the map into 9 zones
 	var zones = initialize_zones()

@@ -1317,9 +1317,9 @@ func execute_ai_turn() -> void:
 		if self.player_name == "Logan. Raines":
 			self.get_child(7).execute_logan_raines_ai_turn()		
 		if self.player_name == "Yoshida. Boi":
-			self.get_child(7).execute_yoshida_ai_turn()
+			self.execute_yoshida_ai_turn()
 		if self.player_name == "Dutch. Major":
-			self.get_child(7).execute_dutch_major_ai_turn()
+			self.execute_dutch_major_ai_turn()
 		if self.player_name == "Chuck. Genius":
 			self.get_child(8).execute_chuck_genius_ai_turn()
 		if self.player_name == "Aleks. Ducat":
@@ -1336,9 +1336,6 @@ func execute_ai_turn() -> void:
 	# ---------------------------
 	# Post-Move Attack Check
 	# ---------------------------
-	
-	if self.has_attacked:
-		return
 	
 	all_enemies.clear()
 	all_enemies = get_tree().get_nodes_in_group("zombies") + get_tree().get_nodes_in_group("player_units")
@@ -1362,6 +1359,8 @@ func execute_ai_turn() -> void:
 				post_move_attack_target = enemy
 
 	if post_move_attack_target:
+		if self.has_attacked:
+			return		
 		print("Post-move attack on enemy at:", post_move_attack_target.tile_pos)
 		display_attack_range_tiles()
 		await get_tree().create_timer(0.5).timeout  # Visual delay.

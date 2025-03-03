@@ -82,7 +82,7 @@ func spawn_player_units():
 		print("Error: Could not initialize zones for spawning.")
 		return
 
-	# Randomly select one zone for players
+	# Randomly select one zone for players and store it in the global player_zone variable
 	player_zone = zones.pop_at(randi() % zones.size())
 
 	# Set minimum distance between player spawns
@@ -144,13 +144,10 @@ func spawn_player_units():
 		reset_level()
 		return
 
-	# Spawn zombies in the remaining zones
-	await spawn_zombies(zones)
-	notify_units_spawned()
 
 func spawn_ai_units():
-	# List of AI unit scenes for easier access – replace with your actual AI unit scene references
-	var ai_units = [M1, M2, R1, R3, S2, S3]
+	# List of AI unit scenes for easier access
+	var ai_units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
 
 	# Divide the map into zones
 	var zones = initialize_zones()
@@ -160,15 +157,14 @@ func spawn_ai_units():
 
 	# Remove the player's zone from available zones if it exists.
 	if player_zone != null:
-		# Erase the player's zone. (Ensure that player_zone exactly matches one of the zones from initialize_zones().)
 		zones.erase(player_zone)
 
 	if zones.is_empty():
 		print("Error: No alternate zones available for AI spawning after removing the player zone.")
 		return
 
-	# Randomly select one zone for AI spawning from the remaining zones.
-	var ai_zone = zones.pop_at(randi() % zones.size())
+	# IMPORTANT: Use the global ai_zone variable (do not redeclare it locally)
+	GlobalManager.ai_zone = zones.pop_at(randi() % zones.size())
 
 	# Set minimum distance between AI spawns (adjust as needed)
 	var minimum_distance = 2
@@ -184,7 +180,7 @@ func spawn_ai_units():
 
 		# Try to find a valid spawn tile in the selected zone
 		while attempts < max_spawn_attempts_per_unit:
-			spawn_position = get_random_tile_in_zone(ai_zone)
+			spawn_position = get_random_tile_in_zone(GlobalManager.ai_zone)
 			if spawn_position != Vector2i(-1, -1):
 				# Ensure the new position is not too close to already-spawned AI units
 				var is_too_close = false
@@ -215,6 +211,22 @@ func spawn_ai_units():
 				ai_positions.append(spawn_position)
 		else:
 			print("Error: No valid position found even after fallback for AI unit:", unit_type)
+
+	# --- Spawn Zombies Outside of the Player and AI Zones ---
+	# Get a fresh list of zones, then remove both player_zone and ai_zone.
+	var zombie_zones = initialize_zones()
+	if player_zone != null:
+		zombie_zones.erase(player_zone)
+	if GlobalManager.ai_zone != null:
+		zombie_zones.erase(GlobalManager.ai_zone)
+
+	if zombie_zones.is_empty():
+		print("Error: No zones available for zombie spawning after removing player and AI zones.")
+		return
+
+	await spawn_zombies(zombie_zones)
+	notify_units_spawned()
+
 
 func find_open_tile_near_player(player_positions: Array) -> Vector2i:
 	# Define directions for adjacent tiles (up, down, left, right)

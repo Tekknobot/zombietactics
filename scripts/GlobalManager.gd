@@ -38,6 +38,8 @@ var zombie_limit = 3
 
 var secret_items_found: int = 0
 
+var ai_zone
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.

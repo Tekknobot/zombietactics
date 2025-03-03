@@ -139,7 +139,7 @@ func get_zombie_in_area():
 			if get_parent().is_in_group("player_units") and !get_parent().is_in_group("unitAI"):
 				add_xp()
 			elif get_parent().is_in_group("unitAI"):
-				add_xp_ai(get_parent())
+				add_xp()
 				
 
 		get_parent().has_attacked = true
@@ -425,42 +425,11 @@ func _trigger_explosion_ai(last_point: Vector2):
 
 				
 func add_xp():
-	# Add XP
-	# Access the HUDManager (move up the tree from PlayerUnit -> UnitSpawn -> parent to HUDManager)
-	var hud_manager = get_node("/root/MapManager/HUDManager")  # Adjust the path if necessary
-	
-	# Get all nodes in the 'hovertile' group
-	var hover_tiles = get_tree().get_nodes_in_group("hovertile")
-	# Iterate through the list and find the HoverTile node
-	for hover_tile in hover_tiles:
-		if hover_tile.name == "HoverTile":
-			# Check if 'last_selected_player' exists and has 'current_xp' property
-			if hover_tile.selected_player or hover_tile.selected_structure or hover_tile.selected_zombie:
-				hover_tile.selected_player.current_xp += 25
-				# Update the HUD to reflect new stats
-				hud_manager.update_hud(hover_tile.selected_player)	
-				print("Added 25 XP to", hover_tile.selected_player, "new XP:", hover_tile.selected_player.current_xp)		
-		
-				# Optional: Check for level up, if applicable
-				if hover_tile.selected_player.current_xp >= hover_tile.selected_player.xp_for_next_level:
-					hover_tile.selected_player.level_up()			
-			else:
-				print("last_selected_player does not exist.")
-
-	hud_manager.update_hud(hover_tile.selected_player)
-
-func add_xp_ai(ai_unit):
-	# Add XP
-	if ai_unit:
-		ai_unit.current_xp += 25
-		# Update the HUD to reflect new stats	
-		print("Added 25 XP to", ai_unit, "new XP:", ai_unit.current_xp)		
-		
+	if get_parent():
+		hover_tile.selected_player.current_xp += 25	
 		# Optional: Check for level up, if applicable
-		if ai_unit.current_xp >= ai_unit.xp_for_next_level:
-			ai_unit.level_up()			
-	else:
-		print("AI Unit does not exist.")
+		if get_parent().current_xp >= get_parent().xp_for_next_level:
+			get_parent().level_up()			
 
 func clear_segments():
 	# Clear previous laser segments

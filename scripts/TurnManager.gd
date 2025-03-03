@@ -112,78 +112,61 @@ func start_player_ai_turn() -> void:
 		match ai.player_name:
 			"Dutch. Major":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
-				if ai.has_attacked or ai.dead:
-					continue
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
 				await ai.execute_dutch_major_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Yoshida. Boi":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.execute_yoshida_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Logan. Raines":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Chuck. Genius":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				info.bbcode_text = "Waiting..."
-				await get_tree().create_timer(5).timeout
-				ai.check_end_turn_conditions() 
+				await get_tree().create_timer(5).timeout 
+				ai.check_end_turn_conditions()
 			"Aleks. Ducat":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout 
 				ai.check_end_turn_conditions()
 			"Angel. Charlie":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"John. Doom":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.get_child(7).execute_john_doom_ai_turn()
 				info.bbcode_text = "Waiting..."
+				ai.check_end_turn_conditions()
 			"Annie. Switch":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout
 				ai.check_end_turn_conditions()
 			"Sarah. Reese":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
 				info.bbcode_text = "Waiting..."
-				await get_tree().create_timer(5).timeout		
+				await get_tree().create_timer(5).timeout	
 				ai.check_end_turn_conditions()
 					
 				
@@ -211,75 +194,57 @@ func end_current_turn_from_button():
 			"Dutch. Major":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
 				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue
 				await ai.execute_dutch_major_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Yoshida. Boi":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.execute_yoshida_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Logan. Raines":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(7).execute_logan_raines_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Chuck. Genius":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(8).execute_chuck_genius_ai_turn()
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout 
 				ai.check_end_turn_conditions()
 			"Aleks. Ducat":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.get_child(8).execute_aleks_ducat_ai_turn()
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout 
 				ai.check_end_turn_conditions()
 			"Angel. Charlie":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.get_child(7).execute_angel_charlie_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"John. Doom":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"			
 				await ai.get_child(7).execute_john_doom_ai_turn()
 				info.bbcode_text = "Waiting..."
 				ai.check_end_turn_conditions()
 			"Annie. Switch":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(7).execute_annie_switch_ai_turn()
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout
 				ai.check_end_turn_conditions()
 			"Sarah. Reese":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
-				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"
-				if ai.has_attacked or ai.dead:
-					continue				
+				info.bbcode_text = "Enemy [color=green]" + ai.player_name + "[/color] is [color=red]moving...[/color]"		
 				await ai.get_child(7).execute_sarah_reese_ai_turn()	
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout	

@@ -73,9 +73,12 @@ func reset_global_manager():
 	GlobalManager.players_killed = false	
 	GlobalManager.unit_ai_cleared = false
 	
-	# Reset has attacked
 	var players = get_tree().get_nodes_in_group("player_units")
 	for player in players:	
 		player.has_attacked = false
 		player.has_moved = false
-		player.can_start_turn = true
+
+	var ai_players = get_tree().get_nodes_in_group("unitAI")
+	for ai_player in ai_players:	
+		ai_player.has_attacked = false
+		ai_player.has_moved = false

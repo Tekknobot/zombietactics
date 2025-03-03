@@ -1160,7 +1160,7 @@ func check_end_turn_conditions() -> void:
 
 func end_turn() -> void:
 	if turn_manager:
-		turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
+		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
 	else:
 		print("Turn manager is not set! Unable to proceed to the next unit.")
 
@@ -1197,6 +1197,8 @@ func clear_unit_ai_executing_flag() -> void:
 	get_tree().set_meta("unit_ai_executing", false)
 
 func execute_ai_turn() -> void:
+	GlobalManager.reset_global_manager()
+	
 	# Ensure this unit is AI-controlled.
 	if not is_in_group("unitAI") or self.dead:
 		return	
@@ -1227,6 +1229,8 @@ func execute_ai_turn() -> void:
 
 	if enemies.is_empty():
 		print("No enemies available. Ending turn.")
+		self.has_attacked = true
+		self.has_moved = true
 		end_turn()
 		clear_unit_ai_executing_flag()
 		return
@@ -1253,9 +1257,9 @@ func execute_ai_turn() -> void:
 			if d < min_attack_distance and is_within_attack_range(enemy.tile_pos):
 				min_attack_distance = d
 				immediate_attack_target = enemy
-
+			
 	if self.has_moved:
-		return
+		pass
 	else:
 		# If an immediate attack target is found, attack and finish the turn.
 		if immediate_attack_target:
@@ -1269,7 +1273,7 @@ func execute_ai_turn() -> void:
 			self.has_attacked = true
 			self.has_moved = true
 			return  # End turn; no further movement or attack.
-
+	
 	# ---------------------------
 	# No immediate attack: Move toward the nearest enemy.
 	# ---------------------------

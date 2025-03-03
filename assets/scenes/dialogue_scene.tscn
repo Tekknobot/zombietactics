@@ -64,9 +64,9 @@ theme_override_font_sizes/normal_font_size = 32
 [node name="Skip" type="Button" parent="."]
 layout_mode = 0
 offset_left = 1056.0
-offset_top = 307.0
+offset_top = 269.0
 offset_right = 1098.0
-offset_bottom = 341.0
+offset_bottom = 303.0
 theme_override_fonts/font = ExtResource("4_f640f")
 theme_override_font_sizes/font_size = 32
 text = "SKIP"

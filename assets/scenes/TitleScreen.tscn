@@ -89,9 +89,9 @@ layout_mode = 2
 
 [node name="Credit" type="RichTextLabel" parent="."]
 offset_left = 15.0
-offset_top = 759.0
+offset_top = 615.0
 offset_right = 494.0
-offset_bottom = 799.0
+offset_bottom = 655.0
 theme_override_fonts/normal_font = ExtResource("4_wapy1")
 theme_override_font_sizes/normal_font_size = 32
 text = "Copyright 2024 Zillatronics, Developed By Pizzzamoney"
@@ -121,7 +121,7 @@ offset_bottom = 40.0
 layout_mode = 0
 offset_left = 515.0
 offset_top = 731.0
-offset_right = 1284.0
+offset_right = 1075.0
 offset_bottom = 2688.0
 theme_override_fonts/normal_font = ExtResource("9_u12o7")
 theme_override_font_sizes/normal_font_size = 32

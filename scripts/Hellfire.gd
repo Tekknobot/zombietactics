@@ -276,7 +276,7 @@ func execute_john_doom_ai_turn() -> void:
 	if get_parent().has_moved:
 		choice = 1
 		
-	if choice == 0:
+	elif choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()
 		return

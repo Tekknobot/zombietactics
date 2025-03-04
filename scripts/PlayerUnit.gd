@@ -1338,7 +1338,7 @@ func execute_ai_turn() -> void:
 			#self.has_attacked = true
 			self.has_moved = true
 			
-	if self.has_attacked == false:
+	if self.has_attacked == false and self.has_moved == true:
 		if self.player_name == "Logan. Raines":
 			self.get_child(7).execute_logan_raines_ai_turn()		
 		if self.player_name == "Yoshida. Boi":

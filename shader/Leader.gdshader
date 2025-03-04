@@ -49,15 +49,30 @@ vec3 hsv2rgb(vec3 c) {
 
 void fragment() {
     vec4 tex_color = texture(TEXTURE, UV);
-    vec3 hsv = rgb2hsv(tex_color.rgb);
+    vec4 final_color = tex_color;
     
-    // Override the hue to red (0.0 or 1.0 works for red in HSV)
-    hsv.x = 0.0;
-    // Force full saturation for a vivid red tone
-    hsv.y = 1.0;
-    // Remap the brightness so that low values become very dark (e.g., 0.2) and high values become bright red (1.0)
-    hsv.z = mix(0.2, 1.0, hsv.z);
+    // Preserve pixels that are nearly black.
+    if (!(tex_color.r < 0.1 && tex_color.g < 0.1 && tex_color.b < 0.1)) {
+        vec3 hsv = rgb2hsv(tex_color.rgb);
+        
+        // Approximate skin tone check:
+        // Here we assume skin tones fall roughly within:
+        // - Hue between 0.03 and 0.12
+        // - Saturation between 0.2 and 0.6
+        // - Brightness above 0.4
+        if (!(hsv.x > 0.03 && hsv.x < 0.12 &&
+              hsv.y > 0.2  && hsv.y < 0.6  &&
+              hsv.z > 0.4)) {
+            // For a predominant black/gray tone, desaturate fully.
+            hsv.x = 0.0; // Hue is irrelevant when saturation is zero.
+            hsv.y = 0.0; // Remove all color.
+            // Remap the brightness to a darker range.
+            // Even bright pixels will be mapped to a dark gray tone.
+            hsv.z = mix(0.1, 0.5, hsv.z);
+            
+            final_color.rgb = hsv2rgb(hsv);
+        }
+    }
     
-    vec3 terminator_color = hsv2rgb(hsv);
-    COLOR = vec4(terminator_color, tex_color.a);
+    COLOR = final_color;
 }

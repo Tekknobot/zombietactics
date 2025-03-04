@@ -7,6 +7,11 @@ extends Node2D
 @export var unit_merc: PackedScene  # Set the unit scene in the Inspector
 @export var unit_dog: PackedScene  # Set the unit scene in the Inspector
 
+@export var unit_soldier_2: PackedScene  # Set the unit scene in the Inspector
+@export var unit_merc_2: PackedScene  # Set the unit scene in the Inspector
+@export var unit_dog_2: PackedScene  # Set the unit scene in the Inspector
+
+
 @export var unit_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
 @export var unit_radioactive_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
 @export var unit_crusher_zombie: PackedScene  # Set the unit scene for the zombie in the Inspector
@@ -147,7 +152,7 @@ func spawn_player_units():
 
 func spawn_ai_units():
 	# List of AI unit scenes for easier access
-	var ai_units = [unit_soldier, unit_merc, unit_dog, M1, M2, R1, R3, S2, S3]
+	var ai_units = [unit_soldier_2, unit_merc_2, unit_dog_2, M1, M2, R1, R3, S2, S3]
 
 	# Divide the map into zones
 	var zones = initialize_zones()

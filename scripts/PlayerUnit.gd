@@ -174,6 +174,9 @@ func _process(delta: float) -> void:
 		# Prevent tile display or any other player action
 		return
 
+	if self.is_in_group("unitAI"):
+		self.modulate = Color8(255, 110, 255)
+
 	update_unit_ui()
 		
 	update_tile_position()

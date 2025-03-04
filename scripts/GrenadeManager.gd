@@ -513,6 +513,7 @@ func execute_logan_raines_ai_turn() -> void:
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await get_parent().execute_ai_turn()
+		return
 	else:
 		# If standard AI hasn't resulted in an attack…
 		if not get_parent().has_attacked:

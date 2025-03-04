@@ -1338,7 +1338,7 @@ func execute_ai_turn() -> void:
 			#self.has_attacked = true
 			self.has_moved = true
 			
-	if !self.has_attacked:
+	if self.has_attacked == false:
 		if self.player_name == "Logan. Raines":
 			self.get_child(7).execute_logan_raines_ai_turn()		
 		if self.player_name == "Yoshida. Boi":
@@ -1356,7 +1356,7 @@ func execute_ai_turn() -> void:
 		if self.player_name == "John. Doom":
 			self.get_child(7).execute_john_doom_ai_turn()	
 		if self.player_name == "Angel. Charlie":
-			self.get_child(7).execute_angel_charlie_ai_turn()																							
+			self.get_child(7).execute_angel_charlie_ai_turn()																						
 			
 	# ---------------------------
 	# Post-Move Attack Check
@@ -1412,6 +1412,7 @@ func start_ai_turn() -> void:
 		# Delay briefly before executing the AI routine.
 		await get_tree().create_timer(1).timeout
 		execute_ai_turn()
+		return
 
 func execute_dutch_major_ai_turn() -> void: 
 	# Randomly decide which branch to execute: 0 = standard AI turn, 1 = special missile attack.
@@ -1423,6 +1424,7 @@ func execute_dutch_major_ai_turn() -> void:
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await execute_ai_turn()
+		return
 	else:
 		# After standard AI execution, if no attack was performed…
 		if not self.has_attacked:
@@ -1452,6 +1454,7 @@ func execute_yoshida_ai_turn() -> void:
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Logan Raines.")
 		await execute_ai_turn()
+		return
 	else:
 		# After standard AI execution, if no attack was performed…
 		if not self.has_attacked:

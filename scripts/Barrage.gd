@@ -322,6 +322,7 @@ func execute_angel_charlie_ai_turn() -> void:
 	if choice == 0:
 		print("Random choice: Executing standard AI turn for Angel Charlie.")
 		await get_parent().execute_ai_turn()
+		return
 	else:
 		# Only perform the special attack if this unit hasn't attacked yet.
 		if not get_parent().has_attacked:

@@ -202,7 +202,8 @@ func finalize_ability() -> void:
 			get_parent().level_up()	
 		check_level_up = true
 	
-	get_parent().check_end_turn_conditions()
+	get_parent().modulate = Color(0.35, 0.35, 0.35, 1)
+	get_parent().on_player_action_completed()
 	print("Ability finalized.")
 
 		

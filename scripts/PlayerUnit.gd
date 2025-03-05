@@ -1138,6 +1138,9 @@ func check_end_turn_conditions() -> void:
 		if !is_in_group("unitAI"):
 			end_turn()
 			
+		if self.has_moved:
+			self.unitAttacked(self)				
+			
 	# Build a filtered list that excludes units in the "unitAI" group.
 	var all_players = []
 	for player in get_tree().get_nodes_in_group("player_units"):
@@ -1154,9 +1157,6 @@ func check_end_turn_conditions() -> void:
 	if dead_players >= all_players.size():
 		GlobalManager.players_killed = true
 		mission_manager.check_mission_manager()
-
-	if self.has_moved:
-		self.unitAttacked(self)	
 	
 func end_turn() -> void:
 	if turn_manager:

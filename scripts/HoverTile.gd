@@ -66,7 +66,7 @@ func is_within_bounds(tile_pos: Vector2i) -> bool:
 
 # Handles left-click input for selecting, moving, or attacking with the unit
 func handle_left_click(tile_pos: Vector2i) -> void:
-	if selected_player and selected_player not in selected_player.attacked_units:		
+	if selected_player and selected_player not in GlobalManager.attacked_units:		
 		# If in attack mode and clicked a valid attack tile
 		if tile_pos in attack_range_tiles:
 			if selected_player.is_in_group("unitAI"):

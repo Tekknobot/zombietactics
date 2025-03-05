@@ -333,7 +333,7 @@ func display_has_moved_tiles() -> void:
 
 # Display movement tiles within range
 func display_special_attack_tiles() -> void:		
-	if self.is_in_group("unitAI"):
+	if self.is_in_group("unitAI") or self in GlobalManager.attacked_units:
 		return	
 	
 	# Check if any zombie in the "zombies" group is moving
@@ -1155,7 +1155,8 @@ func check_end_turn_conditions() -> void:
 		GlobalManager.players_killed = true
 		mission_manager.check_mission_manager()
 
-	unitAttacked(self)
+	if self.has_moved:
+		self.unitAttacked(self)	
 	
 func end_turn() -> void:
 	if turn_manager:
@@ -1476,17 +1477,26 @@ func execute_yoshida_ai_turn() -> void:
 func _on_turn_completed():
 	print("Turn has completed!")
 	emit_signal("turn_completed")
-	
 
-var attacked_units: Array = []
+func get_total_non_ai_units() -> int:
+	var total = 0
+	for unit in get_tree().get_nodes_in_group("player_units"):
+		if not unit.is_in_group("unitAI"):
+			total += 1
+	return total
 
 func unitAttacked(unit: Node) -> void:
-	if unit not in attacked_units:
-		attacked_units.append(unit)
-	# Compare against total player units
-	var total_units = get_tree().get_nodes_in_group("player_units").size()
-	if attacked_units.size() >= total_units:
+	print("Unit attacked: ", unit.name)
+	if unit not in GlobalManager.attacked_units:
+		GlobalManager.attacked_units.append(unit)
+		modulate = Color(0.5, 0.5, 0.5, 1.0)
+	
+	var total_non_ai_units = get_total_non_ai_units()
+	print("Attacked units: ", GlobalManager.attacked_units.size(), " | Total non-AI units: ", total_non_ai_units)
+	
+	if GlobalManager.attacked_units.size() >= total_non_ai_units:
 		resetPlayerUnits()
+		return
 
 func resetPlayerUnits() -> void:
 	var players = get_tree().get_nodes_in_group("player_units")
@@ -1497,6 +1507,6 @@ func resetPlayerUnits() -> void:
 		player.can_start_turn = true
 		# Reset visuals if needed (for example, brighten the unit again)
 		player.modulate = Color(1, 1, 1, 1)
-	attacked_units.clear()
+	GlobalManager.attacked_units.clear()
 	# You may also want to signal that a new round has started
 	print("All units have finished. Resetting turns for a new round.")

@@ -93,7 +93,7 @@ func end_current_turn() -> void:
 	if used_turns_count >= max_turn_count and not trigger_zombies:
 		# Optionally, spawn zombies:
 		await zombie_spawn_manager.spawn_zombies()
-		on_player_action_completed()
+		on_player_action_completed()		
 		
 func start_player_ai_turn() -> void:
 	GlobalManager.zombies_processed = 0

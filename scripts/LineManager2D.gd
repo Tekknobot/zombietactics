@@ -348,11 +348,9 @@ func execute_special_attack() -> void:
 		if player.is_in_group("unitAI") and player.player_name == "Yoshida. Boi":
 			# Get a reference to Dutch. Major (the parent, assumed to be a PlayerUnit)
 			ai_player = player
-			ai_player.display_special_attack_tiles()
 			break
 	
 	await get_tree().create_timer(1).timeout 
-	ai_player.clear_special_tiles()
 	
 	# Get the set of attack range tiles defined by the PlayerUnit’s method.
 	var attack_tiles: Array[Vector2i] = ai_player.get_special_tiles()

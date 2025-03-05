@@ -893,7 +893,7 @@ func on_player_action_completed():
 # Method to apply damage
 func apply_damage(damage: int) -> void:
 	current_health -= damage  # Reduce health by damage
-	current_health = clamp(current_health, 0, max_health)  # Ensure health stays within bounds
+	#current_health = clamp(current_health, 0, max_health)  # Ensure health stays within bounds
 	
 	if current_health <= 0:
 		die()  # Handle player death if health is 0

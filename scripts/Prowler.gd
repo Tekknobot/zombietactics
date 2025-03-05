@@ -214,6 +214,7 @@ func perform_prowler_step(target):
 	attack_next_zombie()
 
 func attack_target(target):
+	attacked_zombies.clear()
 	update_facing_direction(target.position)
 	
 	# Play attack animation

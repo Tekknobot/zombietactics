@@ -426,7 +426,6 @@ func execute_special_attack() -> void:
 		if player.is_in_group("unitAI") and player.player_name == "Dutch. Major":
 			# Get a reference to Dutch. Major (the parent, assumed to be a PlayerUnit)
 			ai_player = player
-			ai_player.display_special_attack_tiles()
 			break
 	
 	if ai_player == null:

@@ -233,7 +233,7 @@ func process_zombie_queue() -> void:
 	print("Debug: zombies_processed =", GlobalManager.zombies_processed, "zombie_limit =", all_players.size())
 	print("Debug: zombie_queue size =", GlobalManager.zombie_queue.size())
 		
-	if GlobalManager.zombies_processed >= all_players.size() or GlobalManager.zombie_queue.is_empty():
+	if GlobalManager.zombies_processed >= 1 or GlobalManager.zombie_queue.is_empty():
 		print("Processed ", GlobalManager.zombies_processed, " zombies. Turn complete.")
 		
 		var all_zombies = get_tree().get_nodes_in_group("zombies")

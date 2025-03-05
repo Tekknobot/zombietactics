@@ -86,7 +86,8 @@ func end_current_turn() -> void:
 		if player.has_used_turn:
 			used_turns_count += 1
 	
-	var max_turn_count = all_non_ai_players.size()
+	#var max_turn_count = all_non_ai_players.size()
+	var max_turn_count = 1
 	
 	# If all non-AI units have used their turns and zombies haven't been triggered, fire the zombie event.
 	if used_turns_count >= max_turn_count and not trigger_zombies:
@@ -168,7 +169,7 @@ func start_player_ai_turn() -> void:
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout	
 				ai.check_end_turn_conditions()
-					
+		break			
 				
 	info.text = "Player turn"	
 	info.visible = false
@@ -189,7 +190,9 @@ func end_current_turn_from_button():
 	info.visible = true
 	
 	# Loop through each AI unit and call its AI turn based on its player_name.
-	for ai in shuffled_units:		
+	for ai in shuffled_units:
+		if ai.dead == true:
+			continue		
 		match ai.player_name:
 			"Dutch. Major":
 				info.bbcode_enabled = true  # Ensure BBCode is enabled
@@ -249,6 +252,7 @@ func end_current_turn_from_button():
 				info.bbcode_text = "Waiting..."
 				await get_tree().create_timer(5).timeout	
 				ai.check_end_turn_conditions()
+		break
 				
 	info.text = "Player turn"	
 	info.visible = false

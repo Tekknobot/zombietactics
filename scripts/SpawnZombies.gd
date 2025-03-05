@@ -79,7 +79,7 @@ func spawn_zombies():
 	var zombies_spawned = 0
 
 	for tile_pos in spawn_positions:
-		if zombies_spawned >= 4:
+		if zombies_spawned >= 1:
 			break
 
 		if is_valid_spawn_position(tile_pos):

@@ -199,6 +199,7 @@ func start_trajectory(start: Vector2, target: Vector2):
 	missiles_launched = 0
 	
 	onTrajectory = false
+	
 	print("Trajectory animation completed and cleaned up.")
 
 # Call this function after every player action

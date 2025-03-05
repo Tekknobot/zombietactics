@@ -875,8 +875,6 @@ func attack(target_tile: Vector2i, is_missile_attack: bool = false, is_landmine_
 	var hud_manager = get_parent().get_parent().get_node("HUDManager")
 	hud_manager.update_hud(self)	
 	hud_manager.hide_special_buttons()				
-	#check_end_turn_conditions()
-	#get_child(0).play("default")
 
 # Function to check if the target is within the attack range
 func is_within_attack_range(target_tile: Vector2i) -> bool:
@@ -1156,8 +1154,9 @@ func check_end_turn_conditions() -> void:
 	if dead_players >= all_players.size():
 		GlobalManager.players_killed = true
 		mission_manager.check_mission_manager()
-	
 
+	unitAttacked(self)
+	
 func end_turn() -> void:
 	if turn_manager:
 		await turn_manager.end_current_turn()  # Notify the turn manager to move to the next unit
@@ -1175,7 +1174,7 @@ func reset_player_units():
 		player.has_attacked = false
 		player.has_used_turn = false
 		player.can_start_turn = true
-		player.modulate = Color(1, 1, 1)
+		#player.modulate = Color(1, 1, 1)
 		if player.is_in_group("unitAI"):
 			player.modulate = Color8(255, 110, 255)
 
@@ -1478,3 +1477,26 @@ func _on_turn_completed():
 	print("Turn has completed!")
 	emit_signal("turn_completed")
 	
+
+var attacked_units: Array = []
+
+func unitAttacked(unit: Node) -> void:
+	if unit not in attacked_units:
+		attacked_units.append(unit)
+	# Compare against total player units
+	var total_units = get_tree().get_nodes_in_group("player_units").size()
+	if attacked_units.size() >= total_units:
+		resetPlayerUnits()
+
+func resetPlayerUnits() -> void:
+	var players = get_tree().get_nodes_in_group("player_units")
+	for player in players:
+		player.has_attacked = false
+		player.has_moved = false
+		player.has_used_turn = false
+		player.can_start_turn = true
+		# Reset visuals if needed (for example, brighten the unit again)
+		player.modulate = Color(1, 1, 1, 1)
+	attacked_units.clear()
+	# You may also want to signal that a new round has started
+	print("All units have finished. Resetting turns for a new round.")

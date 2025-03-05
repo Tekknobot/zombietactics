@@ -46,7 +46,7 @@ func check_player_status():
 				print("Error: XPBar not found for player:", player_name)
 			
 			# Update modulate based on the player's state.
-			if player.has_moved and player.has_attacked:
+			if player.has_moved and player.has_attacked and player in player.attacked_units:
 				self.modulate = Color(0.35, 0.35, 0.35, 1)  # Dimmed for completed actions.
 			else:
 				self.modulate = Color(1, 1, 1, 1)  # Normal for active players.

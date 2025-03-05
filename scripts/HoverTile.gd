@@ -66,11 +66,11 @@ func is_within_bounds(tile_pos: Vector2i) -> bool:
 
 # Handles left-click input for selecting, moving, or attacking with the unit
 func handle_left_click(tile_pos: Vector2i) -> void:
-	if selected_player:		
+	if selected_player and selected_player not in selected_player.attacked_units:		
 		# If in attack mode and clicked a valid attack tile
 		if tile_pos in attack_range_tiles:
 			if selected_player.is_in_group("unitAI"):
-				return
+				return	
 			attack_selected_player(tile_pos)
 		# If in movement mode and clicked a valid movement tile
 		elif tile_pos in movement_range_tiles:
@@ -79,10 +79,10 @@ func handle_left_click(tile_pos: Vector2i) -> void:
 			if tile_pos == selected_player.tile_pos or is_tile_occupied_by_unit(tile_pos) or selected_player.is_in_group("unitAI"):
 				return
 			move_selected_player(tile_pos)
-		else:
+		else:			
 			# If clicked on a non-action tile, try selecting a different unit
 			select_unit_at_tile(tile_pos)		
-	else:
+	else:	
 		# If no player is selected, try selecting one on the clicked tile
 		select_unit_at_tile(tile_pos)		
 
@@ -96,7 +96,7 @@ func is_tile_occupied_by_unit(tile_pos: Vector2i) -> bool:
 	return false
 
 # Handles right-click to toggle between attack and movement range display
-func handle_right_click() -> void:
+func handle_right_click() -> void:	
 	if selected_player and !selected_player.is_in_group("unitAI"):
 		toggle_attack_mode()
 		last_selected_player = selected_player
@@ -410,4 +410,4 @@ func reset_player_units():
 		player.has_attacked = false
 		player.has_used_turn = false
 		player.can_start_turn = true
-		player.modulate = Color(1, 1, 1)
+		#player.modulate = Color(1, 1, 1)

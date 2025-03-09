@@ -516,7 +516,7 @@ func move_along_path(delta: float) -> void:
 		position += direction * move_speed * delta
 		
 		# If the soldier has reached the target tile (within a small threshold)
-		if position.distance_to(target_world_pos) <= 1:  # Threshold to determine if we reached the target
+		if position.distance_to(target_world_pos) <= 2:  # Threshold to determine if we reached the target
 			path_index += 1  # Move to the next tile in the path
 			
 			# After moving, update the AStar grid for any changes (e.g., new walkable tiles, etc.)

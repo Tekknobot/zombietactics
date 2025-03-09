@@ -187,7 +187,7 @@ func _process(delta: float) -> void:
 				self.scale.x = 1  # Facing left
 
 			# Check if the zombie has reached the target position
-			if self.position.distance_to(target_world_pos) <= 1:
+			if self.position.distance_to(target_world_pos) <= 2:
 				self.path_index += 1  # Move to the next point in the path
 
 				# Check if the zombie has moved the maximum range or completed the path
